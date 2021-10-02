@@ -10,30 +10,28 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:textSize="8sp"
-        android:padding="8dp"
-        android:text="."/>
+        android:padding="8dp"/>
     <Button
         android:id="@+id/key_button"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="2dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginLeft="2dp"
-        android:duplicateParentState="true"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="2dp"
         android:longClickable="true"
         android:background="@drawable/key_background"/>
     <ImageView
-        android:id="@+id/spacial_key"
+        android:id="@+id/special_key"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="2dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginLeft="2dp"
-        android:duplicateParentState="true"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="2dp"
         android:longClickable="true"
         android:scaleType="centerInside"
+        android:background="@drawable/key_background"
         android:visibility="gone"/>
 
 
