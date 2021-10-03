@@ -284,11 +284,49 @@ class KeyboardEnglish constructor(
                     specialKey.visibility = View.VISIBLE
                     actionButton.visibility = View.GONE
                     specialKey.setOnClickListener(onClickListener)
+                    specialKey.setOnTouchListener(getOnTouchListener(onClickListener))
                     specialKey.setBackgroundResource(R.drawable.key_background)
                 }
                 child.setOnClickListener(onClickListener)
             }
         }
+    }
+
+    fun getOnTouchListener(clickListener: View.OnClickListener):View.OnTouchListener{
+        val handler = Handler()
+        val initailInterval = 500
+        val normalInterval = 100
+        lateinit var clickedView: View
+        val handlerRunnable = object: Runnable{
+            override fun run() {
+                handler.postDelayed(this, normalInterval.toLong())
+                clickListener.onClick(clickedView)
+            }
+        }
+        val onTouchListener = object:View.OnTouchListener {
+            override fun onTouch(view: View, motionEvent: MotionEvent?): Boolean {
+                clickedView = view
+                when (motionEvent?.getAction()) {
+                    MotionEvent.ACTION_DOWN -> {
+                        handler.removeCallbacks(handlerRunnable)
+                        handler.postDelayed(handlerRunnable, initailInterval.toLong())
+                        clickListener.onClick(view)
+                        return true
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        handler.removeCallbacks(handlerRunnable)
+                        return true
+                    }
+                    MotionEvent.ACTION_CANCEL -> {
+                        handler.removeCallbacks(handlerRunnable)
+                        return true
+                    }
+                }
+                return false
+            }
+        }
+
+        return onTouchListener
     }
 
     fun getSpaceAction(): View.OnClickListener {
