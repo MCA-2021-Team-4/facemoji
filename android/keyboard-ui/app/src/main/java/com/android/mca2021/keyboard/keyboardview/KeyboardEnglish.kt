@@ -11,6 +11,7 @@ import android.content.Context.AUDIO_SERVICE
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.*
+import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.widget.ImageView
@@ -187,7 +188,7 @@ class KeyboardEnglish constructor(
             val cursorcs: CharSequence? =
                 inputConnection?.getSelectedText(InputConnection.GET_TEXT_WITH_STYLES)
             if (cursorcs != null && cursorcs.length >= 2) {
-
+                Log.d("JIHO","test log : $cursorcs")
                 val eventTime = SystemClock.uptimeMillis()
                 inputConnection?.finishComposingText()
                 inputConnection?.sendKeyEvent(
@@ -204,23 +205,15 @@ class KeyboardEnglish constructor(
                         KeyEvent.FLAG_SOFT_KEYBOARD
                     )
                 )
-                inputConnection?.sendKeyEvent(
-                    KeyEvent(
-                        eventTime, eventTime,
-                        KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_LEFT, 0, 0, 0, 0,
-                        KeyEvent.FLAG_SOFT_KEYBOARD
-                    )
+                playClick(
+                    actionButton.text.toString().toCharArray().get(
+                        0
+                    ).toInt()
                 )
-                inputConnection?.sendKeyEvent(
-                    KeyEvent(
-                        SystemClock.uptimeMillis(), eventTime,
-                        KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_LEFT, 0, 0, 0, 0,
-                        KeyEvent.FLAG_SOFT_KEYBOARD
-                    )
-                )
-
+                inputConnection?.commitText(actionButton.text, 1)
             } else {
                 when (actionButton.text.toString()) {
+
                     "한/영" -> {
                         keyboardInteractionListener.modeChange(1)
                     }
