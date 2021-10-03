@@ -22,6 +22,10 @@ class KeyBoardService : InputMethodService(){
                     keyboardEnglish.inputConnection = currentInputConnection
                     keyboardFrame.addView(keyboardEnglish.getLayout())
                 }
+                1 -> {
+                    keyboardFrame.removeAllViews()
+
+                }
             }
         }
     }
