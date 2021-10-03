@@ -1,31 +1,33 @@
 package com.android.mca2021.keyboard.keyboardview
 
 import android.content.Context
-import android.view.LayoutInflater
-import android.view.View
-import android.view.inputmethod.InputConnection
-import android.widget.Button
-import android.widget.LinearLayout
-import android.media.AudioManager
 import android.content.Context.AUDIO_SERVICE
 import android.content.SharedPreferences
 import android.content.res.Configuration
+import android.media.AudioManager
 import android.os.*
 import android.util.Log
+import android.util.TypedValue
 import android.view.KeyEvent
+import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View
+import android.view.inputmethod.InputConnection
+import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.children
 import com.android.mca2021.keyboard.*
 import java.util.*
 
+
 class KeyboardEnglish constructor(
     var context: Context,
     var layoutInflater: LayoutInflater,
-    var keyboardInteractionListener: KeyboardInterationListener
+    var keyboardInteractionListener: KeyboardInteractionListener
 ) {
-    private lateinit var englishLayout: LinearLayout
+    private lateinit var englishLayout: View
     var inputConnection: InputConnection? = null
     private lateinit var vibrator: Vibrator
     private lateinit var sharedPreferences: SharedPreferences
@@ -37,7 +39,7 @@ class KeyboardEnglish constructor(
     private val firstLineText = listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p")
     private val secondLineText = listOf("a", "s", "d", "f", "g", "h", "j", "k", "l")
     private val thirdLineText = listOf("CAPS", "z", "x", "c", "v", "b", "n", "m", "DEL")
-    private val fourthLineText = listOf("!#1", "한/영", ",", "SPACE", ".", "ENTER")
+    private val fourthLineText = listOf("!#1", "한/영", ",", "CAM", "SPACE", ".", "ENTER")
 
     private val firstLongClickText = listOf("!", "@", "#", "$", "%", "^", "&", "*", "(", ")")
     private val secondLongClickText = listOf("~", "+", "-", "×", "♥", ":", ";", "'", "\"")
@@ -64,11 +66,11 @@ class KeyboardEnglish constructor(
     var vibrate = 0
     var capsView: ImageView? = null
 
-    fun init() {
-        englishLayout = layoutInflater.inflate(R.layout.keyboard_action, null) as LinearLayout
+    fun initKeyboard() {
+        englishLayout = layoutInflater.inflate(R.layout.keyboard_english, null)
         vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
-        val numPadLine: LinearLayout = englishLayout.findViewById(R.id.numpad_line)
+        val numPadLine: LinearLayout = englishLayout.findViewById(R.id.num_pad_line)
         val firstLine: LinearLayout = englishLayout.findViewById(R.id.first_line)
         val secondLine: LinearLayout = englishLayout.findViewById(R.id.second_line)
         val thirdLine: LinearLayout = englishLayout.findViewById(R.id.third_line)
@@ -79,16 +81,25 @@ class KeyboardEnglish constructor(
         sound = sharedPreferences.getInt("keyboardSound", -1)
         vibrate = sharedPreferences.getInt("keyboardVibrate", -1)
 
-        val preferredHeight = sharedPreferences.getInt("keyboardHeight", 150)
-        val height =
-            if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) (preferredHeight * 0.7).toInt()
+        val preferredHeight = sharedPreferences.getFloat("keyboardHeight", 250f) / 5.0f
+        val heightInDp =
+            if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) preferredHeight * 0.7f
             else preferredHeight
+        val height = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            heightInDp,
+            context.resources.displayMetrics
+        ).toInt()
 
+        numPadLine.layoutParams =
+            LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
         firstLine.layoutParams =
             LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
         secondLine.layoutParams =
             LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
         thirdLine.layoutParams =
+            LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
+        fourthLine.layoutParams =
             LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
 
         layoutLines = listOf(
@@ -102,12 +113,11 @@ class KeyboardEnglish constructor(
         setLayoutComponents()
     }
 
-    fun getLayout(): LinearLayout {
+    fun getLayout(): View {
         return englishLayout
     }
 
-
-    fun modeChange() {
+    private fun changeCaps() {
         isCaps = !isCaps
         buttons.forEach {
             it.text =
@@ -164,10 +174,10 @@ class KeyboardEnglish constructor(
                 }
                 when (textView.text.toString()) {
                     "한/영" -> {
-                        keyboardInteractionListener.modeChange(1)
+                        keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.KOREAN)
                     }
                     "!#1" -> {
-                        keyboardInteractionListener.modeChange(2)
+                        keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.SYMBOLS)
                     }
                     else -> {
                         playClick(textView.text.toString().toCharArray().get(0).toInt())
@@ -188,7 +198,7 @@ class KeyboardEnglish constructor(
             val cursorcs: CharSequence? =
                 inputConnection?.getSelectedText(InputConnection.GET_TEXT_WITH_STYLES)
             if (cursorcs != null && cursorcs.length >= 2) {
-                Log.d("JIHO","test log : $cursorcs")
+                Log.d("JIHO", "test log : $cursorcs")
                 val eventTime = SystemClock.uptimeMillis()
                 inputConnection?.finishComposingText()
                 inputConnection?.sendKeyEvent(
@@ -213,12 +223,14 @@ class KeyboardEnglish constructor(
                 inputConnection?.commitText(actionButton.text, 1)
             } else {
                 when (actionButton.text.toString()) {
-
                     "한/영" -> {
-                        keyboardInteractionListener.modeChange(1)
+                        keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.KOREAN)
                     }
                     "!#1" -> {
-                        keyboardInteractionListener.modeChange(2)
+                        keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.SYMBOLS)
+                    }
+                    "CAM" -> {
+                        keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.CAMERA)
                     }
                     else -> {
                         playClick(
@@ -351,7 +363,7 @@ class KeyboardEnglish constructor(
     fun getCapsAction(): View.OnClickListener {
         return View.OnClickListener {
             playVibrate()
-            modeChange()
+            changeCaps()
         }
     }
 
@@ -375,6 +387,4 @@ class KeyboardEnglish constructor(
             )
         }
     }
-
-
 }
