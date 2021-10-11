@@ -67,7 +67,7 @@ class KeyboardEnglish constructor(
     var capsView: ImageView? = null
 
     fun initKeyboard() {
-        englishLayout = layoutInflater.inflate(R.layout.keyboard_english, null)
+        englishLayout = layoutInflater.inflate(R.layout.keyboard_basic, null)
         vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         val numPadLine: LinearLayout = englishLayout.findViewById(R.id.num_pad_line)

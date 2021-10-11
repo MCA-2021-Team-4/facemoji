@@ -11,6 +11,7 @@ class FacemojiService : InputMethodService() {
     lateinit var keyboardView: LinearLayout
     lateinit var keyboardFrame: FrameLayout
     lateinit var keyboardEnglish: KeyboardEnglish
+    lateinit var keyboardKorean: KeyboardKorean
     lateinit var keyboardCamera: KeyboardCamera
 
     val keyboardInteractionListener = object : KeyboardInteractionListener {
@@ -24,8 +25,9 @@ class FacemojiService : InputMethodService() {
                     keyboardFrame.addView(keyboardEnglish.getLayout())
                 }
                 KeyboardInteractionListener.KeyboardType.KOREAN -> {
-//                    keyboardFrame.removeAllViews()
-//                    keyboardCamera.
+                    keyboardFrame.removeAllViews()
+                    keyboardKorean.inputConnection = currentInputConnection
+                    keyboardFrame.addView(keyboardKorean.getLayout())
                 }
                 KeyboardInteractionListener.KeyboardType.SYMBOLS -> {
 
@@ -48,8 +50,11 @@ class FacemojiService : InputMethodService() {
 
     override fun onCreateInputView(): View {
         keyboardEnglish = KeyboardEnglish(applicationContext, layoutInflater, keyboardInteractionListener)
+        keyboardKorean = KeyboardKorean(applicationContext, layoutInflater, keyboardInteractionListener)
         keyboardCamera = KeyboardCamera(this, applicationContext, layoutInflater, keyboardInteractionListener)
         keyboardEnglish.inputConnection = currentInputConnection
+        keyboardKorean.inputConnection = currentInputConnection
+        keyboardKorean.initKeyboard()
         keyboardEnglish.initKeyboard()
         return keyboardView
     }
