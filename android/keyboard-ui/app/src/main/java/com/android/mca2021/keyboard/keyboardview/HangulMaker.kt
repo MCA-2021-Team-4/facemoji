@@ -16,9 +16,9 @@ open class HangulMaker {
 
     /**
      * 0:""
-     * 1: 모음 입력상태
-     * 2: 모음 + 자음 입력상태
-     * 3: 모음 + 자음 + 모음입력상태(초 중 종성)
+     * 1: 자음 입력상태
+     * 2: 자음 + 모음 입력상태
+     * 3: 자음 + 모음 + 자음입력상태(초 중 종성)
      * 초성과 종성에 들어갈 수 있는 문자가 다르기 때문에 필요에 맞게 수정이 필요함.(chos != jons)
      */
     protected var state = 0
@@ -319,18 +319,5 @@ open class HangulMaker {
                 return false
             }
         }
-    }
-    fun junAvailable():Boolean{
-        if(jun == 'ㅙ' || jun == 'ㅞ' || jun == 'ㅢ'|| jun == 'ㅐ' || jun == 'ㅔ' || jun == 'ㅛ' || jun == 'ㅒ' || jun == 'ㅖ'){
-            return false
-        }
-        return true
-    }
-
-    fun isDoubleJun():Boolean{
-        if(jun == 'ㅙ' || jun == 'ㅞ' || jun == 'ㅚ'|| jun == 'ㅝ' || jun == 'ㅟ' || jun == 'ㅘ' || jun == 'ㅢ'){
-            return true
-        }
-        return false
     }
 }
