@@ -116,8 +116,8 @@ class KeyboardCamera (
                 .build()
 
             imageAnalysis.setAnalyzer(cameraExecutor, ImageAnalysis.Analyzer { image ->
-                val rotationDegrees = image.imageInfo.rotationDegrees
-                Log.d("JIHO", "CAMERA ANALYSIS : $rotationDegrees")
+                val imgInfo = image.imageInfo
+                image.close()
                 // insert your code here.
             })
 

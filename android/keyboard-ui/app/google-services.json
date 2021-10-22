@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "849097850015",
+    "project_id": "faceemoji-609e3",
+    "storage_bucket": "faceemoji-609e3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:849097850015:android:0fd8274b89df804051b6aa",
+        "android_client_info": {
+          "package_name": "com.android.mca2021.keyboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "849097850015-jsat4std2bkvch0rp1o1lkqeithnvi5j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBypEMNuKRIiMtjoqwqoHNhHVMJCrPdSSk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "849097850015-jsat4std2bkvch0rp1o1lkqeithnvi5j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
