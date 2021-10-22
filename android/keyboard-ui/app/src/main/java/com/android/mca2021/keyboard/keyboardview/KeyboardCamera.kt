@@ -11,9 +11,11 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.*
 import android.util.Log
+import android.util.Size
 import android.util.TypedValue
 import android.view.View
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -108,6 +110,17 @@ class KeyboardCamera (
                     it.setSurfaceProvider(viewFinder.surfaceProvider)
                 }
 
+            val imageAnalysis = ImageAnalysis.Builder()
+                .setTargetResolution(Size(1280, 720))
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build()
+
+            imageAnalysis.setAnalyzer(cameraExecutor, ImageAnalysis.Analyzer { image ->
+                val rotationDegrees = image.imageInfo.rotationDegrees
+                Log.d("JIHO", "CAMERA ANALYSIS : $rotationDegrees")
+                // insert your code here.
+            })
+
             // Select front camera as a default
             val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
 
@@ -117,7 +130,7 @@ class KeyboardCamera (
 
                 // Bind use cases to camera
                 cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview)
+                    this, cameraSelector, imageAnalysis, preview)
 
             } catch(exc: Exception) {
                 Log.e("facemoji", "Use case binding failed", exc)

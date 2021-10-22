@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.inputmethodservice.Keyboard
 import android.media.AudioManager
 import android.os.*
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -255,7 +256,7 @@ class KeyboardKorean constructor(
                 else -> {
                     playClick(actionButton.text.toString().toCharArray().get(0).toInt())
                     try {
-                        val myText = Integer.parseInt(actionButton.text.toString())
+                        Integer.parseInt(actionButton.text.toString())
                         hangulMaker.directlyCommit()
                         inputConnection?.commitText(actionButton.text.toString(), 1)
                     } catch (e: NumberFormatException) {
