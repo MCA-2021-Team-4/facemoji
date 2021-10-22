@@ -1,5 +1,6 @@
 package com.android.mca2021.keyboard.keyboardview
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.inputmethod.InputConnection
@@ -26,6 +27,10 @@ import androidx.lifecycle.LifecycleRegistry
 import com.android.mca2021.keyboard.*
 import com.android.mca2021.keyboard.MainActivity.Companion.REQUEST_PERMISSION
 import com.android.mca2021.keyboard.MainActivity.Companion.REQUIRED_PERMISSIONS
+import com.google.firebase.ml.vision.FirebaseVision
+import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -84,6 +89,15 @@ class KeyboardCamera (
         }
     }
 
+    private fun degreesToFirebaseRotation(degrees: Int): Int = when(degrees) {
+        0 -> FirebaseVisionImageMetadata.ROTATION_0
+        90 -> FirebaseVisionImageMetadata.ROTATION_90
+        180 -> FirebaseVisionImageMetadata.ROTATION_180
+        270 -> FirebaseVisionImageMetadata.ROTATION_270
+        else -> throw Exception("Rotation must be 0, 90, 180, or 270.")
+    }
+
+    @SuppressLint("UnsafeOptInUsageError")
     private fun startCamera(config: Configuration) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(service)
         val viewFinder = cameraLayout.findViewById<PreviewView>(R.id.view_finder)
@@ -98,6 +112,14 @@ class KeyboardCamera (
             context.resources.displayMetrics
         ).toInt()
         viewFinder.layoutParams.height = height
+
+        //Face Detect option
+        val realTimeOpts = FirebaseVisionFaceDetectorOptions.Builder()
+            .setContourMode(FirebaseVisionFaceDetectorOptions.ALL_CONTOURS)
+            .build()
+
+        val detector = FirebaseVision.getInstance()
+            .getVisionFaceDetector(realTimeOpts)
 
         cameraProviderFuture.addListener({
             // Used to bind the lifecycle of cameras to the lifecycle owner
@@ -115,9 +137,21 @@ class KeyboardCamera (
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
 
-            imageAnalysis.setAnalyzer(cameraExecutor, ImageAnalysis.Analyzer { image ->
-                val imgInfo = image.imageInfo
-                image.close()
+            imageAnalysis.setAnalyzer(cameraExecutor, ImageAnalysis.Analyzer { imageProxy ->
+                val mediaImage  = imageProxy.image
+                val degrees = imageProxy.imageInfo.rotationDegrees
+                val imageRotation = degreesToFirebaseRotation(degrees)
+                if (mediaImage  != null) {
+                    val image = FirebaseVisionImage.fromMediaImage(mediaImage, imageRotation)
+                    val result = detector.detectInImage(image)
+                        .addOnSuccessListener { faces ->
+                            Log.d("JIHO", "$faces")
+                        }
+                        .addOnFailureListener { e ->
+
+                        }
+                }
+                imageProxy.close()
                 // insert your code here.
             })
 
