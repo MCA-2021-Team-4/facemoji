@@ -2,6 +2,7 @@ package com.mca20214.facemoji
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.PointF
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +12,11 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.FaceContour
+import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetectorOptions
+import com.google.mlkit.vision.face.FaceLandmark
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.nio.ByteBuffer
@@ -40,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         camera_capture_button.setOnClickListener{ takePhoto() }
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
+
 
     }
 
@@ -90,12 +97,19 @@ class MainActivity : AppCompatActivity() {
             imageCapture = ImageCapture.Builder()
                 .build()
 
+            /*
             val imageAnalyzer = ImageAnalysis.Builder()
                 .build()
                 .also {
                     it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
                         Log.d(TAG, "Average luminosity: $luma")
                     })
+                }
+             */
+            val imageAnalyzer = ImageAnalysis.Builder()
+                .build()
+                .also {
+                    it.setAnalyzer(cameraExecutor, FaceAnalyzer)
                 }
 
             // Select front camera as a default
@@ -149,6 +163,80 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    object FaceAnalyzer : ImageAnalysis.Analyzer {
+        override fun analyze(imageProxy: ImageProxy) {
+            Log.d(TAG, "in faceanalyzer");
+            val mediaImage = imageProxy.image
+            if(mediaImage != null){
+                val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+
+                // Real-time contour detection
+                val realTimeOpts = FaceDetectorOptions.Builder()
+                    .setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
+                    .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
+                    .build()
+                val detector = FaceDetection.getClient(realTimeOpts)
+                val result = detector.process(image)
+                    .addOnSuccessListener { faces ->
+                        for (face in faces) {
+                            val bounds = face.boundingBox
+
+                            /*
+                            public static final int FACE = 1;
+                            public static final int LEFT_EYEBROW_TOP = 2;
+                            public static final int LEFT_EYEBROW_BOTTOM = 3;
+                            public static final int RIGHT_EYEBROW_TOP = 4;
+                            public static final int RIGHT_EYEBROW_BOTTOM = 5;
+                            public static final int LEFT_EYE = 6;
+                            public static final int RIGHT_EYE = 7;
+                            public static final int UPPER_LIP_TOP = 8;
+                            public static final int UPPER_LIP_BOTTOM = 9;
+                            public static final int LOWER_LIP_TOP = 10;
+                            public static final int LOWER_LIP_BOTTOM = 11;
+                            public static final int NOSE_BRIDGE = 12;
+                            public static final int NOSE_BOTTOM = 13;
+                            public static final int LEFT_CHEEK = 14;
+                            public static final int RIGHT_CHEEK = 15;
+                             */
+
+
+                            val ctr = face.allContours
+
+                            // not all contours are guaranteed (ex. when only half face)
+                            Log.d(TAG,"nose point0: " + ctr[12]?.points?.get(0)) // List<PointF>
+                            Log.d(TAG,"nose point1: " + ctr[12]?.points?.get(1)) // List<PointF>
+                            Log.d(TAG,"nose point2: " + ctr[12]?.points?.get(2)) // List<PointF>
+
+                            // x : right is smaller
+                            // y : top is smaller
+
+
+                            if(face.smilingProbability != null) {
+                                val smileProb = face.smilingProbability
+                                Log.d(TAG, "smileProb: " + smileProb)
+                            }
+                            if(face.leftEyeOpenProbability != null) {
+                                val leftEyeOpenProb = face.leftEyeOpenProbability
+                                Log.d(TAG, "leftEyeProb: " + leftEyeOpenProb) // currently right eye
+                            }
+                            if(face.rightEyeOpenProbability != null) {
+                                val rightEyeOpenProb = face.rightEyeOpenProbability
+                                Log.d(TAG, "rightEyeProb: " + rightEyeOpenProb) // currently left eye
+                            }
+
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.d(TAG, "failed ...." + e)
+                    }
+                    .addOnCompleteListener {
+                        mediaImage.close()
+                        imageProxy.close()
+                    }
+            }
+        }
+    }
+
     private class LuminosityAnalyzer(private val listener: LumaListener) : ImageAnalysis.Analyzer {
 
         private fun ByteBuffer.toByteArray(): ByteArray {
@@ -173,7 +261,7 @@ class MainActivity : AppCompatActivity() {
 
 
     companion object {
-        private const val TAG = "CameraXBasic"
+        private const val TAG = "faceface"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
