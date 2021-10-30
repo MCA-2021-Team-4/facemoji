@@ -67,6 +67,7 @@ class KeyboardCamera (
         sharedPreferences = context.getSharedPreferences("setting", Context.MODE_PRIVATE)
         sound = sharedPreferences.getInt("keyboardSound", -1)
         vibrate = sharedPreferences.getInt("keyboardVibrate", -1)
+        cameraExecutor = Executors.newSingleThreadExecutor()
 
         if (allPermissionsGranted()) {
             startCamera(config)
@@ -79,8 +80,6 @@ class KeyboardCamera (
         }
 
         lifecycleRegistry.currentState = Lifecycle.State.STARTED
-
-        cameraExecutor = Executors.newSingleThreadExecutor()
 
         val changeModeButton = cameraLayout.findViewById<Button>(R.id.change_camera_input_mode)
         changeModeButton.setOnClickListener {

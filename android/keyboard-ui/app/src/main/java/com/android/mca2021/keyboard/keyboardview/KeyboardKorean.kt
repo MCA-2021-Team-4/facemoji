@@ -248,7 +248,7 @@ class KeyboardKorean constructor(
                     keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.ENGLISH)
                 }
                 "!#1" -> {
-                    keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.SYMBOLS)
+                    keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.SYMBOL)
                 }
                 "CAM" -> {
                     keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.CAMERA)

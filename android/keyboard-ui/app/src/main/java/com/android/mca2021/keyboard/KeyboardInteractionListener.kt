@@ -4,7 +4,8 @@ interface KeyboardInteractionListener {
     enum class KeyboardType {
         ENGLISH,
         KOREAN,
-        SYMBOLS,
+        SYMBOL,
+        EMOJI,
         CAMERA,
     }
     fun changeMode(mode: KeyboardType)

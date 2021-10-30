@@ -177,7 +177,7 @@ class KeyboardEnglish constructor(
                         keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.KOREAN)
                     }
                     "!#1" -> {
-                        keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.SYMBOLS)
+                        keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.SYMBOL)
                     }
                     else -> {
                         playClick(textView.text.toString().toCharArray().get(0).toInt())
@@ -227,7 +227,7 @@ class KeyboardEnglish constructor(
                         keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.KOREAN)
                     }
                     "!#1" -> {
-                        keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.SYMBOLS)
+                        keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.SYMBOL)
                     }
                     "CAM" -> {
                         keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.CAMERA)
