@@ -19,12 +19,6 @@ class FaceBoundsOverlay constructor(context: Context?, attributeSet: AttributeSe
   private var proxyWidth: Int = 0
   private var proxyHeight: Int = 0
 
-  private val paint = Paint().apply {
-    style = Paint.Style.STROKE
-    color = ContextCompat.getColor(context!!, android.R.color.black)
-    strokeWidth = 10f
-  }
-
   override fun onDraw(canvas: Canvas) {
     super.onDraw(canvas)
     // face
@@ -58,7 +52,7 @@ class FaceBoundsOverlay constructor(context: Context?, attributeSet: AttributeSe
     invalidate()
   }
 
-  fun drawFace(canvas: Canvas, face: Face?, facePosition: Int, @ColorInt selectedColor: Int) {
+  private fun drawFace(canvas: Canvas, face: Face?, facePosition: Int, @ColorInt selectedColor: Int) {
     val contour = face?.getContour(facePosition)
     val path = Path()
 
