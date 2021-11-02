@@ -5,5 +5,5 @@
 - [x] Pre-process frames before feeding them to neural network
 - [x] Run face detection model with real time video input
 - [x] Analyze face detection output results
-- [ ] Display detection results in human readable form
+- [x] Display detection results in human readable form
 - [ ] Integrate with keyboard interface
