@@ -7,6 +7,7 @@ import android.inputmethodservice.Keyboard
 import android.media.AudioManager
 import android.os.*
 import android.util.Log
+import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -61,8 +62,17 @@ class KeyboardKorean constructor(
 
         sharedPreferences = context.getSharedPreferences("setting", Context.MODE_PRIVATE)
 
-        val height = sharedPreferences.getInt("keyboardHeight", 150)
         val config = context.getResources().configuration
+
+        val preferredHeight = sharedPreferences.getFloat("keyboardHeight", 250f) / 5.0f
+        val heightInDp =
+            if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) preferredHeight * 0.7f
+            else preferredHeight
+        val height = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            heightInDp,
+            context.resources.displayMetrics
+        ).toInt()
         sound = sharedPreferences.getInt("keyboardSound", -1)
         vibrate = sharedPreferences.getInt("keyboardVibrate", -1)
 

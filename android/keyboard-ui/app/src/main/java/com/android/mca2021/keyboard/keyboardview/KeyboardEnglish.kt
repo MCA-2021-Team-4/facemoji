@@ -119,7 +119,7 @@ class KeyboardEnglish constructor(
 
     private fun changeCaps() {
         isCaps = !isCaps
-        buttons.forEach {
+        buttons.filter{ it.text != "CAM" }.forEach {
             it.text =
                 if (isCaps) it.text.toString().toLowerCase(Locale.US)
                 else it.text.toString().toUpperCase(Locale.US)

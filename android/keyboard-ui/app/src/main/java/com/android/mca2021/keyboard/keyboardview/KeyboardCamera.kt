@@ -15,6 +15,8 @@ import android.util.Log
 import android.util.Size
 import android.util.TypedValue
 import android.view.View
+import android.widget.TextView
+import androidx.appcompat.view.menu.MenuView
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -46,6 +48,15 @@ class KeyboardCamera (
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var cameraExecutor: ExecutorService
 
+    private var emojiList: List<String>
+
+    private var emojiItemIds = listOf(
+        R.id.recommendation_1,
+        R.id.recommendation_2,
+        R.id.recommendation_3,
+        R.id.recommendation_4
+    )
+
     private val lifecycleRegistry = LifecycleRegistry(this)
 
     var sound = 0
@@ -53,10 +64,28 @@ class KeyboardCamera (
 
     init {
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
+        emojiList = listOf(0x1F600, 0x1F601, 0x1F600, 0x1F600).map{ getEmojiByUnicode(it) }
+    }
+
+    private fun getEmojiByUnicode(unicode: Int): String {
+        return String(Character.toChars(unicode))
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun setEmojiLayout() {
+        emojiList.forEachIndexed { idx, emoji ->
+            val textView = cameraLayout
+                .findViewById<View>(emojiItemIds[idx])
+                .findViewById<TextView>(R.id.emoji_text)
+
+            textView.text = emoji
+            textView.setOnClickListener {
+                inputConnection?.commitText((it as TextView).text.toString(), 1)
+            }
+        }
     }
 
     fun initKeyboard() {
@@ -86,6 +115,8 @@ class KeyboardCamera (
             cameraExecutor.shutdown()
             keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.ENGLISH)
         }
+
+        setEmojiLayout()
     }
 
     private fun degreesToFirebaseRotation(degrees: Int): Int = when(degrees) {

@@ -15,7 +15,6 @@ import android.view.inputmethod.InputConnection
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.core.view.children
 import com.android.mca2021.keyboard.KeyboardInteractionListener
 import com.android.mca2021.keyboard.*
@@ -53,7 +52,7 @@ class KeyboardSimbol constructor(
     var sound = 0
 
     fun initKeyboard(){
-        simbolLayout = layoutInflater.inflate(R.layout.keyboard_simbol, null) as LinearLayout
+        simbolLayout = layoutInflater.inflate(R.layout.keyboard_symbol, null) as LinearLayout
         vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         val numPadLine: LinearLayout = simbolLayout.findViewById(R.id.num_pad_line)
