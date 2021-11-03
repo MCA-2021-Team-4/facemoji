@@ -307,7 +307,7 @@ class KeyboardEnglish constructor(
     fun getOnTouchListener(clickListener: View.OnClickListener):View.OnTouchListener{
         val handler = Handler()
         val initailInterval = 500
-        val normalInterval = 100
+        val normalInterval = 10
         lateinit var clickedView: View
         val handlerRunnable = object: Runnable{
             override fun run() {

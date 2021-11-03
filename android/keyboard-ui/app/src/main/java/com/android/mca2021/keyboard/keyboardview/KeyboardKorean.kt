@@ -45,12 +45,7 @@ class KeyboardKorean constructor(
     val thirdLineText = listOf("CAPS", "ㅋ", "ㅌ", "ㅊ", "ㅍ", "ㅠ", "ㅜ", "ㅡ", "DEL")
     val fourthLineText = listOf("!#1", "한/영", ",", "CAM", "SPACE", ".", "ENTER")
 
-    val firstLongClickText = listOf("!", "@", "#", "$", "%", "^", "&", "*", "(", ")")
-    val secondLongClickText = listOf("~", "+", "-", "×", "♥", ":", ";", "'", "\"")
-    val thirdLongClickText = listOf("", "_", "<", ">", "/", ",", "?")
-
     val myKeysText = ArrayList<List<String>>()
-    val myLongClickKeysText = ArrayList<List<String>>()
     val layoutLines = ArrayList<LinearLayout>()
     var downView: View? = null
     var capsView: ImageView? = null
@@ -120,11 +115,6 @@ class KeyboardKorean constructor(
         myKeysText.add(secondLineText)
         myKeysText.add(thirdLineText)
         myKeysText.add(fourthLineText)
-
-        myLongClickKeysText.clear()
-        myLongClickKeysText.add(firstLongClickText)
-        myLongClickKeysText.add(secondLongClickText)
-        myLongClickKeysText.add(thirdLongClickText)
 
         layoutLines.clear()
         layoutLines.add(numpadLine)
@@ -231,28 +221,28 @@ class KeyboardKorean constructor(
                 inputConnection?.requestCursorUpdates(InputConnection.CURSOR_UPDATE_IMMEDIATE)
             }
             playVibrate()
-            val cursorcs: CharSequence? =
-                inputConnection?.getSelectedText(InputConnection.GET_TEXT_WITH_STYLES)
-            if (cursorcs != null && cursorcs.length >= 2) {
-
-                val eventTime = SystemClock.uptimeMillis()
-                inputConnection?.finishComposingText()
-                inputConnection?.sendKeyEvent(
-                    KeyEvent(
-                        eventTime, eventTime,
-                        KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
-                        KeyEvent.FLAG_SOFT_KEYBOARD
-                    )
-                )
-                inputConnection?.sendKeyEvent(
-                    KeyEvent(
-                        SystemClock.uptimeMillis(), eventTime,
-                        KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
-                        KeyEvent.FLAG_SOFT_KEYBOARD
-                    )
-                )
-                hangulMaker.clear()
-            }
+//            val cursorcs: CharSequence? =
+//                inputConnection?.getSelectedText(InputConnection.GET_TEXT_WITH_STYLES)
+//            if (cursorcs != null && cursorcs.length >= 2) {
+//
+//                val eventTime = SystemClock.uptimeMillis()
+//                inputConnection?.finishComposingText()
+//                inputConnection?.sendKeyEvent(
+//                    KeyEvent(
+//                        eventTime, eventTime,
+//                        KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
+//                        KeyEvent.FLAG_SOFT_KEYBOARD
+//                    )
+//                )
+//                inputConnection?.sendKeyEvent(
+//                    KeyEvent(
+//                        SystemClock.uptimeMillis(), eventTime,
+//                        KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
+//                        KeyEvent.FLAG_SOFT_KEYBOARD
+//                    )
+//                )
+//                hangulMaker.clear()
+//            }
             when (actionButton.text.toString()) {
                 "한/영" -> {
                     keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.ENGLISH)
@@ -285,7 +275,7 @@ class KeyboardKorean constructor(
     fun getOnTouchListener(clickListener: View.OnClickListener): View.OnTouchListener {
         val handler = Handler()
         val initailInterval = 500
-        val normalInterval = 100
+        val normalInterval = 10
         val handlerRunnable = object : Runnable {
             override fun run() {
                 handler.postDelayed(this, normalInterval.toLong())
@@ -324,7 +314,6 @@ class KeyboardKorean constructor(
         for (line in layoutLines.indices) {
             val children = layoutLines[line].children.toList()
             val myText = myKeysText[line]
-            var longClickIndex = 0
             for (item in children.indices) {
                 val actionButton = children[item].findViewById<Button>(R.id.key_button)
                 val specialKey = children[item].findViewById<ImageView>(R.id.special_key)

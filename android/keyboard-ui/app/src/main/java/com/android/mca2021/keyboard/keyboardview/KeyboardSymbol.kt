@@ -19,7 +19,7 @@ import androidx.core.view.children
 import com.android.mca2021.keyboard.KeyboardInteractionListener
 import com.android.mca2021.keyboard.*
 
-class KeyboardSimbol constructor(
+class KeyboardSymbol constructor(
     var context:Context,
     var layoutInflater: LayoutInflater,
     var keyboardInterationListener: KeyboardInteractionListener

@@ -9,4 +9,5 @@ interface KeyboardInteractionListener {
         CAMERA,
     }
     fun changeMode(mode: KeyboardType)
+    fun connectInput()
 }
