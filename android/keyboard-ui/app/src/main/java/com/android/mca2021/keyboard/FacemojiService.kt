@@ -80,11 +80,12 @@ class FacemojiService : InputMethodService() {
     override fun updateInputViewShown() {
         super.updateInputViewShown()
         currentInputConnection.finishComposingText()
-        if (currentInputEditorInfo.inputType == EditorInfo.TYPE_CLASS_NUMBER) {
-            keyboardFrame.removeAllViews()
-//            keyboardFrame.addView(KeyboardNumpad.newInstance(applicationContext, layoutInflater, currentInputConnection, keyboardInterationListener))
-        } else {
-            keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.ENGLISH)
-        }
+        keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.ENGLISH)
+//        if (currentInputEditorInfo.inputType == EditorInfo.TYPE_CLASS_NUMBER) {
+//            keyboardFrame.removeAllViews()
+////            keyboardFrame.addView(KeyboardNumpad.newInstance(applicationContext, layoutInflater, currentInputConnection, keyboardInterationListener))
+//        } else {
+//            keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.ENGLISH)
+//        }
     }
 }
