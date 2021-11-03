@@ -48,6 +48,8 @@ internal class FaceAnalyzer : ImageAnalysis.Analyzer {
 
 
                         val ctr = face.allContours
+
+												//Update face on FaceBoundsOverlay, provide imageProxy's width, height
                         listener.onFacesDetected(imageProxy.width, imageProxy.height, face)
 
                         /*
@@ -85,7 +87,7 @@ internal class FaceAnalyzer : ImageAnalysis.Analyzer {
         }
     }
 
-
+		//abstract interface, implemented in MainActivity
     internal interface Listener {
         /** Callback that receives face bounds that can be drawn on top of the viewfinder.  */
         fun onFacesDetected(proxyWidth: Int, proxyHeight: Int, face: Face)

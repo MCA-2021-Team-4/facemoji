@@ -151,6 +151,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+		//Provide Analyzer instance
     private fun createFaceDetector(): ImageAnalysis.Analyzer {
         val faceDetector = FaceAnalyzer()
         faceDetector.listener = object : FaceAnalyzer.Listener {
@@ -165,6 +166,7 @@ class MainActivity : AppCompatActivity() {
         return faceDetector
     }
 
+		//Not used currently
     private fun getCameraLensFacing(cameraProvider: ProcessCameraProvider): Int {
         try {
             if (cameraProvider.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)) {

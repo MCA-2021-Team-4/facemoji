@@ -80,7 +80,8 @@ class FaceBoundsOverlay constructor(context: Context?, attributeSet: AttributeSe
         }
         canvas.drawPath(path, paint)
     }
-
+		
+		//functions to transform coordinate
     private fun translateX(horizontal: Float): Float {
         val scale1 = width.toFloat() / this.proxyHeight
         val scale2 = height.toFloat() / this.proxyWidth
