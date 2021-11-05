@@ -22,13 +22,13 @@ internal class FaceAnalyzer : ImageAnalysis.Analyzer {
                 .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
                 .build()
             val detector = FaceDetection.getClient(realTimeOpts)
-            val result = detector.process(image)
+            detector.process(image)
                 .addOnSuccessListener { faces ->
                     val listener = listener ?: return@addOnSuccessListener
                     for (face in faces) {
 
-                        val bounds = face.boundingBox
                         /*
+                        val bounds = face.boundingBox
                         public static final int FACE = 1;
                         public static final int LEFT_EYEBROW_TOP = 2;
                         public static final int LEFT_EYEBROW_BOTTOM = 3;
@@ -47,9 +47,7 @@ internal class FaceAnalyzer : ImageAnalysis.Analyzer {
                          */
 
 
-                        val ctr = face.allContours
-
-												//Update face on FaceBoundsOverlay, provide imageProxy's width, height
+                        //Update face on FaceBoundsOverlay, provide imageProxy's width, height
                         listener.onFacesDetected(imageProxy.width, imageProxy.height, face)
 
                         /*
@@ -87,7 +85,7 @@ internal class FaceAnalyzer : ImageAnalysis.Analyzer {
         }
     }
 
-		//abstract interface, implemented in MainActivity
+    // implemented at KeyboardCamera.kt
     internal interface Listener {
         /** Callback that receives face bounds that can be drawn on top of the viewfinder.  */
         fun onFacesDetected(proxyWidth: Int, proxyHeight: Int, face: Face)

@@ -2,9 +2,6 @@ package com.android.mca2021.keyboard.keyboardview
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.view.LayoutInflater
-import android.view.inputmethod.InputConnection
-import android.widget.Button
 import android.content.Intent
 import android.content.Intent.*
 import android.content.SharedPreferences
@@ -14,9 +11,11 @@ import android.os.*
 import android.util.Log
 import android.util.Size
 import android.util.TypedValue
+import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.InputConnection
+import android.widget.Button
 import android.widget.TextView
-import androidx.appcompat.view.menu.MenuView
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -26,13 +25,16 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
+import com.google.mlkit.vision.face.Face
 import com.android.mca2021.keyboard.*
 import com.android.mca2021.keyboard.MainActivity.Companion.REQUEST_PERMISSION
 import com.android.mca2021.keyboard.MainActivity.Companion.REQUIRED_PERMISSIONS
+import com.android.mca2021.keyboard.core.FaceAnalyzer
+import com.android.mca2021.keyboard.core.FaceContourOverlay
 import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
+import com.google.mlkit.vision.face.FaceContour
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -47,6 +49,7 @@ class KeyboardCamera (
     private lateinit var vibrator: Vibrator
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var cameraExecutor: ExecutorService
+    private val TAG: String = "mojiface"
 
     private var emojiList: List<String>
 
@@ -166,24 +169,9 @@ class KeyboardCamera (
                 .setTargetResolution(Size(1280, 720))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
-
-            imageAnalysis.setAnalyzer(cameraExecutor, ImageAnalysis.Analyzer { imageProxy ->
-                val mediaImage  = imageProxy.image
-                val degrees = imageProxy.imageInfo.rotationDegrees
-                val imageRotation = degreesToFirebaseRotation(degrees)
-                if (mediaImage  != null) {
-                    val image = FirebaseVisionImage.fromMediaImage(mediaImage, imageRotation)
-                    val result = detector.detectInImage(image)
-                        .addOnSuccessListener { faces ->
-                            Log.d("JIHO", "$faces")
-                        }
-                        .addOnFailureListener { e ->
-
-                        }
+                .also{
+                    it.setAnalyzer(cameraExecutor, createFaceDetector())
                 }
-                imageProxy.close()
-                // insert your code here.
-            })
 
             // Select front camera as a default
             val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
@@ -205,6 +193,21 @@ class KeyboardCamera (
 
     fun getLayout(): View {
         return cameraLayout
+    }
+
+    private fun createFaceDetector(): ImageAnalysis.Analyzer {
+        val faceDetector = FaceAnalyzer()
+        faceDetector.listener = object : FaceAnalyzer.Listener {
+            override fun onFacesDetected(proxyWidth: Int, proxyHeight: Int, face: Face) {
+                val faceContourOverlay = cameraLayout.findViewById<FaceContourOverlay>(R.id.faceContourOverlay)
+                faceContourOverlay.post { faceContourOverlay.drawFaceBounds(proxyWidth, proxyHeight, face)}
+            }
+
+            override fun onError(exception: Exception) {
+                Log.e(TAG, "Face detection error", exception)
+            }
+        }
+        return faceDetector
     }
 
     private fun playVibrate() {

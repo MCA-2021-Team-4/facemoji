@@ -3,6 +3,7 @@ package com.android.mca2021.keyboard.core
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.annotation.ColorInt
 import com.google.mlkit.vision.face.Face
@@ -17,31 +18,43 @@ class FaceContourOverlay constructor(context: Context?, attributeSet: AttributeS
     private var proxyWidth: Int = 0
     private var proxyHeight: Int = 0
 
+    private val TAG: String= "mojiface"
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        // face
-        drawFace(canvas, face, FaceContour.FACE, Color.BLUE)
 
+        // face
+        drawFace(canvas, face, FaceContour.FACE, Color.DKGRAY)
+
+        // left <-> right mirrored
         // left eye
-        drawFace(canvas, face, FaceContour.LEFT_EYEBROW_TOP, Color.RED)
-        drawFace(canvas, face, FaceContour.LEFT_EYE, Color.BLACK)
-        drawFace(canvas, face, FaceContour.LEFT_EYEBROW_BOTTOM, Color.CYAN)
+        drawFace(canvas, face, FaceContour.LEFT_EYEBROW_TOP, Color.BLUE)
+        drawFace(canvas, face, FaceContour.LEFT_EYEBROW_BOTTOM, Color.GREEN)
+        val leftEyeOpened = face?.leftEyeOpenProbability
+        val leftEyeColor = if(leftEyeOpened != null && leftEyeOpened > 0.4) Color.CYAN else Color.BLACK
+        drawFace(canvas, face, FaceContour.LEFT_EYE, leftEyeColor)
 
         // right eye
-        drawFace(canvas, face, FaceContour.RIGHT_EYE, Color.DKGRAY)
-        drawFace(canvas, face, FaceContour.RIGHT_EYEBROW_BOTTOM, Color.GRAY)
-        drawFace(canvas, face, FaceContour.RIGHT_EYEBROW_TOP, Color.GREEN)
+        drawFace(canvas, face, FaceContour.RIGHT_EYEBROW_TOP, Color.BLUE)
+        drawFace(canvas, face, FaceContour.RIGHT_EYEBROW_BOTTOM, Color.GREEN)
+        val rightEyeOpened = face?.rightEyeOpenProbability
+        val rightEyeColor = if(rightEyeOpened != null && rightEyeOpened > 0.4) Color.CYAN else Color.BLACK
+        drawFace(canvas, face, FaceContour.RIGHT_EYE, rightEyeColor)
 
         // nose
-        drawFace(canvas, face, FaceContour.NOSE_BOTTOM, Color.LTGRAY)
+        drawFace(canvas, face, FaceContour.NOSE_BOTTOM, Color.MAGENTA)
         drawFace(canvas, face, FaceContour.NOSE_BRIDGE, Color.MAGENTA)
 
-        // rip
-        drawFace(canvas, face, FaceContour.LOWER_LIP_BOTTOM, Color.WHITE)
-        drawFace(canvas, face, FaceContour.LOWER_LIP_TOP, Color.YELLOW)
-        drawFace(canvas, face, FaceContour.UPPER_LIP_BOTTOM, Color.GREEN)
-        drawFace(canvas, face, FaceContour.UPPER_LIP_TOP, Color.CYAN)
+        // lip
+        val isSmiling = face?.smilingProbability
+        val lipColor = if(isSmiling != null && isSmiling > 0.6) Color.RED else Color.YELLOW
+        drawFace(canvas, face, FaceContour.LOWER_LIP_BOTTOM, lipColor)
+        drawFace(canvas, face, FaceContour.LOWER_LIP_TOP, Color.WHITE)
+        drawFace(canvas, face, FaceContour.UPPER_LIP_BOTTOM, Color.WHITE)
+        drawFace(canvas, face, FaceContour.UPPER_LIP_TOP, lipColor)
+
     }
+
 
     fun drawFaceBounds(proxyWidth: Int, proxyHeight: Int, face: Face) {
         this.face = face
