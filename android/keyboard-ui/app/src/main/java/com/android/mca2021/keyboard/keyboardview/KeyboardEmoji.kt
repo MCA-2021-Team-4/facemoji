@@ -3,6 +3,7 @@ package com.android.mca2021.keyboard.keyboardview
 import android.content.Context
 import android.os.*
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputConnection
 import android.widget.Button
@@ -107,6 +108,7 @@ class KeyboardEmoji constructor(
             }
         }
     }
+
 
     private fun setLayoutComponents(unicode: Int, count: Int) {
         var recyclerView = emojiLayout.findViewById<RecyclerView>(R.id.emoji_recyclerview)

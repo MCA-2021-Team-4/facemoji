@@ -30,19 +30,24 @@ class FacemojiService : InputMethodService() {
             keyboardFrame.removeAllViews()
             when (currentMode) {
                 KeyboardInteractionListener.KeyboardType.ENGLISH -> {
+                    keyboardEnglish.inputConnection = currentInputConnection
                     keyboardFrame.addView(keyboardEnglish.getLayout())
                 }
                 KeyboardInteractionListener.KeyboardType.KOREAN -> {
+                    keyboardKorean.inputConnection = currentInputConnection
                     keyboardFrame.addView(keyboardKorean.getLayout())
                 }
                 KeyboardInteractionListener.KeyboardType.SYMBOL -> {
+                    keyboardSymbol.inputConnection = currentInputConnection
                     keyboardFrame.addView(keyboardSymbol.getLayout())
                 }
                 KeyboardInteractionListener.KeyboardType.EMOJI -> {
+                    keyboardEmoji.inputConnection = currentInputConnection
                     keyboardFrame.addView(keyboardEmoji.getLayout())
                 }
                 KeyboardInteractionListener.KeyboardType.CAMERA -> {
                     keyboardCamera.initKeyboard()
+                    keyboardCamera.inputConnection = currentInputConnection
                     keyboardFrame.addView(keyboardCamera.getLayout())
                 }
             }
