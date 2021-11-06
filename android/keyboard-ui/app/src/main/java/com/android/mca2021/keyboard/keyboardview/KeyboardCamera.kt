@@ -34,19 +34,19 @@ import com.android.mca2021.keyboard.core.FaceContourOverlay
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
-import com.google.mlkit.vision.face.FaceContour
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class KeyboardCamera (
-    private var service: FacemojiService,
-    private var context: Context,
-    private var layoutInflater: LayoutInflater,
-    private var keyboardInteractionListener: KeyboardInteractionListener
-): LifecycleOwner {
+    private val service: FacemojiService,
+    override val context: Context,
+    private val layoutInflater: LayoutInflater,
+    override val keyboardInteractionListener: KeyboardInteractionManager,
+): FacemojiKeyboard(), LifecycleOwner {
     private lateinit var cameraLayout: View
-    var inputConnection: InputConnection? = null
-    private lateinit var vibrator: Vibrator
+
+    override var inputConnection: InputConnection? = null
+    override var vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var cameraExecutor: ExecutorService
     private val TAG: String = "mojiface"
@@ -60,10 +60,9 @@ class KeyboardCamera (
         R.id.recommendation_4
     )
 
-    private val lifecycleRegistry = LifecycleRegistry(this)
+    override fun changeCaps() {}
 
-    var sound = 0
-    var vibrate = 0
+    private val lifecycleRegistry = LifecycleRegistry(this)
 
     init {
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
@@ -91,7 +90,7 @@ class KeyboardCamera (
         }
     }
 
-    fun initKeyboard() {
+    override fun initKeyboard() {
         cameraLayout = layoutInflater.inflate(R.layout.keyboard_camera, null)
         vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
@@ -111,12 +110,13 @@ class KeyboardCamera (
             context.startActivity(intent)
         }
 
-        lifecycleRegistry.currentState = Lifecycle.State.STARTED
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
 
         val changeModeButton = cameraLayout.findViewById<Button>(R.id.change_camera_input_mode)
         changeModeButton.setOnClickListener {
             cameraExecutor.shutdown()
-            keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.ENGLISH)
+            keyboardInteractionListener.changeMode(KeyboardInteractionManager.KeyboardType.ENGLISH)
+            lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
         }
 
         setEmojiLayout()
@@ -191,7 +191,7 @@ class KeyboardCamera (
         }, ContextCompat.getMainExecutor(service))
     }
 
-    fun getLayout(): View {
+    override fun getLayout(): View {
         return cameraLayout
     }
 
@@ -208,16 +208,6 @@ class KeyboardCamera (
             }
         }
         return faceDetector
-    }
-
-    private fun playVibrate() {
-        if (vibrate > 0) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrator.vibrate(VibrationEffect.createOneShot(70, vibrate))
-            } else {
-                vibrator.vibrate(70)
-            }
-        }
     }
 
     override fun getLifecycle(): Lifecycle {

@@ -3,7 +3,6 @@ package com.android.mca2021.keyboard.keyboardview
 import android.content.Context
 import android.os.*
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputConnection
 import android.widget.Button
@@ -16,10 +15,10 @@ import com.android.mca2021.keyboard.*
 
 
 class KeyboardEmoji constructor(
-    var context:Context,
-    var layoutInflater: LayoutInflater,
-    private var keyboardInteractionListener: KeyboardInteractionListener
-){
+    override val context:Context,
+    private val layoutInflater: LayoutInflater,
+    override val keyboardInteractionListener: KeyboardInteractionManager,
+): FacemojiKeyboard() {
     val emotionUnicode = 0x1F600
     val animalUnicode = 0x1F435
     val foodUnicode = 0x1F347
@@ -33,8 +32,8 @@ class KeyboardEmoji constructor(
     val skySize = 30
 
     lateinit var emojiLayout: View
-    var inputConnection: InputConnection? = null
-    lateinit var vibrator: Vibrator
+    override var inputConnection: InputConnection? = null
+    override val vibrator: Vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
     lateinit var emojiRecyclerViewAdapter: EmojiRecyclerViewAdapter
     private val fourthLineText = listOf(
@@ -46,12 +45,9 @@ class KeyboardEmoji constructor(
         getEmojiByUnicode(skyUnicode),
         "DEL"
     )
-    var vibrate = 0
-    var sound = 0
 
-    fun initKeyboard() {
+    override fun initKeyboard() {
         emojiLayout = layoutInflater.inflate(R.layout.keyboard_emoji, null) as LinearLayout
-        vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         val sharedPreferences = context.getSharedPreferences("setting", Context.MODE_PRIVATE)
         vibrate = sharedPreferences.getInt("vibrate", -1)
@@ -60,17 +56,22 @@ class KeyboardEmoji constructor(
         val fourthLine: LinearLayout = emojiLayout.findViewById(R.id.fourth_line)
         fourthLine.forEachIndexed { item, child ->
             val actionButton = child.findViewById<Button>(R.id.key_button)
-            val spacialKey = child.findViewById<ImageView>(R.id.special_key)
+            val specialKey = child.findViewById<ImageView>(R.id.special_key)
             if (fourthLineText[item].equals("DEL")) {
-                actionButton.setBackgroundResource(R.drawable.del)
                 val myOnClickListener = getDeleteAction()
-                actionButton.setOnClickListener(myOnClickListener)
+                val myOnTouchListener = getOnTouchListener(myOnClickListener)
+                specialKey.setImageResource(R.drawable.del)
+                specialKey.visibility = View.VISIBLE
+                actionButton.visibility = View.GONE
+                specialKey.setOnClickListener(myOnClickListener)
+                specialKey.setOnTouchListener(myOnTouchListener)
+                specialKey.setBackgroundResource(R.drawable.key_background)
             } else {
                 actionButton.text = fourthLineText[item]
                 actionButton.setOnClickListener(View.OnClickListener {
                     when ((it as Button).text) {
                         "한/영" -> {
-                            keyboardInteractionListener.changeMode(KeyboardInteractionListener.KeyboardType.ENGLISH)
+                            keyboardInteractionListener.changeMode(KeyboardInteractionManager.KeyboardType.ENGLISH)
                         }
                         getEmojiByUnicode(emotionUnicode) -> {
                             setLayoutComponents(emotionUnicode, emotionSize)
@@ -95,23 +96,12 @@ class KeyboardEmoji constructor(
         setLayoutComponents(0x1F600, 79)
     }
 
-    fun getLayout():View{
+    override fun getLayout():View{
         return emojiLayout
     }
 
-    private fun playVibrate() {
-        if (vibrate > 0) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrator.vibrate(VibrationEffect.createOneShot(70, vibrate))
-            } else {
-                vibrator.vibrate(70)
-            }
-        }
-    }
-
-
     private fun setLayoutComponents(unicode: Int, count: Int) {
-        var recyclerView = emojiLayout.findViewById<RecyclerView>(R.id.emoji_recyclerview)
+        val recyclerView = emojiLayout.findViewById<RecyclerView>(R.id.emoji_recyclerview)
         val emojiList = ArrayList<String>()
         val sharedPreferences = context.getSharedPreferences("setting", Context.MODE_PRIVATE)
         val height = sharedPreferences.getInt("keyboardHeight", 150)
@@ -134,15 +124,5 @@ class KeyboardEmoji constructor(
         return String(Character.toChars(unicode))
     }
 
-    fun getDeleteAction(): View.OnClickListener {
-        return View.OnClickListener {
-            playVibrate()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                inputConnection!!.deleteSurroundingTextInCodePoints(1, 0)
-            } else {
-                inputConnection!!.deleteSurroundingText(1, 0)
-            }
-        }
-    }
-
+    override fun changeCaps() {}
 }

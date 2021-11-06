@@ -1,6 +1,6 @@
 package com.android.mca2021.keyboard
 
-interface KeyboardInteractionListener {
+interface KeyboardInteractionManager {
     enum class KeyboardType {
         ENGLISH,
         KOREAN,
@@ -9,5 +9,4 @@ interface KeyboardInteractionListener {
         CAMERA,
     }
     fun changeMode(mode: KeyboardType)
-    fun connectInput()
 }
