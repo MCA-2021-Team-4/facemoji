@@ -26,7 +26,6 @@ class EmojiRecyclerViewAdapter constructor(
                 inputConnection.commitText((it as TextView).text.toString(), 1)
             }
             textView?.setOnClickListener(onClickListener)
-            textView?.setOnTouchListener(getOnTouchListener(onClickListener))
         }
     }
 
@@ -42,42 +41,5 @@ class EmojiRecyclerViewAdapter constructor(
 
     override fun getItemCount(): Int {
         return emojiList.size
-    }
-
-    private fun getOnTouchListener(clickListener: View.OnClickListener):View.OnTouchListener{
-        val handler = Handler()
-        val initailInterval = 500
-        val normalInterval = 10
-        lateinit var clickedView: View
-        val handlerRunnable = object: Runnable{
-            override fun run() {
-                handler.postDelayed(this, normalInterval.toLong())
-                clickListener.onClick(clickedView)
-            }
-        }
-        val onTouchListener = object:View.OnTouchListener {
-            override fun onTouch(view: View, motionEvent: MotionEvent?): Boolean {
-                clickedView = view
-                when (motionEvent?.getAction()) {
-                    MotionEvent.ACTION_DOWN -> {
-                        handler.removeCallbacks(handlerRunnable)
-                        handler.postDelayed(handlerRunnable, initailInterval.toLong())
-                        clickListener.onClick(view)
-                        return true
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        handler.removeCallbacks(handlerRunnable)
-                        return true
-                    }
-                    MotionEvent.ACTION_CANCEL -> {
-                        handler.removeCallbacks(handlerRunnable)
-                        return true
-                    }
-                }
-                return false
-            }
-        }
-
-        return onTouchListener
     }
 }

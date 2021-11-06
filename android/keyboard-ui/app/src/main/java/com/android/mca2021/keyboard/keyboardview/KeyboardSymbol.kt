@@ -27,7 +27,7 @@ class KeyboardSymbol constructor(
     private val firstLineText = listOf("+","×","÷","=","/","￦","<",">","♡","☆")
     private val secondLineText = listOf("!","@","#","~","%","^","&","*","(",")")
     private val thirdLineText = listOf("\uD83D\uDE00","-","'","\"",":",";",",","?","DEL")
-    private val fourthLineText = listOf("가",",","CAM","SPACE",".","ENTER")
+    private val fourthLineText = listOf("가","CAM","SPACE",".","ENTER")
 
     override val myKeysText = listOf(
         numpadText,

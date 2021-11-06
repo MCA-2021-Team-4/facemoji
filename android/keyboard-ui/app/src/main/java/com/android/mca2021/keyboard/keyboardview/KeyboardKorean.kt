@@ -32,7 +32,7 @@ class KeyboardKorean constructor(
     private val firstLineText = listOf("ㅂ", "ㅈ", "ㄷ", "ㄱ", "ㅅ", "ㅛ", "ㅕ", "ㅑ", "ㅐ", "ㅔ")
     private val secondLineText = listOf("ㅁ", "ㄴ", "ㅇ", "ㄹ", "ㅎ", "ㅗ", "ㅓ", "ㅏ", "ㅣ")
     private val thirdLineText = listOf("CAPS", "ㅋ", "ㅌ", "ㅊ", "ㅍ", "ㅠ", "ㅜ", "ㅡ", "DEL")
-    private val fourthLineText = listOf("!#1", "한/영", ",", "CAM", "SPACE", ".", "ENTER")
+    private val fourthLineText = listOf("!#1", "한/영", "CAM", "SPACE", ".", "ENTER")
 
     var capsView: ImageView? = null
 

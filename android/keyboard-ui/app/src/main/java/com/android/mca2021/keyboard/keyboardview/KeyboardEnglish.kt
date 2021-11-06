@@ -28,7 +28,7 @@ class KeyboardEnglish constructor(
     private val firstLineText = listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p")
     private val secondLineText = listOf("a", "s", "d", "f", "g", "h", "j", "k", "l")
     private val thirdLineText = listOf("CAPS", "z", "x", "c", "v", "b", "n", "m", "DEL")
-    private val fourthLineText = listOf("!#1", "한/영", ",", "CAM", "SPACE", ".", "ENTER")
+    private val fourthLineText = listOf("!#1", "한/영", "CAM", "SPACE", ".", "ENTER")
 
     private val firstLongClickText = listOf("!", "@", "#", "$", "%", "^", "&", "*", "(", ")")
     private val secondLongClickText = listOf("~", "+", "-", "×", "♥", ":", ";", "'", "\"")
