@@ -249,11 +249,23 @@ abstract class FacemojiKeyboard {
     open fun getDeleteAction(): View.OnClickListener {
         return View.OnClickListener {
             playVibrate()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                inputConnection?.deleteSurroundingTextInCodePoints(1, 0)
-            } else {
-                inputConnection?.deleteSurroundingText(1, 0)
-            }
+            val eventTime = SystemClock.uptimeMillis()
+            inputConnection?.finishComposingText()
+            inputConnection?.sendKeyEvent(
+                KeyEvent(
+                    eventTime, eventTime,
+                    KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
+                    KeyEvent.FLAG_SOFT_KEYBOARD
+                )
+            )
+            inputConnection?.sendKeyEvent(
+                KeyEvent(
+                    SystemClock.uptimeMillis(), eventTime,
+                    KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
+                    KeyEvent.FLAG_SOFT_KEYBOARD
+                )
+            )
+            inputConnection?.deleteSurroundingText(1, 0)
         }
     }
 

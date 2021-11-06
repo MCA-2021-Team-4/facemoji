@@ -213,7 +213,6 @@ class KeyboardKorean constructor(
             val cursorcs: CharSequence? =
                 inputConnection?.getSelectedText(InputConnection.GET_TEXT_WITH_STYLES)
             if (cursorcs != null && cursorcs.length >= 2) {
-
                 val eventTime = SystemClock.uptimeMillis()
                 inputConnection?.finishComposingText()
                 inputConnection?.sendKeyEvent(
