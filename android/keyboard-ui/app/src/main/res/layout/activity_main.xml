@@ -7,14 +7,39 @@
     tools:context=".MainActivity">
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:onClick="openKeyboardSetting"
-        android:text="change default keyboard"
+        android:id="@+id/btn_enablekeyboard"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="50dp"
+        android:gravity="left|center_vertical"
+        android:onClick="enableKeyboard"
+        android:text="enable facemoji"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_selectkeyboard"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:gravity="left|center_vertical"
+        android:onClick="openKeyboardSetting"
+        android:text="select facemoji as default"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_enablekeyboard" />
+
+    <Button
+        android:id="@+id/btn_checkdefaultIM"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/black"
+        android:gravity="center|center_vertical"
+        android:onClick="checkIfDefault"
+        android:text="check default keyboard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_selectkeyboard" />
 
     <EditText
         android:layout_width="wrap_content"
