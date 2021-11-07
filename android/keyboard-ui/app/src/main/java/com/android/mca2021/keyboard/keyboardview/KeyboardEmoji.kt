@@ -19,17 +19,17 @@ class KeyboardEmoji constructor(
     private val layoutInflater: LayoutInflater,
     override val keyboardInteractionListener: KeyboardInteractionManager,
 ): FacemojiKeyboard() {
-    val emotionUnicode = 0x1F600
-    val animalUnicode = 0x1F435
-    val foodUnicode = 0x1F347
-    val placeUnicode = 0x1F30D
-    val skyUnicode = 0x1F311
+    private val emotionUnicode: List<Int> = listOf(0x1F600, 0x1F910, 0x1F920, 0x1F928, 0x1F973)
+    private val animalUnicode: List<Int> = listOf(0x1F408, 0x1F409, 0x1F40C, 0x1F40F, 0x1F411, 0x1F413, 0x1F414, 0x1F415, 0x1F416, 0x1F417, 0x1F42B)
+    private val foodUnicode: List<Int> = listOf(0x1F347)
+    private val placeUnicode: List<Int> = listOf(0x1F30D)
+    private val skyUnicode: List<Int> = listOf(0x1F311)
 
-    val emotionSize = 146
-    val animalSize = 100
-    val foodSize = 100
-    val placeSize = 100
-    val skySize = 30
+    private val emotionSize: List<Int> = listOf(64, 9, 8, 7, 4)
+    private val animalSize: List<Int> = listOf(1, 3, 3, 2, 2, 1 ,1, 1, 1, 19, 20)
+    private val foodSize: List<Int> = listOf(100)
+    private val placeSize: List<Int> = listOf(100)
+    private val skySize: List<Int> = listOf(30)
 
     lateinit var emojiLayout: View
     override var inputConnection: InputConnection? = null
@@ -38,11 +38,11 @@ class KeyboardEmoji constructor(
     lateinit var emojiRecyclerViewAdapter: EmojiRecyclerViewAdapter
     private val fourthLineText = listOf(
         "한/영",
-        getEmojiByUnicode(emotionUnicode),
-        getEmojiByUnicode(animalUnicode),
-        getEmojiByUnicode(foodUnicode),
-        getEmojiByUnicode(placeUnicode),
-        getEmojiByUnicode(skyUnicode),
+        getEmojiByUnicode(emotionUnicode[0]),
+        getEmojiByUnicode(animalUnicode[0]),
+        getEmojiByUnicode(foodUnicode[0]),
+        getEmojiByUnicode(placeUnicode[0]),
+        getEmojiByUnicode(skyUnicode[0]),
         "DEL"
     )
 
@@ -73,19 +73,19 @@ class KeyboardEmoji constructor(
                         "한/영" -> {
                             keyboardInteractionListener.changeMode(KeyboardInteractionManager.KeyboardType.ENGLISH)
                         }
-                        getEmojiByUnicode(emotionUnicode) -> {
+                        getEmojiByUnicode(emotionUnicode[0]) -> {
                             setLayoutComponents(emotionUnicode, emotionSize)
                         }
-                        getEmojiByUnicode(animalUnicode) -> {
+                        getEmojiByUnicode(animalUnicode[0]) -> {
                             setLayoutComponents(animalUnicode, animalSize)
                         }
-                        getEmojiByUnicode(foodUnicode) -> {
+                        getEmojiByUnicode(foodUnicode[0]) -> {
                             setLayoutComponents(foodUnicode, foodSize)
                         }
-                        getEmojiByUnicode(placeUnicode) -> {
+                        getEmojiByUnicode(placeUnicode[0]) -> {
                             setLayoutComponents(placeUnicode, placeSize)
                         }
-                        getEmojiByUnicode(skyUnicode) -> {
+                        getEmojiByUnicode(skyUnicode[0]) -> {
                             setLayoutComponents(skyUnicode, skySize)
                         }
                     }
@@ -93,23 +93,28 @@ class KeyboardEmoji constructor(
             }
         }
 
-        setLayoutComponents(0x1F600, 79)
+        setLayoutComponents(emotionUnicode, emotionSize)
     }
 
     override fun getLayout():View{
         return emojiLayout
     }
 
-    private fun setLayoutComponents(unicode: Int, count: Int) {
+    private fun setLayoutComponents(unicodes: List<Int>, counts: List<Int>) {
         val recyclerView = emojiLayout.findViewById<RecyclerView>(R.id.emoji_recyclerview)
         val emojiList = ArrayList<String>()
         val sharedPreferences = context.getSharedPreferences("setting", Context.MODE_PRIVATE)
         val height = sharedPreferences.getInt("keyboardHeight", 150)
 
-
-        for (i in 0..count) {
-            emojiList.add(getEmojiByUnicode(unicode + i))
+        for (i in unicodes.indices){
+            var unicode = unicodes[i]
+            var count = counts[i]
+            for (j in 0..count){
+                emojiList.add(getEmojiByUnicode(unicode + j))
+            }
         }
+
+
 
         emojiRecyclerViewAdapter = EmojiRecyclerViewAdapter(context, emojiList, inputConnection!!)
         recyclerView.adapter = emojiRecyclerViewAdapter
