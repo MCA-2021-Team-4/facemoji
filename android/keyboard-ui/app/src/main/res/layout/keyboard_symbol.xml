@@ -8,6 +8,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_weight="1"
+            android:weightSum="10"
             android:orientation="horizontal">
         <include
                 layout="@layout/keyboard_item"
@@ -93,6 +94,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_weight="1"
+            android:weightSum="10"
             android:orientation="horizontal">
         <include
                 layout="@layout/keyboard_item"
@@ -179,8 +181,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_weight="1"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
+            android:weightSum="10"
             android:orientation="horizontal">
         <include
                 layout="@layout/keyboard_item"
