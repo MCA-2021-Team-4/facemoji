@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal"
+        android:weightSum="10"
         android:baselineAligned="false">
         <include
             layout="@layout/keyboard_item"
@@ -75,6 +76,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal"
+        android:weightSum="10"
         android:baselineAligned="false">
         <include
             layout="@layout/keyboard_item"
@@ -141,9 +143,9 @@
         android:id="@+id/second_line"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp"
         android:orientation="horizontal"
+        android:weightSum="10"
+        android:gravity="center"
         android:baselineAligned="false">
         <include
             layout="@layout/keyboard_item"
