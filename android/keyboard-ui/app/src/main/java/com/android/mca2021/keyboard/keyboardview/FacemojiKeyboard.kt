@@ -265,7 +265,6 @@ abstract class FacemojiKeyboard {
                     KeyEvent.FLAG_SOFT_KEYBOARD
                 )
             )
-            inputConnection?.deleteSurroundingText(1, 0)
         }
     }
 
