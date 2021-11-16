@@ -107,7 +107,6 @@ abstract class FacemojiKeyboard {
             val cursorcs: CharSequence? =
                 inputConnection?.getSelectedText(InputConnection.GET_TEXT_WITH_STYLES)
             if (cursorcs != null && cursorcs.length >= 2) {
-                Log.d("JIHO", "test log : $cursorcs")
                 val eventTime = SystemClock.uptimeMillis()
                 inputConnection?.finishComposingText()
                 inputConnection?.sendKeyEvent(
@@ -265,7 +264,7 @@ abstract class FacemojiKeyboard {
                     KeyEvent.FLAG_SOFT_KEYBOARD
                 )
             )
-            inputConnection?.deleteSurroundingText(1, 0)
+//            inputConnection?.deleteSurroundingText(1, 0)
         }
     }
 
