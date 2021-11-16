@@ -27,6 +27,11 @@ abstract class FacemojiKeyboard {
     open val myLongClickKeysText: List<List<String>> = listOf()
     open var layoutLines: List<LinearLayout> = listOf()
 
+    open val setting: String = "setting"
+    open val vibrateSetting: String = "keyboardVibrate"
+    open val soundSetting: String = "keyboardSound"
+
+
     var buttons: MutableList<Button> = mutableListOf()
     var isCaps: Boolean = false
     var sound = 0

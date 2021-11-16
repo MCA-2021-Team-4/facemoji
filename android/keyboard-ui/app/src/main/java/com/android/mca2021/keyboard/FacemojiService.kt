@@ -21,6 +21,10 @@ class FacemojiService : InputMethodService() {
     lateinit var keyboardEmoji : KeyboardEmoji
     lateinit var keyboardCamera: KeyboardCamera
 
+    val setting: String = "setting"
+    val vibrateSetting: String = "keyboardVibrate"
+    val soundSetting: String = "keyboardSound"
+
     private lateinit var sharedPreferences: SharedPreferences
 
     private val keyboardInteractionManager = object : KeyboardInteractionManager {
@@ -59,9 +63,9 @@ class FacemojiService : InputMethodService() {
     }
 
     private fun setting(){
-        sharedPreferences = getSharedPreferences( "setting", Context.MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences( setting, Context.MODE_PRIVATE)
         val sharedPreferencesEditor: SharedPreferences.Editor = sharedPreferences.edit()
-        sharedPreferencesEditor.putInt("keyboardVibrate", 1)
+        sharedPreferencesEditor.putInt(vibrateSetting, 1)
         sharedPreferencesEditor.apply()
     }
 
