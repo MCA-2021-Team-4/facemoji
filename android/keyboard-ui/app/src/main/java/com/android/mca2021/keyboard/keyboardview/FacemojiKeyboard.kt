@@ -27,11 +27,6 @@ abstract class FacemojiKeyboard {
     open val myLongClickKeysText: List<List<String>> = listOf()
     open var layoutLines: List<LinearLayout> = listOf()
 
-    open val setting: String = "setting"
-    open val vibrateSetting: String = "keyboardVibrate"
-    open val soundSetting: String = "keyboardSound"
-
-
     var buttons: MutableList<Button> = mutableListOf()
     var isCaps: Boolean = false
     var sound = 0
@@ -112,6 +107,7 @@ abstract class FacemojiKeyboard {
             val cursorcs: CharSequence? =
                 inputConnection?.getSelectedText(InputConnection.GET_TEXT_WITH_STYLES)
             if (cursorcs != null && cursorcs.length >= 2) {
+                Log.d("JIHO", "test log : $cursorcs")
                 val eventTime = SystemClock.uptimeMillis()
                 inputConnection?.finishComposingText()
                 inputConnection?.sendKeyEvent(
@@ -269,7 +265,6 @@ abstract class FacemojiKeyboard {
                     KeyEvent.FLAG_SOFT_KEYBOARD
                 )
             )
-//            inputConnection?.deleteSurroundingText(1, 0)
         }
     }
 
