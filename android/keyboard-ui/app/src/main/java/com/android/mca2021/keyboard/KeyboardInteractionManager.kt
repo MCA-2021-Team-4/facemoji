@@ -8,5 +8,6 @@ interface KeyboardInteractionManager {
         EMOJI,
         CAMERA,
     }
+
     fun changeMode(mode: KeyboardType)
 }
