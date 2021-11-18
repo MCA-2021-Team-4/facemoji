@@ -1,87 +1,124 @@
 package com.android.mca2021.keyboard.core
 
+import android.graphics.*
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.google.mlkit.vision.common.InputImage
+import com.asav.facialprocessing.mtcnn.MTCNNModel
 import com.google.mlkit.vision.face.Face
-import com.google.mlkit.vision.face.FaceDetection
-import com.google.mlkit.vision.face.FaceDetectorOptions
+import java.util.*
+import android.graphics.BitmapFactory
 
-internal class FaceAnalyzer : ImageAnalysis.Analyzer {
+import android.graphics.Bitmap
+
+import android.content.Context
+import android.content.res.AssetManager
+import com.android.mca2021.keyboard.core.mtcnn.Box
+import com.asav.facialprocessing.mtcnn.MTCNNModel.Companion.create
+import java.io.ByteArrayOutputStream
+import java.util.Collections.max
+import kotlin.math.max
+import android.graphics.YuvImage
+import android.media.Image
+import java.nio.ByteBuffer
+import java.util.Collections.min
+import kotlin.math.min
+
+
+internal class FaceAnalyzer(
+    context: Context,
+    assets: AssetManager,
+) : ImageAnalysis.Analyzer {
+    private val minFaceSize = 32
+    private var mtcnnFaceDetector: MTCNNModel? = null
+    private var emotionClassifierTfLite: EmotionTfLiteClassifier? = null
 
     var listener: Listener? = null
+
+    init {
+        try {
+            emotionClassifierTfLite = EmotionTfLiteClassifier(context)
+        } catch (e: java.lang.Exception) {
+            Log.e("FACEOMJI", "Exception initializing EmotionTfLiteClassifier!")
+        }
+        try {
+            mtcnnFaceDetector = create(assets)
+        } catch (e: java.lang.Exception) {
+            Log.e("FACEOMJI", "Exception initializing MTCNNModel!")
+        }
+    }
+
     override fun analyze(imageProxy: ImageProxy) {
-        val mediaImage = imageProxy.image
-        if (mediaImage != null) {
-            val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+        val bitmapImage = imageProxy.toBitmap()!!
 
-            // Real-time contour detection
-            val realTimeOpts = FaceDetectorOptions.Builder()
-                .setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
-                .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
-                .build()
-            val detector = FaceDetection.getClient(realTimeOpts)
-            detector.process(image)
-                .addOnSuccessListener { faces ->
-                    val listener = listener ?: return@addOnSuccessListener
-                    for (face in faces) {
+        val rotateMatrix = Matrix()
+        rotateMatrix.postRotate(-90f)
 
-                        /*
-                        val bounds = face.boundingBox
-                        public static final int FACE = 1;
-                        public static final int LEFT_EYEBROW_TOP = 2;
-                        public static final int LEFT_EYEBROW_BOTTOM = 3;
-                        public static final int RIGHT_EYEBROW_TOP = 4;
-                        public static final int RIGHT_EYEBROW_BOTTOM = 5;
-                        public static final int LEFT_EYE = 6;
-                        public static final int RIGHT_EYE = 7;
-                        public static final int UPPER_LIP_TOP = 8;
-                        public static final int UPPER_LIP_BOTTOM = 9;
-                        public static final int LOWER_LIP_TOP = 10;
-                        public static final int LOWER_LIP_BOTTOM = 11;
-                        public static final int NOSE_BRIDGE = 12;
-                        public static final int NOSE_BOTTOM = 13;
-                        public static final int LEFT_CHEEK = 14;
-                        public static final int RIGHT_CHEEK = 15;
-                         */
+        val rotated = Bitmap.createBitmap(bitmapImage, 0, 0,
+        bitmapImage.width, bitmapImage.height, rotateMatrix, false);
+        mtcnnDetectionAndAttributesRecognition(rotated, emotionClassifierTfLite)
+//        if (image != null) {
+//            val bitmapImage = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
+//            yuvToRgbConverter.yuvToRgb(image, bitmapImage)
+//        }
+        imageProxy.image?.close()
+        imageProxy.close()
+    }
 
+    fun Image.toBitmap(): Bitmap {
+        val yBuffer = planes[0].buffer // Y
+        val vuBuffer = planes[2].buffer // VU
 
-                        //Update face on FaceBoundsOverlay, provide imageProxy's width, height
-                        listener.onFacesDetected(imageProxy.width, imageProxy.height, face)
+        val ySize = yBuffer.remaining()
+        val vuSize = vuBuffer.remaining()
 
-                        /*
-                        // not all contours are guaranteed (ex. when only half face)
-                        Log.d(MainActivity.TAG,"nose point0: " + ctr[12]?.points?.get(0)) // List<PointF>
-                        Log.d(MainActivity.TAG,"nose point1: " + ctr[12]?.points?.get(1)) // List<PointF>
-                        Log.d(MainActivity.TAG,"nose point2: " + ctr[12]?.points?.get(2)) // List<PointF>
+        val nv21 = ByteArray(ySize + vuSize)
 
-                        // x : right is smaller
-                        // y : top is smaller
+        yBuffer.get(nv21, 0, ySize)
+        vuBuffer.get(nv21, ySize, vuSize)
 
+        val yuvImage = YuvImage(nv21, ImageFormat.NV21, this.width, this.height, null)
+        val out = ByteArrayOutputStream()
+        yuvImage.compressToJpeg(Rect(0, 0, yuvImage.width, yuvImage.height), 50, out)
+        val imageBytes = out.toByteArray()
+        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+    }
 
-                        if(face.smilingProbability != null) {
-                          val smileProb = face.smilingProbability
-                          Log.d(MainActivity.TAG, "smileProb: " + smileProb)
-                        }
-                        if(face.leftEyeOpenProbability != null) {
-                          val leftEyeOpenProb = face.leftEyeOpenProbability
-                          Log.d(MainActivity.TAG, "leftEyeProb: " + leftEyeOpenProb) // currently right eye
-                        }
-                        if(face.rightEyeOpenProbability != null) {
-                          val rightEyeOpenProb = face.rightEyeOpenProbability
-                          Log.d(MainActivity.TAG, "rightEyeProb: " + rightEyeOpenProb) // currently left eye
-                        }
-                        */
-                    }
-                }
-                .addOnFailureListener { e ->
-                    listener?.onError(e)
-                }
-                .addOnCompleteListener {
-                    mediaImage.close()
-                    imageProxy.close()
-                }
+    private fun mtcnnDetectionAndAttributesRecognition(image: Bitmap, classifier: TfLiteClassifier?) {
+        val bmp: Bitmap = image
+        val bboxes: Vector<Box> = mtcnnFaceDetector!!.detectFaces(
+            bmp,
+            minFaceSize
+        )
+        if (bboxes.isEmpty()) {
+            listener?.onEmotionDetected("Neutral")
+            return
+        }
+        val box = bboxes.first()
+        val bbox: Rect =
+            box.transform2Rect() //new android.graphics.Rect(Math.max(0,box.left()),Math.max(0,box.top()),box.right(),box.bottom());
+        if (classifier != null && bbox.width() > 0 && bbox.height() > 0) {
+            val bboxOrig = Rect(
+                bbox.left * bmp.width / bmp.width,
+                bmp.height * bbox.top / bmp.height,
+                bmp.width * bbox.right / bmp.width,
+                bmp.height * bbox.bottom / bmp.height
+            )
+            val faceBitmap = Bitmap.createBitmap(
+                bmp,
+                0,
+                0,
+                bboxOrig.width(),
+                bboxOrig.height()
+            )
+            val resultBitmap = Bitmap.createScaledBitmap(
+                faceBitmap,
+                classifier.imageSizeX,
+                classifier.imageSizeY,
+                false
+            )
+            val res = classifier.classifyFrame(resultBitmap)
+            listener?.onEmotionDetected(res.toString())
         }
     }
 
@@ -89,6 +126,9 @@ internal class FaceAnalyzer : ImageAnalysis.Analyzer {
     internal interface Listener {
         /** Callback that receives face bounds that can be drawn on top of the viewfinder.  */
         fun onFacesDetected(proxyWidth: Int, proxyHeight: Int, face: Face)
+
+        /** Callback that receives face bounds that can be drawn on top of the viewfinder.  */
+        fun onEmotionDetected(emotion: String)
 
         /** Invoked when an error is encounter during face detection.  */
         fun onError(exception: Exception)

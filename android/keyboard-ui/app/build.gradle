@@ -23,6 +23,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    aaptOptions {
+        noCompress "pt"
+        noCompress "ptl"
+        noCompress "tflite"
+        ignoreAssetsPattern "!age_gender_ethnicity_224_deep-03-0.13-0.97-0.88.pb"
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -59,4 +65,8 @@ dependencies {
 
     // mlkit
     implementation 'com.google.mlkit:face-detection:16.1.2'
+
+    implementation 'org.tensorflow:tensorflow-android:+'
+    implementation 'org.tensorflow:tensorflow-lite-gpu:+'
+    implementation 'org.tensorflow:tensorflow-lite-support:+'
 }
