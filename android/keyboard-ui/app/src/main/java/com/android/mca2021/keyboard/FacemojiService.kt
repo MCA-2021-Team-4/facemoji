@@ -82,7 +82,7 @@ class FacemojiService : InputMethodService() {
         keyboardKorean = KeyboardKorean(applicationContext, layoutInflater, keyboardInteractionManager)
         keyboardSymbol = KeyboardSymbol(applicationContext, layoutInflater, keyboardInteractionManager)
         keyboardEmoji = KeyboardEmoji(applicationContext, layoutInflater, keyboardInteractionManager)
-        keyboardCamera = KeyboardCamera(this, applicationContext, layoutInflater, keyboardInteractionManager)
+        keyboardCamera = KeyboardCamera(this, applicationContext, assets, layoutInflater, keyboardInteractionManager)
         keyboardInteractionManager.changeMode(KeyboardInteractionManager.KeyboardType.ENGLISH)
 
         initializeKeyboard()

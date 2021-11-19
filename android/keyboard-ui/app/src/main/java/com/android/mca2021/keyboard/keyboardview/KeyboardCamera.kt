@@ -6,13 +6,13 @@ import android.content.Intent
 import android.content.Intent.*
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.content.res.AssetManager
 import android.content.res.Configuration
 import android.os.*
 import android.util.Log
 import android.util.Size
 import android.util.TypedValue
-import android.view.LayoutInflater
-import android.view.View
+import android.view.*
 import android.view.inputmethod.InputConnection
 import android.widget.Button
 import android.widget.TextView
@@ -30,16 +30,17 @@ import com.android.mca2021.keyboard.*
 import com.android.mca2021.keyboard.MainActivity.Companion.REQUEST_PERMISSION
 import com.android.mca2021.keyboard.MainActivity.Companion.REQUIRED_PERMISSIONS
 import com.android.mca2021.keyboard.core.FaceAnalyzer
-import com.android.mca2021.keyboard.core.FaceContourOverlay
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+
 class KeyboardCamera (
     private val service: FacemojiService,
     override val context: Context,
+    private val assets: AssetManager,
     private val layoutInflater: LayoutInflater,
     override val keyboardInteractionListener: KeyboardInteractionManager,
 ): FacemojiKeyboard(), LifecycleOwner {
@@ -58,6 +59,17 @@ class KeyboardCamera (
         R.id.recommendation_2,
         R.id.recommendation_3,
         R.id.recommendation_4
+    )
+
+    private val labelEmojis = mapOf(
+        "Anger" to "\uD83D\uDE21",
+        "Contempt" to "\uD83D\uDE12",
+        "Disgust" to "\uD83D\uDE23",
+        "Fear" to "\uD83D\uDE28",
+        "Happiness" to "\uD83D\uDE42",
+        "Neutral" to "\uD83D\uDE10",
+        "Sadness" to "\uD83D\uDE1E",
+        "Surprise" to "\uD83D\uDE2E",
     )
 
     override fun changeCaps() {}
@@ -165,9 +177,17 @@ class KeyboardCamera (
                     it.setSurfaceProvider(viewFinder.surfaceProvider)
                 }
 
+            val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            val width = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                windowManager.currentWindowMetrics.bounds.width()
+            } else {
+                windowManager.defaultDisplay.width
+            }
+
             val imageAnalysis = ImageAnalysis.Builder()
-                .setTargetResolution(Size(1280, 720))
+                .setTargetResolution(Size(width, height))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .setTargetRotation(Surface.ROTATION_90)
                 .build()
                 .also{
                     it.setAnalyzer(cameraExecutor, createFaceDetector())
@@ -187,7 +207,6 @@ class KeyboardCamera (
             } catch(exc: Exception) {
                 Log.e("facemoji", "Use case binding failed", exc)
             }
-
         }, ContextCompat.getMainExecutor(service))
     }
 
@@ -196,11 +215,19 @@ class KeyboardCamera (
     }
 
     private fun createFaceDetector(): ImageAnalysis.Analyzer {
-        val faceDetector = FaceAnalyzer()
+        val faceDetector = FaceAnalyzer(context, assets)
         faceDetector.listener = object : FaceAnalyzer.Listener {
             override fun onFacesDetected(proxyWidth: Int, proxyHeight: Int, face: Face) {
-                val faceContourOverlay = cameraLayout.findViewById<FaceContourOverlay>(R.id.faceContourOverlay)
-                faceContourOverlay.post { faceContourOverlay.drawFaceBounds(proxyWidth, proxyHeight, face)}
+//                val faceContourOverlay = cameraLayout.findViewById<FaceContourOverlay>(R.id.faceContourOverlay)
+//                faceContourOverlay.post { faceContourOverlay.drawFaceBounds(proxyWidth, proxyHeight, face)}
+            }
+
+            override fun onEmotionDetected(emotion: String) {
+                emojiList = listOf(labelEmojis[emotion]!!) + emojiList
+                emojiList = emojiList.subList(0, 4)
+                Handler(Looper.getMainLooper()).post {
+                    setEmojiLayout()
+                }
             }
 
             override fun onError(exception: Exception) {
