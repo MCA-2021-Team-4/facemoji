@@ -24,6 +24,10 @@ class KeyboardEnglish constructor(
     override val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     private lateinit var sharedPreferences: SharedPreferences
 
+    val setting: String = "setting"
+    val vibrateSetting: String = "keyboardVibrate"
+    val soundSetting: String = "keyboardSound"
+
     private val numPadText = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0")
     private val firstLineText = listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p")
     private val secondLineText = listOf("a", "s", "d", "f", "g", "h", "j", "k", "l")
