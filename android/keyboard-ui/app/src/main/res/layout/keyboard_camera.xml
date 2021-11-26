@@ -23,6 +23,56 @@
 <!--        app:layout_constraintStart_toStartOf="parent"-->
 <!--        app:layout_constraintTop_toTopOf="parent" />-->
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        <TextView
+            android:id="@+id/anger_text"
+            android:textColor="@color/white"
+            android:text="Anger: "
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/disgust_text"
+            android:textColor="@color/white"
+            android:text="Disgust: "
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/fear_text"
+            android:textColor="@color/white"
+            android:text="Fear: "
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/happiness_text"
+            android:textColor="@color/white"
+            android:text="Happiness: "
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/neutral_text"
+            android:textColor="@color/white"
+            android:text="Neutral: "
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/sadness_text"
+            android:textColor="@color/white"
+            android:text="Sadness: "
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/surprise_text"
+            android:textColor="@color/white"
+            android:text="Surprise: "
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
     <Button
         android:id="@+id/change_camera_input_mode"
         android:layout_width="50dp"

@@ -52,6 +52,8 @@ class KeyboardCamera (
     private lateinit var cameraExecutor: ExecutorService
     private val TAG: String = "mojiface"
 
+    private var reloadEmotion: Boolean = true
+
     private var emojiList: List<String>
 
     private var emojiItemIds = listOf(
@@ -70,6 +72,26 @@ class KeyboardCamera (
         "Neutral" to "\uD83D\uDE10",
         "Sadness" to "\uD83D\uDE1E",
         "Surprise" to "\uD83D\uDE2E",
+    )
+
+    private val emotions = arrayOf(
+        "Anger",
+        "Disgust",
+        "Fear",
+        "Happiness",
+        "Neutral",
+        "Sadness",
+        "Surprise",
+    )
+
+    private val emotionTextIds = arrayOf(
+        R.id.anger_text,
+        R.id.disgust_text,
+        R.id.fear_text,
+        R.id.happiness_text,
+        R.id.neutral_text,
+        R.id.sadness_text,
+        R.id.surprise_text,
     )
 
     override fun changeCaps() {}
@@ -102,6 +124,13 @@ class KeyboardCamera (
         }
     }
 
+    private fun setEmotionText(scores: FloatArray) {
+        scores.forEachIndexed { idx, score ->
+            val textView = cameraLayout.findViewById<TextView>(emotionTextIds[idx])
+            textView.text = emotions[idx] + ": " + score
+        }
+    }
+
     override fun initKeyboard() {
         cameraLayout = layoutInflater.inflate(R.layout.keyboard_camera, null)
         vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -129,6 +158,24 @@ class KeyboardCamera (
             cameraExecutor.shutdown()
             keyboardInteractionListener.changeMode(KeyboardInteractionManager.KeyboardType.ENGLISH)
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        }
+
+        cameraLayout.setOnTouchListener { v, event ->
+            when(event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    reloadEmotion = false
+                    Log.i("FACEMOJI", "no reload")
+                }
+                MotionEvent.ACTION_UP -> {
+                    reloadEmotion = true
+                    Log.i("FACEMOJI", "reload")
+                }
+                MotionEvent.ACTION_CANCEL -> {
+                    reloadEmotion = true
+                    Log.i("FACEMOJI", "reload")
+                }
+            }
+            return@setOnTouchListener true
         }
 
         setEmojiLayout()
@@ -226,7 +273,17 @@ class KeyboardCamera (
                 emojiList = listOf(labelEmojis[emotion]!!) + emojiList
                 emojiList = emojiList.subList(0, 4)
                 Handler(Looper.getMainLooper()).post {
-                    setEmojiLayout()
+                    if(reloadEmotion) {
+                        setEmojiLayout()
+                    }
+                }
+            }
+
+            override fun onEmotionScoreDetected(scores: FloatArray) {
+                Handler(Looper.getMainLooper()).post {
+                    if (reloadEmotion) {
+                        setEmotionText(scores)
+                    }
                 }
             }
 
