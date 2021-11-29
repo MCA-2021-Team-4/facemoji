@@ -2,7 +2,6 @@ import cv2
 import os
 import time
 import image_similarity_measures
-from sys import argv
 from image_similarity_measures.quality_metrics import *
 
 platforms = ["Apple", "Facebook", "Google", "Samsung", "Twitter"]
@@ -10,7 +9,6 @@ platforms = ["Apple", "Facebook", "Google", "Samsung", "Twitter"]
 def write_result(metric, dict, platform):
     f = open("results/{}/{}.txt".format(platform, metric), 'w')
     for i, res in enumerate(dict.values()):
-        f.write("{} ".format(i))
         for value in res.values():
             f.write("{:.3f} ".format(value))
         f.write("\n")
