@@ -1,6 +1,6 @@
 # face-moji
 
-## project layout
+## directory layout
 ```
 ├─ android/                          android application source code
 ├─ measuring-emoji-similarity/       measuring similarity between emojis for emoji graph
