@@ -13,5 +13,6 @@ Measuring similarity between emojis with image similarity metrics.
 - Except RMSE, bigger calculated value = more similar images. (smaller is more similar for RMSE)
 
 ### Threhold based similarity judgement
-- `python3 simORnot.py {platform} {metric} {threshold}` for generating bitmap table of similar or not similar emojis at `results/{platform}/bitmap_{metirc}_{threshold}`
+- `python3 simORnot.py {platform} {metric} {threshold}` for printing statistics(average & std. for number of similar emojis for each emoji) for given threhold.
+- `python3 simORnot.py {platform} {metric} {threshold} 1` for printing statistics and generating bitmap table of similar or not similar emojis at `results/{platform}/bitmap_{metirc}_{threshold}`
 - i'th line is in format of `{1 if emoji_i and emoji_0 is similar, else 0} {1 if emoji_i and emoji_1 is similar, else 0} ...`
