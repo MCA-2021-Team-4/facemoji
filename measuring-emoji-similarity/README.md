@@ -16,3 +16,9 @@ Measuring similarity between emojis with image similarity metrics.
 - `python3 simORnot.py {platform} {metric} {threshold}` for printing statistics(average & std. for number of similar emojis for each emoji) for given threhold.
 - `python3 simORnot.py {platform} {metric} {threshold} 1` for printing statistics and generating bitmap table of similar or not similar emojis at `results/{platform}/bitmap_{metirc}_{threshold}`
 - i'th line is in format of `{1 if emoji_i and emoji_0 is similar, else 0} {1 if emoji_i and emoji_1 is similar, else 0} ...`
+
+### Visualization based on similarity result
+- `python3 draw_table.py {platform} {metric} {top_k}` for see visualization
+If top_k is 3, the table has 3 columns and 95 rows. 
+Each i-th row contains the k emojis which is most similar to the i-th emoji.
+The preferred value of top_k is 8 or less.
