@@ -70,6 +70,6 @@ USAGE:
        python3 draw_table.py {platform} {metric} {top_k}
        platform : Apple or Facebook ...
        metric : psnr or rmse ...
-       top_k : int, show top_k most similar pairs 
+       top_k : int, show top_k most similar pairs , max k in my computer is 8
        
 """
