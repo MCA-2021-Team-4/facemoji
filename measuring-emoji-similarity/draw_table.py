@@ -6,9 +6,12 @@ import cv2
 
 def draw_table(img_result, col):
     
-    fig = px.imshow(np.array(img_result), facet_col=0, binary_string=True, facet_col_wrap=col, facet_row_spacing=0.003)
+    fig = px.imshow(np.array(img_result), 
+                    facet_col=0, binary_string=True, 
+                    facet_col_wrap=col,
+                    facet_row_spacing=0.003)
     for i in range(0, len(img_result)):
-        fig.layout.annotations[i]['text'] = "rank"
+        fig.layout.annotations[i]['text'] = ""
     
     fig.update_xaxes(showticklabels=False)
     fig.update_yaxes(showticklabels=False)
@@ -16,6 +19,8 @@ def draw_table(img_result, col):
         margin=dict(l=10, r=10, t=20, b=1),
     )
     fig['layout'].update(height=10000)
+    fig['layout'].update(width=2000)
+    
     fig.show()
 
 def top_k_img_pair(platform, metric, k):
@@ -58,3 +63,13 @@ if __name__ == "__main__":
     k = int(argv[3]) #top k
     img_result = top_k_img_pair(platform, metric, k)
     draw_table(img_result, k)
+    
+
+"""
+USAGE:
+       python3 draw_table.py {platform} {metric} {top_k}
+       platform : Apple or Facebook ...
+       metric : psnr or rmse ...
+       top_k : int, show top_k most similar pairs 
+       
+"""
