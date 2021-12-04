@@ -12,7 +12,9 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" >
+
+    </androidx.camera.view.PreviewView>
 
 <!--    <com.android.mca2021.keyboard.core.FaceContourOverlay-->
 <!--        android:id="@+id/faceContourOverlay"-->
@@ -22,6 +24,40 @@
 <!--        app:layout_constraintEnd_toEndOf="parent"-->
 <!--        app:layout_constraintStart_toStartOf="parent"-->
 <!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="100dp"
+        >
+
+        <Button
+            android:id="@+id/btn_emoji1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="@color/white"
+            android:textSize="30dp"
+            android:visibility="invisible"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <Button
+            android:id="@+id/btn_emoji0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            android:textSize="30dp"
+            android:clickable="true"
+            android:focusable="true"
+            />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -84,52 +120,53 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/view_finder" />
 
-    <LinearLayout
-        android:background="@drawable/recommendation_background"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="10dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/view_finder">
+<!--    <LinearLayout-->
+<!--        android:background="@drawable/recommendation_background"-->
+<!--        android:layout_width="100dp"-->
+<!--        android:layout_height="100dp"-->
+<!--        android:layout_marginEnd="10dp"-->
+<!--        android:layout_marginBottom="10dp"-->
+<!--        android:orientation="vertical"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/view_finder">-->
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:baselineAligned="false"
-            android:orientation="horizontal">
-            <include
-                layout="@layout/emoji_item"
-                android:id="@+id/recommendation_1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
-            <include
-                layout="@layout/emoji_item"
-                android:id="@+id/recommendation_2"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
-        </LinearLayout>
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:baselineAligned="false"-->
+<!--            android:orientation="horizontal">-->
+<!--            <include-->
+<!--                layout="@layout/emoji_item"-->
+<!--                android:id="@+id/recommendation_1"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_weight="1"/>-->
+<!--            <include-->
+<!--                layout="@layout/emoji_item"-->
+<!--                android:id="@+id/recommendation_2"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_weight="1"/>-->
+<!--        </LinearLayout>-->
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:baselineAligned="false"
-            android:orientation="horizontal">
-            <include
-                layout="@layout/emoji_item"
-                android:id="@+id/recommendation_3"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
-            <include
-                layout="@layout/emoji_item"
-                android:id="@+id/recommendation_4"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
-        </LinearLayout>
-    </LinearLayout>
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:baselineAligned="false"-->
+<!--            android:orientation="horizontal">-->
+<!--            <include-->
+<!--                layout="@layout/emoji_item"-->
+<!--                android:id="@+id/recommendation_3"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_weight="1"/>-->
+<!--            <include-->
+<!--                layout="@layout/emoji_item"-->
+<!--                android:id="@+id/recommendation_4"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_weight="1"/>-->
+<!--        </LinearLayout>-->
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

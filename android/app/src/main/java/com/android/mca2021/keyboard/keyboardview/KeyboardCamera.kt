@@ -13,9 +13,12 @@ import android.util.Log
 import android.util.Size
 import android.util.TypedValue
 import android.view.*
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputConnection
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -56,12 +59,15 @@ class KeyboardCamera (
 
     private var emojiList: List<String>
 
+    /*
+
     private var emojiItemIds = listOf(
         R.id.recommendation_1,
         R.id.recommendation_2,
         R.id.recommendation_3,
         R.id.recommendation_4
     )
+     */
 
     private val labelEmojis = mapOf(
         "Anger" to "\uD83D\uDE21",
@@ -94,6 +100,13 @@ class KeyboardCamera (
         R.id.surprise_text,
     )
 
+    /* UI */
+    private lateinit var btn_emoji0: Button
+    private lateinit var btn_emoji1: Button
+    private val openMenuAnim: Animation by lazy {AnimationUtils.loadAnimation(context, R.anim.open_anim)}
+    private val closeMenuAnim: Animation by lazy {AnimationUtils.loadAnimation(context, R.anim.close_anim)}
+    private var isMenuOpened = false
+
     override fun changeCaps() {}
 
     private val lifecycleRegistry = LifecycleRegistry(this)
@@ -112,6 +125,7 @@ class KeyboardCamera (
     }
 
     private fun setEmojiLayout() {
+        /*
         emojiList.forEachIndexed { idx, emoji ->
             val textView = cameraLayout
                 .findViewById<View>(emojiItemIds[idx])
@@ -122,6 +136,10 @@ class KeyboardCamera (
                 inputConnection?.commitText((it as TextView).text.toString(), 1)
             }
         }
+
+         */
+        /* First emoji0 will be set as follow later */
+        // btn_emoji0.text = emojiList[0]
     }
 
     private fun setEmotionText(scores: FloatArray) {
@@ -131,6 +149,7 @@ class KeyboardCamera (
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun initKeyboard() {
         cameraLayout = layoutInflater.inflate(R.layout.keyboard_camera, null)
         vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -163,23 +182,73 @@ class KeyboardCamera (
         cameraLayout.setOnTouchListener { v, event ->
             when(event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    reloadEmotion = false
-                    Log.i("FACEMOJI", "no reload")
+                    if(isMenuOpened){
+                        reloadEmotion = true
+                        isMenuOpened = false
+                        animateGraphButtons(false)
+                    }
                 }
                 MotionEvent.ACTION_UP -> {
-                    reloadEmotion = true
-                    Log.i("FACEMOJI", "reload")
                 }
                 MotionEvent.ACTION_CANCEL -> {
-                    reloadEmotion = true
-                    Log.i("FACEMOJI", "reload")
                 }
             }
             return@setOnTouchListener true
         }
 
+        /* UI */
+        btn_emoji0 = cameraLayout.findViewById(R.id.btn_emoji0)
+        btn_emoji1 = cameraLayout.findViewById(R.id.btn_emoji1)
+
+        btn_emoji0.text = "1"
+
+        btn_emoji0.setOnClickListener {
+            if(isMenuOpened){ /* use that emoji and close menu */
+                Toast.makeText(context, "Used Emoji " + btn_emoji0.text, Toast.LENGTH_SHORT).show()
+                isMenuOpened = false
+                reloadEmotion = true
+                btn_emoji1.isClickable = false
+                animateGraphButtons(false)
+            } else{ /* open menu */
+                isMenuOpened = true
+                reloadEmotion = false
+                btn_emoji1.isClickable = true
+                updateGraphButtons()
+            }
+        }
+
+        btn_emoji1.setOnClickListener {
+            if(isMenuOpened){
+                btn_emoji0.text = btn_emoji1.text
+                updateGraphButtons()
+            }else {
+                Toast.makeText(context, "Something is wrong. This cannot be clicked.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         setEmojiLayout()
     }
+
+    private fun updateGraphButtons() {
+        btn_emoji1.text = getAdjacentEmojis(btn_emoji0.text as String)
+        animateGraphButtons(true)
+    }
+
+    private fun animateGraphButtons(isOpening: Boolean) {
+        if(isOpening)
+            btn_emoji1.startAnimation(openMenuAnim)
+        else
+            btn_emoji1.startAnimation(closeMenuAnim)
+    }
+
+    private fun getAdjacentEmojis(emoji0: String): String {
+        /*
+        This function will return adjacent emojis of emoji0 (based on emoji graph) later.
+        As prototype, just get integer string and return doubled value of it.
+         */
+        return (emoji0.toInt() * 2).toString()
+    }
+
 
     private fun degreesToFirebaseRotation(degrees: Int): Int = when(degrees) {
         0 -> FirebaseVisionImageMetadata.ROTATION_0
