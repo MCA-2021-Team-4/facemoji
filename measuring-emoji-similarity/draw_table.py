@@ -46,7 +46,7 @@ def top_k_img_pair(platform, metric, k):
         else:
             sorted_listline = sorted(listline, key=lambda tup: tup[1], reverse=True)
             
-        top_k = sorted_listline[0:k]
+        top_k = sorted_listline[1:k + 1]
         row_img = cv2.imread(os.path.join(target_dir, emojis[row]))
         for i in range(0, k):
             col_img = cv2.imread(os.path.join(target_dir, emojis[top_k[i][0]]))
