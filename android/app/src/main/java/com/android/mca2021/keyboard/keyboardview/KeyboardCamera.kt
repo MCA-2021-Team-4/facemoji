@@ -56,8 +56,6 @@ class KeyboardCamera(
     private lateinit var cameraExecutor: ExecutorService
     private val TAG: String = "mojiface"
 
-    private var emojiList: List<String>
-
     /*
 
     private var emojiItemIds = listOf(
@@ -104,25 +102,15 @@ class KeyboardCamera(
     private lateinit var btnMainEmoji: View
     private lateinit var mainEmojiText: TextView
 
-    private lateinit var emojiButtonList: List<View>
+    private lateinit var emojiButtons: List<View>
     private lateinit var disabledIndicator: View
 
     private var buttonSize = 50
+    private var graphBounds = 200
 
-    private var scaledEmojiIndex = -1
-    private val openMenuAnim: Animation by lazy {
-        AnimationUtils.loadAnimation(
-            context,
-            R.anim.open_anim
-        )
-    }
-    private val closeMenuAnim: Animation by lazy {
-        AnimationUtils.loadAnimation(
-            context,
-            R.anim.close_anim
-        )
-    }
-    private var isMenuOpened = false
+    private var scaledEmojiIndex: Int? = null
+    private lateinit var openAnimations: List<Animation>
+    private lateinit var closeAnimations: List<Animation>
 
     override fun changeCaps() {}
 
@@ -133,7 +121,6 @@ class KeyboardCamera(
 
     init {
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
-        emojiList = listOf(0x1F600, 0x1F601, 0x1F600, 0x1F600).map { getEmojiByUnicode(it) }
     }
 
     private fun getEmojiByUnicode(unicode: Int): String {
@@ -201,12 +188,28 @@ class KeyboardCamera(
 
         /* UI */
         btnMainEmoji = cameraLayout.findViewById(R.id.main_emoji)
-        emojiButtonList = listOf(
+        emojiButtons = listOf(
             cameraLayout.findViewById(R.id.emoji0),
             cameraLayout.findViewById(R.id.emoji1),
             cameraLayout.findViewById(R.id.emoji2),
             cameraLayout.findViewById(R.id.emoji3),
             cameraLayout.findViewById(R.id.emoji4),
+        )
+
+        openAnimations = listOf(
+            AnimationUtils.loadAnimation(context, R.anim.open_anim_0),
+            AnimationUtils.loadAnimation(context, R.anim.open_anim_1),
+            AnimationUtils.loadAnimation(context, R.anim.open_anim_2),
+            AnimationUtils.loadAnimation(context, R.anim.open_anim_3),
+            AnimationUtils.loadAnimation(context, R.anim.open_anim_4),
+        )
+
+        closeAnimations = listOf(
+            AnimationUtils.loadAnimation(context, R.anim.close_anim_0),
+            AnimationUtils.loadAnimation(context, R.anim.close_anim_1),
+            AnimationUtils.loadAnimation(context, R.anim.close_anim_2),
+            AnimationUtils.loadAnimation(context, R.anim.close_anim_3),
+            AnimationUtils.loadAnimation(context, R.anim.close_anim_4),
         )
 
         emojiGraph = cameraLayout.findViewById(R.id.emoji_graph)
@@ -221,20 +224,31 @@ class KeyboardCamera(
             context.resources.displayMetrics
         ).toInt()
 
-        emojiButtonList.forEach {
-            it.alpha = 0.5f
-        }
+        graphBounds = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            100f,
+            context.resources.displayMetrics
+        ).toInt()
 
         disabledIndicator.setOnClickListener {
             faceAnalyzer.resumeAnalysis()
             it.visibility = View.INVISIBLE
-            moveEmojiGraphDown()
+            startAnalysis()
+            btnMainEmoji.alpha = 0.5f
         }
+
+        btnMainEmoji.scaleX = 1.5f
+        btnMainEmoji.scaleY = 1.5f
+        btnMainEmoji.alpha = 0.5f
 
         btnMainEmoji.setOnTouchListener { v, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
+                    btnMainEmoji.alpha = 1.0f
                     faceAnalyzer.pauseAnalysis()
+                    if (disabledIndicator.visibility == View.INVISIBLE) {
+                        showGraphEmojis()
+                    }
                     true
                 }
                 MotionEvent.ACTION_UP -> {
@@ -242,20 +256,21 @@ class KeyboardCamera(
                     if (insideBounds(event.x, event.y)) {
                         inputConnection?.commitText(mainEmojiText.text.toString(), 1)
                         disabledIndicator.visibility = View.INVISIBLE
-                        faceAnalyzer.resumeAnalysis()
-                        moveEmojiGraphDown()
+                        startAnalysis()
+                    } else if (outsideBounds(event.x, event.y)) {
+                        if (disabledIndicator.visibility == View.INVISIBLE) {
+                            startAnalysis(false)
+                        }
                     } else {
+                        startTraverse()
                         val selection = getEmojiIndex(event.x, event.y)
-                        val newEmoji = emojiButtonList[selection].findViewById<TextView>(R.id.emoji_text).text
+                        val newEmoji = emojiButtons[selection].findViewById<TextView>(R.id.emoji_text).text
                         mainEmojiText.text = newEmoji
-                        disabledIndicator.visibility = View.VISIBLE
-                        faceAnalyzer.pauseAnalysis()
-                        moveEmojiGraphUp()
                     }
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    if (insideBounds(event.x, event.y)) scaleEmoji()
+                    if (insideBounds(event.x, event.y) || outsideBounds(event.x, event.y)) scaleEmoji()
                     else {
                         val selection = getEmojiIndex(event.x, event.y)
                         scaleEmoji(selection)
@@ -267,6 +282,26 @@ class KeyboardCamera(
                 }
             }
         }
+
+        emojiButtons.forEach {
+            it.setOnClickListener {
+                val newEmoji = it.findViewById<TextView>(R.id.emoji_text).text
+                mainEmojiText.text = newEmoji
+            }
+        }
+    }
+
+    private fun startAnalysis(moveGraph: Boolean = true) {
+        faceAnalyzer.resumeAnalysis()
+        if (moveGraph) moveEmojiGraphDown()
+        hideGraphEmojis()
+        btnMainEmoji.alpha = 0.5f
+    }
+
+    private fun startTraverse() {
+        faceAnalyzer.pauseAnalysis()
+        disabledIndicator.visibility = View.VISIBLE
+        moveEmojiGraphUp()
     }
 
     private fun moveEmojiGraphUp() {
@@ -307,33 +342,43 @@ class KeyboardCamera(
         return x > 0 && x < buttonSize && y > 0 && y < buttonSize
     }
 
-    private fun showGraphEmojis() {
+    private fun outsideBounds(x: Float, y: Float): Boolean {
+        val cX = x - buttonSize
+        val cY = buttonSize - y
+        return cX * cX + cY * cY > graphBounds * graphBounds
+    }
 
+    private fun showGraphEmojis() {
+        emojiButtons.forEachIndexed { idx, view ->
+            view.startAnimation(openAnimations[idx])
+        }
     }
 
     private fun hideGraphEmojis() {
-
+        emojiButtons.forEachIndexed { idx, view ->
+            view.startAnimation(closeAnimations[idx])
+        }
     }
 
-    private fun scaleEmoji(index: Int = -1) {
+    private fun scaleEmoji(index: Int? = null) {
         if(scaledEmojiIndex == index) return
-
-        if(scaledEmojiIndex >= 0)
-            emojiButtonList[scaledEmojiIndex].animate()
+        else if(scaledEmojiIndex != null && scaledEmojiIndex!! >= 0) {
+            emojiButtons[scaledEmojiIndex!!].animate()
                 .scaleX(1f)
                 .scaleY(1f)
-                .alpha(0.5f)
                 .setDuration(200)
                 .start()
+        }
 
         scaledEmojiIndex = index
-        if (index < 0) return
-        emojiButtonList[index].animate()
-            .scaleXBy(1.2f)
-            .scaleYBy(1.2f)
-            .alpha(1f)
-            .setDuration(200)
-            .start()
+
+        if (index != null) {
+            emojiButtons[index].animate()
+                .scaleX(1.5f)
+                .scaleY(1.5f)
+                .setDuration(200)
+                .start()
+        }
     }
 
     private fun getAdjacentEmojis(emoji0: String): String {
