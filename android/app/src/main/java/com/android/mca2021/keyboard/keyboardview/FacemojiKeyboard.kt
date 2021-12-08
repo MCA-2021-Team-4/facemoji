@@ -3,6 +3,7 @@ package com.android.mca2021.keyboard.keyboardview
 import android.content.Context
 import android.media.AudioManager
 import android.os.*
+import android.os.VibrationEffect.DEFAULT_AMPLITUDE
 import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -224,9 +225,9 @@ abstract class FacemojiKeyboard {
     open fun playVibrate() {
         if (vibrate > 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrator.vibrate(VibrationEffect.createOneShot(70, vibrate))
+                vibrator.vibrate(VibrationEffect.createOneShot(50, DEFAULT_AMPLITUDE))
             } else {
-                vibrator.vibrate(70)
+                vibrator.vibrate(50)
             }
         }
     }

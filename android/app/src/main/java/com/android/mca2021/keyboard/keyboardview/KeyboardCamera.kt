@@ -18,7 +18,6 @@ import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputConnection
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -38,15 +37,17 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.math.PI
+import kotlin.math.atan2
 
 
-class KeyboardCamera (
+class KeyboardCamera(
     private val service: FacemojiService,
     override val context: Context,
     private val assets: AssetManager,
     private val layoutInflater: LayoutInflater,
     override val keyboardInteractionListener: KeyboardInteractionManager,
-): FacemojiKeyboard(), LifecycleOwner {
+) : FacemojiKeyboard(), LifecycleOwner {
     private lateinit var cameraLayout: View
 
     override var inputConnection: InputConnection? = null
@@ -54,8 +55,6 @@ class KeyboardCamera (
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var cameraExecutor: ExecutorService
     private val TAG: String = "mojiface"
-
-    private var reloadEmotion: Boolean = true
 
     private var emojiList: List<String>
 
@@ -101,19 +100,40 @@ class KeyboardCamera (
     )
 
     /* UI */
-    private lateinit var btn_emoji0: Button
-    private lateinit var btn_emoji1: Button
-    private val openMenuAnim: Animation by lazy {AnimationUtils.loadAnimation(context, R.anim.open_anim)}
-    private val closeMenuAnim: Animation by lazy {AnimationUtils.loadAnimation(context, R.anim.close_anim)}
+    private lateinit var emojiGraph: View
+    private lateinit var btnMainEmoji: View
+    private lateinit var mainEmojiText: TextView
+
+    private lateinit var emojiButtonList: List<View>
+    private lateinit var disabledIndicator: View
+
+    private var buttonSize = 50
+
+    private var scaledEmojiIndex = -1
+    private val openMenuAnim: Animation by lazy {
+        AnimationUtils.loadAnimation(
+            context,
+            R.anim.open_anim
+        )
+    }
+    private val closeMenuAnim: Animation by lazy {
+        AnimationUtils.loadAnimation(
+            context,
+            R.anim.close_anim
+        )
+    }
     private var isMenuOpened = false
 
     override fun changeCaps() {}
 
     private val lifecycleRegistry = LifecycleRegistry(this)
+    private val faceAnalyzer: FaceAnalyzer by lazy {
+        createFaceAnalyzer()
+    }
 
     init {
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
-        emojiList = listOf(0x1F600, 0x1F601, 0x1F600, 0x1F600).map{ getEmojiByUnicode(it) }
+        emojiList = listOf(0x1F600, 0x1F601, 0x1F600, 0x1F600).map { getEmojiByUnicode(it) }
     }
 
     private fun getEmojiByUnicode(unicode: Int): String {
@@ -179,66 +199,141 @@ class KeyboardCamera (
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
         }
 
-        cameraLayout.setOnTouchListener { v, event ->
-            when(event.action) {
+        /* UI */
+        btnMainEmoji = cameraLayout.findViewById(R.id.main_emoji)
+        emojiButtonList = listOf(
+            cameraLayout.findViewById(R.id.emoji0),
+            cameraLayout.findViewById(R.id.emoji1),
+            cameraLayout.findViewById(R.id.emoji2),
+            cameraLayout.findViewById(R.id.emoji3),
+            cameraLayout.findViewById(R.id.emoji4),
+        )
+
+        emojiGraph = cameraLayout.findViewById(R.id.emoji_graph)
+
+        mainEmojiText = btnMainEmoji.findViewById(R.id.emoji_text)
+
+        disabledIndicator = cameraLayout.findViewById(R.id.disabled_indicator)
+
+        buttonSize = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            50f,
+            context.resources.displayMetrics
+        ).toInt()
+
+        emojiButtonList.forEach {
+            it.alpha = 0.5f
+        }
+
+        disabledIndicator.setOnClickListener {
+            faceAnalyzer.resumeAnalysis()
+            it.visibility = View.INVISIBLE
+            moveEmojiGraphDown()
+        }
+
+        btnMainEmoji.setOnTouchListener { v, event ->
+            when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
-                    if(isMenuOpened){
-                        reloadEmotion = true
-                        isMenuOpened = false
-                        animateGraphButtons(false)
-                    }
+                    faceAnalyzer.pauseAnalysis()
+                    true
                 }
                 MotionEvent.ACTION_UP -> {
+                    scaleEmoji()
+                    if (insideBounds(event.x, event.y)) {
+                        inputConnection?.commitText(mainEmojiText.text.toString(), 1)
+                        disabledIndicator.visibility = View.INVISIBLE
+                        faceAnalyzer.resumeAnalysis()
+                        moveEmojiGraphDown()
+                    } else {
+                        val selection = getEmojiIndex(event.x, event.y)
+                        val newEmoji = emojiButtonList[selection].findViewById<TextView>(R.id.emoji_text).text
+                        mainEmojiText.text = newEmoji
+                        disabledIndicator.visibility = View.VISIBLE
+                        faceAnalyzer.pauseAnalysis()
+                        moveEmojiGraphUp()
+                    }
+                    true
                 }
-                MotionEvent.ACTION_CANCEL -> {
+                MotionEvent.ACTION_MOVE -> {
+                    if (insideBounds(event.x, event.y)) scaleEmoji()
+                    else {
+                        val selection = getEmojiIndex(event.x, event.y)
+                        scaleEmoji(selection)
+                    }
+                    false
+                }
+                else -> {
+                    false
                 }
             }
-            return@setOnTouchListener true
         }
-
-        /* UI */
-        btn_emoji0 = cameraLayout.findViewById(R.id.btn_emoji0)
-        btn_emoji1 = cameraLayout.findViewById(R.id.btn_emoji1)
-
-        btn_emoji0.text = "1"
-
-        btn_emoji0.setOnClickListener {
-            if(isMenuOpened){ /* use that emoji and close menu */
-                Toast.makeText(context, "Used Emoji " + btn_emoji0.text, Toast.LENGTH_SHORT).show()
-                isMenuOpened = false
-                reloadEmotion = true
-                btn_emoji1.isClickable = false
-                animateGraphButtons(false)
-            } else{ /* open menu */
-                isMenuOpened = true
-                reloadEmotion = false
-                btn_emoji1.isClickable = true
-                updateGraphButtons()
-            }
-        }
-
-        btn_emoji1.setOnClickListener {
-            if(isMenuOpened){
-                btn_emoji0.text = btn_emoji1.text
-                updateGraphButtons()
-            }else {
-                Toast.makeText(context, "Something is wrong. This cannot be clicked.", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        setEmojiLayout()
     }
 
-    private fun updateGraphButtons() {
-        btn_emoji1.text = getAdjacentEmojis(btn_emoji0.text as String)
-        animateGraphButtons(true)
+    private fun moveEmojiGraphUp() {
+        emojiGraph.animate()
+            .translationY(-175f)
+            .setDuration(300)
+            .start()
     }
 
-    private fun animateGraphButtons(isOpening: Boolean) {
-        if(isOpening)
-            btn_emoji1.startAnimation(openMenuAnim)
-        else
-            btn_emoji1.startAnimation(closeMenuAnim)
+    private fun moveEmojiGraphDown() {
+        emojiGraph.animate()
+            .translationY(0f)
+            .setDuration(300)
+            .start()
+    }
+
+    private fun getEmojiIndex(x: Float, y: Float): Int {
+        val cX = x - buttonSize
+        val cY = buttonSize - y
+        val theta = atan2(cX, cY) * 180 / PI
+        val seg = 360f / 5f
+        return if (theta > 0) {
+            when {
+                theta < seg / 2 -> 0
+                theta < seg / 2 + seg -> 1
+                else -> 2
+            }
+        } else {
+            when {
+                theta > -seg / 2 -> 0
+                theta > -seg / 2 - seg -> 4
+                else -> 3
+            }
+        }
+    }
+
+    private fun insideBounds(x: Float, y: Float): Boolean {
+        return x > 0 && x < buttonSize && y > 0 && y < buttonSize
+    }
+
+    private fun showGraphEmojis() {
+
+    }
+
+    private fun hideGraphEmojis() {
+
+    }
+
+    private fun scaleEmoji(index: Int = -1) {
+        if(scaledEmojiIndex == index) return
+
+        if(scaledEmojiIndex >= 0)
+            emojiButtonList[scaledEmojiIndex].animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .alpha(0.5f)
+                .setDuration(200)
+                .start()
+
+        scaledEmojiIndex = index
+        if (index < 0) return
+        emojiButtonList[index].animate()
+            .scaleXBy(1.2f)
+            .scaleYBy(1.2f)
+            .alpha(1f)
+            .setDuration(200)
+            .start()
     }
 
     private fun getAdjacentEmojis(emoji0: String): String {
@@ -250,7 +345,7 @@ class KeyboardCamera (
     }
 
 
-    private fun degreesToFirebaseRotation(degrees: Int): Int = when(degrees) {
+    private fun degreesToFirebaseRotation(degrees: Int): Int = when (degrees) {
         0 -> FirebaseVisionImageMetadata.ROTATION_0
         90 -> FirebaseVisionImageMetadata.ROTATION_90
         180 -> FirebaseVisionImageMetadata.ROTATION_180
@@ -305,8 +400,8 @@ class KeyboardCamera (
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .setTargetRotation(Surface.ROTATION_90)
                 .build()
-                .also{
-                    it.setAnalyzer(cameraExecutor, createFaceDetector())
+                .also {
+                    it.setAnalyzer(cameraExecutor, faceAnalyzer)
                 }
 
             // Select front camera as a default
@@ -318,9 +413,10 @@ class KeyboardCamera (
 
                 // Bind use cases to camera
                 cameraProvider.bindToLifecycle(
-                    this, cameraSelector, imageAnalysis, preview)
+                    this, cameraSelector, imageAnalysis, preview
+                )
 
-            } catch(exc: Exception) {
+            } catch (exc: Exception) {
                 Log.e("facemoji", "Use case binding failed", exc)
             }
         }, ContextCompat.getMainExecutor(service))
@@ -330,37 +426,31 @@ class KeyboardCamera (
         return cameraLayout
     }
 
-    private fun createFaceDetector(): ImageAnalysis.Analyzer {
-        val faceDetector = FaceAnalyzer(context, assets)
-        faceDetector.listener = object : FaceAnalyzer.Listener {
+    private fun createFaceAnalyzer(): FaceAnalyzer {
+        val faceAnalyzer = FaceAnalyzer(context, assets)
+        faceAnalyzer.listener = object : FaceAnalyzer.Listener {
             override fun onFacesDetected(proxyWidth: Int, proxyHeight: Int, face: Face) {
 //                val faceContourOverlay = cameraLayout.findViewById<FaceContourOverlay>(R.id.faceContourOverlay)
 //                faceContourOverlay.post { faceContourOverlay.drawFaceBounds(proxyWidth, proxyHeight, face)}
             }
 
             override fun onEmotionDetected(emotion: String) {
-                emojiList = listOf(labelEmojis[emotion]!!) + emojiList
-                emojiList = emojiList.subList(0, 4)
                 Handler(Looper.getMainLooper()).post {
-                    if(reloadEmotion) {
-                        setEmojiLayout()
-                    }
+                    mainEmojiText.text = labelEmojis[emotion]
                 }
             }
 
             override fun onEmotionScoreDetected(scores: FloatArray) {
-                Handler(Looper.getMainLooper()).post {
-                    if (reloadEmotion) {
-                        setEmotionText(scores)
-                    }
-                }
+//                Handler(Looper.getMainLooper()).post {
+//                    setEmotionText(scores)
+//                }
             }
 
             override fun onError(exception: Exception) {
                 Log.e(TAG, "Face detection error", exception)
             }
         }
-        return faceDetector
+        return faceAnalyzer
     }
 
     override fun getLifecycle(): Lifecycle {

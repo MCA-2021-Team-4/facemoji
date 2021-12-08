@@ -36,6 +36,7 @@ internal class FaceAnalyzer(
     private val minFaceSize = 32
     private var mtcnnFaceDetector: MTCNNModel? = null
     private var emotionClassifierTfLite: EmotionTfLiteClassifier? = null
+    private var paused: Boolean = false
 
     var listener: Listener? = null
 
@@ -52,20 +53,31 @@ internal class FaceAnalyzer(
         }
     }
 
+    fun pauseAnalysis() {
+        paused = true
+    }
+
+    fun resumeAnalysis() {
+        paused = false
+    }
+
     override fun analyze(imageProxy: ImageProxy) {
         val currentTimestamp = System.currentTimeMillis()
-        val bitmapImage = imageProxy.toBitmap()!!
 
-        val rotateMatrix = Matrix()
-        rotateMatrix.postRotate(-90f)
+        if (!paused) {
+            val bitmapImage = imageProxy.toBitmap()!!
 
-        val rotated = Bitmap.createBitmap(bitmapImage, 0, 0,
-        bitmapImage.width, bitmapImage.height, rotateMatrix, false);
-        mtcnnDetectionAndAttributesRecognition(rotated, emotionClassifierTfLite)
+            val rotateMatrix = Matrix()
+            rotateMatrix.postRotate(-90f)
+
+            val rotated = Bitmap.createBitmap(bitmapImage, 0, 0,
+                bitmapImage.width, bitmapImage.height, rotateMatrix, false);
+            mtcnnDetectionAndAttributesRecognition(rotated, emotionClassifierTfLite)
 //        if (image != null) {
 //            val bitmapImage = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
 //            yuvToRgbConverter.yuvToRgb(image, bitmapImage)
 //        }
+        }
 
         CoroutineScope(Dispatchers.IO).launch {
             delay(1000 - (System.currentTimeMillis() - currentTimestamp))

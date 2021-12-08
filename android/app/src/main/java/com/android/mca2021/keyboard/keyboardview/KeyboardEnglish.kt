@@ -61,8 +61,8 @@ class KeyboardEnglish constructor(
 
         val config = context.resources.configuration
         sharedPreferences = context.getSharedPreferences("setting", Context.MODE_PRIVATE)
-        sound = sharedPreferences.getInt("keyboardSound", -1)
-        vibrate = sharedPreferences.getInt("keyboardVibrate", -1)
+        sound = sharedPreferences.getInt("keyboardSound", 0)
+        vibrate = sharedPreferences.getInt("keyboardVibrate", 0)
 
         val preferredHeight = sharedPreferences.getFloat("keyboardHeight", 250f) / 5.0f
         val heightInDp =
