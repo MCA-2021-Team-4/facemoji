@@ -7,8 +7,7 @@ Measuring similarity between emojis with image similarity metrics.
 - Measured with 5 diffrent metrics ([PSNR](https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio), [RMSE](https://en.wikipedia.org/wiki/Root-mean-square_deviation), [SAM](https://ntrs.nasa.gov/citations/19940012238), [SRE](https://www.sciencedirect.com/science/article/abs/pii/S0924271618302636), [SSIM](https://en.wikipedia.org/wiki/Structural_similarity))
 
 ### Raw measurement result (measure.py)
-- USAGE: `measure.py`
-- Result is at `results/{platform}/{metric}.txt` for 5 platforms and 5 metrics.
+- `measure.py` makes result at `results/{platform}/{metric}.txt` for 5 platforms and 5 metrics.
 - `results/label.txt` contains unique index given to each emoji.
 - i'th line is in format of `{similarity between emoji_i and emoji_0} {similarity between emoji_i and emoji_1} ...`
 - Except RMSE, bigger calculated value = more similar images. (smaller is more similar for RMSE)
