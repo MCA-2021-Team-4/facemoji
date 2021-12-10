@@ -15,6 +15,7 @@ import android.util.TypedValue
 import android.view.*
 import android.view.inputmethod.InputConnection
 import android.widget.Button
+import android.widget.SeekBar
 import android.widget.TextView
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -71,9 +72,9 @@ class KeyboardCamera (
         "Sadness" to "\uD83D\uDE1E",
         "Surprise" to "\uD83D\uDE2E",
     )
-
+    private var iWeight = 1f
     override fun changeCaps() {}
-
+    private var savedAnalyzer : FaceAnalyzer? = null
     private val lifecycleRegistry = LifecycleRegistry(this)
 
     init {
@@ -130,6 +131,23 @@ class KeyboardCamera (
             keyboardInteractionListener.changeMode(KeyboardInteractionManager.KeyboardType.ENGLISH)
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
         }
+
+        val changeWeightSeekbar = cameraLayout.findViewById<SeekBar>(R.id.seekBar_weight)
+        changeWeightSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+                iWeight = 1f + 100 * (p0?.progress?.div(7f) ?: 0f)
+                savedAnalyzer!!.changeWeight(iWeight)
+                Log.i("Seekbar", iWeight.toString())
+            }
+        })
 
         setEmojiLayout()
     }
@@ -234,6 +252,7 @@ class KeyboardCamera (
                 Log.e(TAG, "Face detection error", exception)
             }
         }
+        savedAnalyzer = faceDetector
         return faceDetector
     }
 

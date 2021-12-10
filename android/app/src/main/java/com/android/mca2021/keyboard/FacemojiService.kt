@@ -3,7 +3,6 @@ package com.android.mca2021.keyboard
 import android.content.Context
 import android.content.SharedPreferences
 import android.inputmethodservice.InputMethodService
-import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -24,7 +23,6 @@ class FacemojiService : InputMethodService() {
     val setting: String = "setting"
     val vibrateSetting: String = "keyboardVibrate"
     val soundSetting: String = "keyboardSound"
-
     private lateinit var sharedPreferences: SharedPreferences
 
     private val keyboardInteractionManager = object : KeyboardInteractionManager {

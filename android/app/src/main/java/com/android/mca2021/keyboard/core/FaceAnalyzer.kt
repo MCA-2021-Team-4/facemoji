@@ -47,7 +47,9 @@ internal class FaceAnalyzer(
             Log.e("FACEOMJI", "Exception initializing MTCNNModel!")
         }
     }
-
+    fun changeWeight(iWeight: Float) {
+        emotionClassifierTfLite!!.changeWeight(iWeight)
+    }
     override fun analyze(imageProxy: ImageProxy) {
         val bitmapImage = imageProxy.toBitmap()!!
 

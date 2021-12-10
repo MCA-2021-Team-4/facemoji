@@ -14,9 +14,13 @@ public class EmotionTfLiteClassifier extends TfLiteClassifier{
     private static final String TAG = "EmotionTfLite";
 
     private static final String MODEL_FILE = "emotions_mobilenet.tflite";
-
+    public static float weight = 1;
     public EmotionTfLiteClassifier(final Context context) throws IOException {
         super(context,MODEL_FILE);
+    }
+
+    public void changeWeight(float newWeight) {
+        weight = newWeight;
     }
 
     protected void addPixelValue(int val) {
@@ -28,6 +32,8 @@ public class EmotionTfLiteClassifier extends TfLiteClassifier{
     protected ClassifierResult getResults(float[][][] outputs) {
         final float[] emotions_scores = outputs[0][0];
         EmotionData res=new EmotionData(emotions_scores);
+        res.changeWeight(weight);
+        Log.i("Weight in EmotionCf", String.valueOf(weight));
         return res;
     }
 }
