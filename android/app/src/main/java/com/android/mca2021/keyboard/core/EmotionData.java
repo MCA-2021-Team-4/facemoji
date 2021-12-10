@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 public class EmotionData implements ClassifierResult,Serializable {
     public float[] emotionScores=null;
-    public static float weight = 1;
+    public static float[] weightArray = {1f, 1f, 1f, 1f, 1f, 1f, 1f};
     public EmotionData(){
 
     }
@@ -22,12 +22,14 @@ public class EmotionData implements ClassifierResult,Serializable {
 
     private static String[] emotions={"","Anger", "Disgust", "Fear", "Happiness", "Neutral", "Sadness", "Surprise"};
     public static String getEmotion(float[] emotionScores){
-        emotionScores[0] *= weight;
+        for (int i = 0; i < 7; i++) {
+            emotionScores[i] *= weightArray[i];
+        }
         String emotionScoreStr = String.format("Anger: %f, Disgust: %f, Fear: %f, Happiness: %f, Neutral: %f, Sadness: %f, Surprise: %f",
                 emotionScores[0], emotionScores[1], emotionScores[2], emotionScores[3], emotionScores[4], emotionScores[5],
                 emotionScores[6]);
         Log.i("EmotionScore", emotionScoreStr);
-        Log.i("Weight", String.valueOf(weight));
+        Log.i("Weight", String.valueOf(weightArray[0]));
 
         int bestInd=-1;
         if (emotionScores!=null){
@@ -44,7 +46,7 @@ public class EmotionData implements ClassifierResult,Serializable {
     public String toString(){
         return getEmotion(emotionScores);
     }
-    public void changeWeight(float newWeight) {
-        weight = newWeight;
+    public void changeWeight(float[] newWeight) {
+        weightArray = newWeight;
     }
 }

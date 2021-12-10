@@ -15,6 +15,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <ImageButton
+            android:id="@+id/option_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/option" />
     </androidx.camera.view.PreviewView>
 
 <!--    <com.android.mca2021.keyboard.core.FaceContourOverlay-->
@@ -25,19 +33,6 @@
 <!--        app:layout_constraintEnd_toEndOf="parent"-->
 <!--        app:layout_constraintStart_toStartOf="parent"-->
 <!--        app:layout_constraintTop_toTopOf="parent" />-->
-
-    <SeekBar
-        android:id="@+id/seekBar_weight"
-        style="@style/Widget.AppCompat.SeekBar.Discrete"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="200dp"
-        android:layout_marginBottom="300dp"
-        android:scrollbarSize="100dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/view_finder"
-        android:max="7"
-        android:progress="0"/>
 
     <Button
         android:id="@+id/change_camera_input_mode"

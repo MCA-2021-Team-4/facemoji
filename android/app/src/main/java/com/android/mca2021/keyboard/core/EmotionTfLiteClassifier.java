@@ -14,12 +14,12 @@ public class EmotionTfLiteClassifier extends TfLiteClassifier{
     private static final String TAG = "EmotionTfLite";
 
     private static final String MODEL_FILE = "emotions_mobilenet.tflite";
-    public static float weight = 1;
+    public static float[] weight = {1f, 1f, 1f, 1f, 1f, 1f, 1f};
     public EmotionTfLiteClassifier(final Context context) throws IOException {
         super(context,MODEL_FILE);
     }
 
-    public void changeWeight(float newWeight) {
+    public void changeWeight(float[] newWeight) {
         weight = newWeight;
     }
 

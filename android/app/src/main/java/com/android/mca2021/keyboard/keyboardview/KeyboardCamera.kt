@@ -15,6 +15,7 @@ import android.util.TypedValue
 import android.view.*
 import android.view.inputmethod.InputConnection
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.camera.core.CameraSelector
@@ -72,7 +73,7 @@ class KeyboardCamera (
         "Sadness" to "\uD83D\uDE1E",
         "Surprise" to "\uD83D\uDE2E",
     )
-    private var iWeight = 1f
+    private var weightArray: FloatArray = FloatArray(7) {1f}
     override fun changeCaps() {}
     private var savedAnalyzer : FaceAnalyzer? = null
     private val lifecycleRegistry = LifecycleRegistry(this)
@@ -132,22 +133,16 @@ class KeyboardCamera (
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
         }
 
-        val changeWeightSeekbar = cameraLayout.findViewById<SeekBar>(R.id.seekBar_weight)
-        changeWeightSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-
+        val optionButton = cameraLayout.findViewById<ImageButton>(R.id.option_button)
+        /*optionButton.setOnClickListener {
+            val dlg = EmojiWeightDialog(context)
+            dlg.setOnConfirmClickedListener { content ->
+                weightArray = content
+                //savedAnalyzer?.changeWeight(weightArray)
             }
-
-            override fun onStartTrackingTouch(p0: SeekBar?) {
-
-            }
-
-            override fun onStopTrackingTouch(p0: SeekBar?) {
-                iWeight = 1f + 100 * (p0?.progress?.div(7f) ?: 0f)
-                savedAnalyzer!!.changeWeight(iWeight)
-                Log.i("Seekbar", iWeight.toString())
-            }
-        })
+            dlg.start()
+            savedAnalyzer?.changeWeight(weightArray)
+        }*/
 
         setEmojiLayout()
     }

@@ -47,7 +47,7 @@ internal class FaceAnalyzer(
             Log.e("FACEOMJI", "Exception initializing MTCNNModel!")
         }
     }
-    fun changeWeight(iWeight: Float) {
+    fun changeWeight(iWeight: FloatArray) {
         emotionClassifierTfLite!!.changeWeight(iWeight)
     }
     override fun analyze(imageProxy: ImageProxy) {
