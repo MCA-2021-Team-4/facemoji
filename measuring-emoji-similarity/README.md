@@ -31,6 +31,6 @@ The preferred value of top_k is 8 or less.
 1. For specific metric, fetch ith line from results of every platform.
 2. Select top k similar emojis from each platform for `k = N`, and intersect those results.
 3. If size of intersection is smaller than N, repeat step 2 with `k = k + 1`. Else, select top N results with largest sum of measured value.
-4. Repeat step 1~3 for i = 0~94
+4. Repeat step 1..3 for i = 0..94
 5. Write merged result at "{output_dir}/{metric}.txt" with each ith line in format of `{index of most similar emoji with emoji_i} {index of next most similar emoji with emoji_i} ...`
 - Output shows statistic info. of value of k required to satisfy get intersection of size N for each metrics. (avg, min, max, std, histogram)
