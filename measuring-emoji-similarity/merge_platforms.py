@@ -66,13 +66,7 @@ def merge(metric, n):
             # remove itself
             inter.remove(linenum)
 
-            if len(inter) == n:
-                topn_inds_line = inter
-                ks.append(k)
-                break
-            elif len(inter) < n:
-                k = k + 1
-            else:
+            if len(inter) >= n:
                 sum_of_vals = {}
                 for ind in inter:
                     sum_of_vals[ind] = 0
@@ -82,15 +76,18 @@ def merge(metric, n):
                 topn_inds_line = [i[0] for i in sorted_sum_of_vals[:n]]
                 ks.append(k)
                 break
+            else:
+                k = k + 1
         topn_inds_lines.append(topn_inds_line)
         linenum = linenum + 1
 
     nparr = numpy.array(ks)
-    print("average: {}".format(sum(ks)/len(ks)))
+    print("avg: {}".format(sum(ks)/len(ks)))
     print("min: {}".format(min(ks)))
     print("max: {}".format(max(ks)))
     print("std: {}".format(numpy.std(nparr)))
-    print(plotille.histogram(nparr))
+    print("hist: ")
+    print(plotille.histogram(nparr, X_label="k"))
     print("")
     return topn_inds_lines # list of list of indices
 
