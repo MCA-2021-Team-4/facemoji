@@ -40,11 +40,11 @@ if __name__ == "__main__":
     metric = argv[1]
     # mark_dir = argv[2]
     
-    maxRank = 0
+    minRank = 80000
     for plat in platforms:
         rank = get_platform_rank(metric, plat)
-        if rank > maxRank:
-            maxRank = rank
+        if rank < minRank:
+            minRank = rank
             selected_platform = plat
     
     print(selected_platform)
