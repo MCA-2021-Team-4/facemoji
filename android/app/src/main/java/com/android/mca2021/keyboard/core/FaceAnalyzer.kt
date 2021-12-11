@@ -108,8 +108,8 @@ internal class FaceAnalyzer(
                 bmp,
                 max(bboxOrig.left, 0),
                 max(bboxOrig.top, 0),
-                min(bboxOrig.width(), bmp.width - bboxOrig.left),
-                min(bboxOrig.height(), bmp.height - bboxOrig.top)
+                min(bboxOrig.width(), bmp.width - max(bboxOrig.left, 0)),
+                min(bboxOrig.height(), bmp.height - max(bboxOrig.top, 0))
             )
             val resultBitmap = Bitmap.createScaledBitmap(
                 faceBitmap,
