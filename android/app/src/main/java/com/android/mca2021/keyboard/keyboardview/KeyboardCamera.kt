@@ -74,7 +74,6 @@ class KeyboardCamera (
     )
     private var weightArray: FloatArray = FloatArray(7) {1f}
     override fun changeCaps() {}
-    private var savedAnalyzer : FaceAnalyzer? = null
     private val lifecycleRegistry = LifecycleRegistry(this)
 
     init {
@@ -112,8 +111,6 @@ class KeyboardCamera (
         sound = sharedPreferences.getInt("keyboardSound", -1)
         vibrate = sharedPreferences.getInt("keyboardVibrate", -1)
 
-        getEmojiWeight(sharedPreferences)
-
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         if (allPermissionsGranted()) {
@@ -137,24 +134,13 @@ class KeyboardCamera (
 
         val optionButton = cameraLayout.findViewById<ImageButton>(R.id.option_button)
         optionButton.setOnClickListener {
-            val intent2 = Intent(context, EmojiWeightPopup::class.java).apply {
+            val intent = Intent(context, EmojiWeightSetActivity::class.java).apply {
                 addFlags(FLAG_ACTIVITY_NEW_TASK)
             }
-            context.startActivity(intent2)
-
+            context.startActivity(intent)
         }
 
         setEmojiLayout()
-    }
-
-    private fun getEmojiWeight(preferences: SharedPreferences) {
-        weightArray[0] = 1f + 100*preferences.getInt("anger", 0).div(7f)
-        weightArray[1] = 1f + 100*preferences.getInt("disgust", 0).div(7f)
-        weightArray[2] = 1f + 100*preferences.getInt("fear", 0).div(7f)
-        weightArray[3] = 1f + 100*preferences.getInt("happiness", 0).div(7f)
-        weightArray[4] = 1f + 100*preferences.getInt("neutral", 0).div(7f)
-        weightArray[5] = 1f + 100*preferences.getInt("sadness", 0).div(7f)
-        weightArray[6] = 1f + 100*preferences.getInt("surprise", 0).div(7f)
     }
 
     private fun degreesToFirebaseRotation(degrees: Int): Int = when(degrees) {
@@ -257,8 +243,6 @@ class KeyboardCamera (
                 Log.e(TAG, "Face detection error", exception)
             }
         }
-        savedAnalyzer = faceDetector
-        savedAnalyzer?.changeWeight(weightArray)
         return faceDetector
     }
 

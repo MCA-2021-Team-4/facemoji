@@ -35,7 +35,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@+id/view_finder"
         android:scaleType="centerCrop"
-        app:srcCompat="@drawable/option" />
+        android:src="@drawable/option" />
 
     <Button
         android:id="@+id/change_camera_input_mode"

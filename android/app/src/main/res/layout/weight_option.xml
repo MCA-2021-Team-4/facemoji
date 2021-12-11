@@ -9,6 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="20dp"
+        android:layout_marginTop="10dp"
     />
 
     <LinearLayout
@@ -16,13 +17,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="center">
+        android:gravity="center"
+        android:layout_marginTop="5dp">
 
         <TextView
             android:text="Anger"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            />
+            android:layout_marginLeft="10dp" />
 
         <SeekBar
             android:id="@+id/seekBar_anger"
@@ -38,12 +40,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="center">
+        android:gravity="center"
+        android:layout_marginTop="5dp">
 
         <TextView
             android:text="Disgust"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             />
 
         <SeekBar
@@ -60,13 +64,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="center">
+        android:gravity="center"
+        android:layout_marginTop="5dp">
 
         <TextView
             android:text="Fear"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            />
+            android:layout_marginLeft="10dp" />
 
         <SeekBar
             android:id="@+id/seekBar_fear"
@@ -82,13 +87,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="center">
+        android:gravity="center"
+        android:layout_marginTop="5dp">
 
         <TextView
             android:text="Happiness"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            />
+            android:layout_marginLeft="10dp" />
 
         <SeekBar
             android:id="@+id/seekBar_happiness"
@@ -104,13 +110,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="center">
+        android:gravity="center"
+        android:layout_marginTop="5dp">
 
         <TextView
             android:text="Neutral"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            />
+            android:layout_marginLeft="10dp" />
 
         <SeekBar
             android:id="@+id/seekBar_neutral"
@@ -126,13 +133,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="center">
+        android:gravity="center"
+        android:layout_marginTop="5dp">
 
         <TextView
             android:text="Sadness"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            />
+            android:layout_marginLeft="10dp" />
 
         <SeekBar
             android:id="@+id/seekBar_sadness"
@@ -148,13 +156,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="center">
+        android:gravity="center"
+        android:layout_marginTop="5dp">
 
         <TextView
             android:text="Surprise"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            />
+            android:layout_marginLeft="10dp" />
 
         <SeekBar
             android:id="@+id/seekBar_surprise"

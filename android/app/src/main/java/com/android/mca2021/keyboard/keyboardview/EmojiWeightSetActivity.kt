@@ -2,17 +2,15 @@ package com.android.mca2021.keyboard.keyboardview
 
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Window
 import android.widget.Button
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
-import com.android.mca2021.keyboard.FacemojiService
 import com.android.mca2021.keyboard.R
 
-class EmojiWeightPopup: AppCompatActivity() {
+class EmojiWeightSetActivity: AppCompatActivity() {
     private lateinit var btnConfirm: Button
     private var weightArray: IntArray = IntArray(7) {0}
     private lateinit var seekBarAnger: SeekBar
@@ -35,8 +33,6 @@ class EmojiWeightPopup: AppCompatActivity() {
         seekBarConfig()
 
         btnConfirm = findViewById(R.id.confirm_button)
-
-        val intent = Intent(this.baseContext, FacemojiService::class.java)
         btnConfirm.setOnClickListener {
             sharedPreferencesEditor.putInt("anger", weightArray[0])
             sharedPreferencesEditor.putInt("disgust", weightArray[1])
@@ -47,7 +43,6 @@ class EmojiWeightPopup: AppCompatActivity() {
             sharedPreferencesEditor.putInt("surprise", weightArray[6])
             sharedPreferencesEditor.apply()
             finish()
-
         }
 
     }
@@ -109,7 +104,6 @@ class EmojiWeightPopup: AppCompatActivity() {
                 }
             }
         }
-
         seekBarAnger.setOnSeekBarChangeListener(listener)
         seekBarDisgust.setOnSeekBarChangeListener(listener)
         seekBarFear.setOnSeekBarChangeListener(listener)
@@ -117,13 +111,6 @@ class EmojiWeightPopup: AppCompatActivity() {
         seekBarNeutral.setOnSeekBarChangeListener(listener)
         seekBarSadness.setOnSeekBarChangeListener(listener)
         seekBarSurprise.setOnSeekBarChangeListener(listener)
-
     }
-
-    override fun onBackPressed() {
-
-    }
-
-
 
 }
