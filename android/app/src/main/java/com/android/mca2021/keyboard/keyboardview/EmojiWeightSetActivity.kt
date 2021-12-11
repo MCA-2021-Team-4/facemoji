@@ -81,26 +81,14 @@ class EmojiWeightSetActivity: AppCompatActivity() {
             }
 
             override fun onStopTrackingTouch(p0: SeekBar?) {
-                if (p0 == seekBarAnger) {
-                    weightArray[0] = p0.progress
-                }
-                else if (p0 == seekBarDisgust) {
-                    weightArray[1] = p0.progress
-                }
-                else if (p0 == seekBarFear) {
-                    weightArray[2] = p0.progress
-                }
-                else if (p0 == seekBarHappiness) {
-                    weightArray[3] = p0.progress
-                }
-                else if (p0 == seekBarNeutral) {
-                    weightArray[4] = p0.progress
-                }
-                else if (p0 == seekBarSadness) {
-                    weightArray[5] = p0.progress
-                }
-                else if (p0 == seekBarSurprise) {
-                    weightArray[6] = p0.progress
+                when (p0) {
+                    seekBarAnger -> weightArray[0] = p0.progress
+                    seekBarDisgust -> weightArray[1] = p0.progress
+                    seekBarFear -> weightArray[2] = p0.progress
+                    seekBarHappiness -> weightArray[3] = p0.progress
+                    seekBarNeutral -> weightArray[4] = p0.progress
+                    seekBarSadness -> weightArray[5] = p0.progress
+                    seekBarSurprise -> weightArray[6] = p0.progress
                 }
             }
         }
