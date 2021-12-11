@@ -49,6 +49,7 @@ internal class FaceAnalyzer(
     }
     fun changeWeight(iWeight: FloatArray) {
         emotionClassifierTfLite!!.changeWeight(iWeight)
+        Log.i("WeightCFTF", iWeight[0].toString())
     }
     override fun analyze(imageProxy: ImageProxy) {
         val bitmapImage = imageProxy.toBitmap()!!

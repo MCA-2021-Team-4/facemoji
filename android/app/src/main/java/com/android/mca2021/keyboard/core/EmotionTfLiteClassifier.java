@@ -33,7 +33,7 @@ public class EmotionTfLiteClassifier extends TfLiteClassifier{
         final float[] emotions_scores = outputs[0][0];
         EmotionData res=new EmotionData(emotions_scores);
         res.changeWeight(weight);
-        Log.i("Weight in EmotionCf", String.valueOf(weight));
+        Log.i("Weight in EmotionCf", String.valueOf(weight[0]));
         return res;
     }
 }

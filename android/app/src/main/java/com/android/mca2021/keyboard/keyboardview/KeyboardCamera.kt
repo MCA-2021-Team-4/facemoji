@@ -16,7 +16,6 @@ import android.view.*
 import android.view.inputmethod.InputConnection
 import android.widget.Button
 import android.widget.ImageButton
-import android.widget.SeekBar
 import android.widget.TextView
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -112,6 +111,9 @@ class KeyboardCamera (
         sharedPreferences = context.getSharedPreferences("setting", Context.MODE_PRIVATE)
         sound = sharedPreferences.getInt("keyboardSound", -1)
         vibrate = sharedPreferences.getInt("keyboardVibrate", -1)
+
+        getEmojiWeight(sharedPreferences)
+
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         if (allPermissionsGranted()) {
@@ -134,17 +136,25 @@ class KeyboardCamera (
         }
 
         val optionButton = cameraLayout.findViewById<ImageButton>(R.id.option_button)
-        /*optionButton.setOnClickListener {
-            val dlg = EmojiWeightDialog(context)
-            dlg.setOnConfirmClickedListener { content ->
-                weightArray = content
-                //savedAnalyzer?.changeWeight(weightArray)
+        optionButton.setOnClickListener {
+            val intent2 = Intent(context, EmojiWeightPopup::class.java).apply {
+                addFlags(FLAG_ACTIVITY_NEW_TASK)
             }
-            dlg.start()
-            savedAnalyzer?.changeWeight(weightArray)
-        }*/
+            context.startActivity(intent2)
+
+        }
 
         setEmojiLayout()
+    }
+
+    private fun getEmojiWeight(preferences: SharedPreferences) {
+        weightArray[0] = 1f + 100*preferences.getInt("anger", 0).div(7f)
+        weightArray[1] = 1f + 100*preferences.getInt("disgust", 0).div(7f)
+        weightArray[2] = 1f + 100*preferences.getInt("fear", 0).div(7f)
+        weightArray[3] = 1f + 100*preferences.getInt("happiness", 0).div(7f)
+        weightArray[4] = 1f + 100*preferences.getInt("neutral", 0).div(7f)
+        weightArray[5] = 1f + 100*preferences.getInt("sadness", 0).div(7f)
+        weightArray[6] = 1f + 100*preferences.getInt("surprise", 0).div(7f)
     }
 
     private fun degreesToFirebaseRotation(degrees: Int): Int = when(degrees) {
@@ -248,6 +258,7 @@ class KeyboardCamera (
             }
         }
         savedAnalyzer = faceDetector
+        savedAnalyzer?.changeWeight(weightArray)
         return faceDetector
     }
 

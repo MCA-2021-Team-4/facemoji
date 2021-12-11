@@ -20,7 +20,7 @@
 
         <TextView
             android:text="Anger"
-            android:layout_width="70dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             />
 
@@ -42,7 +42,7 @@
 
         <TextView
             android:text="Disgust"
-            android:layout_width="70dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             />
 
@@ -64,7 +64,7 @@
 
         <TextView
             android:text="Fear"
-            android:layout_width="70dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             />
 
@@ -86,7 +86,7 @@
 
         <TextView
             android:text="Happiness"
-            android:layout_width="70dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             />
 
@@ -108,7 +108,7 @@
 
         <TextView
             android:text="Neutral"
-            android:layout_width="70dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             />
 
@@ -130,7 +130,7 @@
 
         <TextView
             android:text="Sadness"
-            android:layout_width="70dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             />
 
@@ -152,7 +152,7 @@
 
         <TextView
             android:text="Surprise"
-            android:layout_width="70dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             />
 
