@@ -72,7 +72,6 @@ class KeyboardCamera (
         "Sadness" to "\uD83D\uDE1E",
         "Surprise" to "\uD83D\uDE2E",
     )
-    private var weightArray: FloatArray = FloatArray(7) {1f}
     override fun changeCaps() {}
     private val lifecycleRegistry = LifecycleRegistry(this)
 

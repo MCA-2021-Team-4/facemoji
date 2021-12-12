@@ -1,177 +1,198 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="300dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
+
     <TextView
-        android:text="Emotion Weight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginBottom="20dp"
         android:layout_marginTop="10dp"
-    />
+        android:layout_marginBottom="20dp"
+        android:text="Emoji Weight"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="50dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
-        <TextView
-            android:text="Anger"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp" />
+        <include
+            layout="@layout/emoji_item"
+            android:id="@+id/emoji_anger"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            />
 
         <SeekBar
             android:id="@+id/seekBar_anger"
             style="@style/Widget.AppCompat.SeekBar.Discrete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
             android:max="7"
             android:progress="0" />
+
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="50dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
-        <TextView
-            android:text="Disgust"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+        <include
+            layout="@layout/emoji_item"
+            android:id="@+id/emoji_disgust"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             />
 
         <SeekBar
             android:id="@+id/seekBar_disgust"
             style="@style/Widget.AppCompat.SeekBar.Discrete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
             android:max="7"
             android:progress="0" />
+
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="50dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
-        <TextView
-            android:text="Fear"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp" />
+        <include
+            layout="@layout/emoji_item"
+            android:id="@+id/emoji_fear"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            />
 
         <SeekBar
             android:id="@+id/seekBar_fear"
             style="@style/Widget.AppCompat.SeekBar.Discrete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
             android:max="7"
             android:progress="0" />
+
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="50dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
-        <TextView
-            android:text="Happiness"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp" />
+        <include
+            layout="@layout/emoji_item"
+            android:id="@+id/emoji_happiness"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            />
 
         <SeekBar
             android:id="@+id/seekBar_happiness"
             style="@style/Widget.AppCompat.SeekBar.Discrete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
             android:max="7"
             android:progress="0" />
+
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="50dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
-        <TextView
-            android:text="Neutral"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp" />
+        <include
+            layout="@layout/emoji_item"
+            android:id="@+id/emoji_neutral"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            />
 
         <SeekBar
             android:id="@+id/seekBar_neutral"
             style="@style/Widget.AppCompat.SeekBar.Discrete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
             android:max="7"
             android:progress="0" />
+
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="50dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
-        <TextView
-            android:text="Sadness"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp" />
+        <include
+            layout="@layout/emoji_item"
+            android:id="@+id/emoji_sadness"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            />
 
         <SeekBar
             android:id="@+id/seekBar_sadness"
             style="@style/Widget.AppCompat.SeekBar.Discrete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
             android:max="7"
             android:progress="0" />
+
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="50dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
-        <TextView
-            android:text="Surprise"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp" />
+        <include
+            layout="@layout/emoji_item"
+            android:id="@+id/emoji_surprise"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            />
 
         <SeekBar
             android:id="@+id/seekBar_surprise"
             style="@style/Widget.AppCompat.SeekBar.Discrete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
             android:max="7"
             android:progress="0" />
+
     </LinearLayout>
 
     <Button
