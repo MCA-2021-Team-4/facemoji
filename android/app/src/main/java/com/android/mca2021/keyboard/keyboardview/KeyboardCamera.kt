@@ -15,6 +15,7 @@ import android.util.TypedValue
 import android.view.*
 import android.view.inputmethod.InputConnection
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -71,9 +72,8 @@ class KeyboardCamera (
         "Sadness" to "\uD83D\uDE1E",
         "Surprise" to "\uD83D\uDE2E",
     )
-
+    private var weightArray: FloatArray = FloatArray(7) {1f}
     override fun changeCaps() {}
-
     private val lifecycleRegistry = LifecycleRegistry(this)
 
     init {
@@ -110,6 +110,7 @@ class KeyboardCamera (
         sharedPreferences = context.getSharedPreferences("setting", Context.MODE_PRIVATE)
         sound = sharedPreferences.getInt("keyboardSound", -1)
         vibrate = sharedPreferences.getInt("keyboardVibrate", -1)
+
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         if (allPermissionsGranted()) {
@@ -129,6 +130,14 @@ class KeyboardCamera (
             cameraExecutor.shutdown()
             keyboardInteractionListener.changeMode(KeyboardInteractionManager.KeyboardType.ENGLISH)
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        }
+
+        val optionButton = cameraLayout.findViewById<ImageButton>(R.id.option_button)
+        optionButton.setOnClickListener {
+            val intent = Intent(context, EmojiWeightSetActivity::class.java).apply {
+                addFlags(FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
         }
 
         setEmojiLayout()
