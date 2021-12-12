@@ -4,16 +4,14 @@ from sys import argv
 import numpy as np
 import cv2
 
-def draw_table(img_result, col, strange_nums = []):
+def draw_table(img_result, col, labels = []):
     
     fig = px.imshow(np.array(img_result), 
                     facet_col=0, binary_string=True, 
                     facet_col_wrap=col,
                     facet_row_spacing=0.003)
     for i in range(0, len(img_result)):
-        label = ((95 - int(i / 8)) - 1) * 8 + int(i % 8)
-        label = (str(label) + "-strange") if label in strange_nums else label
-        fig.layout.annotations[i]['text'] = label
+        fig.layout.annotations[i]['text'] = labels[len(labels) - i - 1]
     
     fig.update_xaxes(showticklabels=False)
     fig.update_yaxes(showticklabels=False)

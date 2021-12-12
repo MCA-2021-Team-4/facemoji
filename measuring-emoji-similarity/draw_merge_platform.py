@@ -7,7 +7,30 @@ from draw_table import draw_table
 
 
 platforms = ["Apple", "Facebook", "Google", "Samsung", "Twitter"]
+emotion = {"0" : "Happiness", "1" : "Neutral", "2" : "Surprise", "3" : "Fear", "4" : "Sadness", "5" : "Disgust", "6" : "Anger"}
 
+def draw_emoji_emotion(plat):
+    target_dir = os.path.join("emojis", plat)
+    emoji_emotion_f = open(f"results/label-with-emotion.txt", "r")
+    
+    img_results= []
+    for emoji in sorted(os.listdir(target_dir)):
+        img = cv2.imread(os.path.join(target_dir, emoji))
+        img_results.append(img)
+        
+    labels = []
+    while True:
+        line = emoji_emotion_f.readline()
+        if not line:
+            break
+        line = list(line.split())
+        labels.append(emotion[line[2]])
+        
+    draw_table(img_results, 1, labels)
+        
+   
+        
+    
 def get_platform_rank(metric, plat):
     merged_f = open(f"merged/{metric}.txt", "r")
     plat_f = open(f"results/{plat}/{metric}.txt", "r")
@@ -34,11 +57,9 @@ def get_platform_rank(metric, plat):
                     rank += index
     return rank
 
-def get_image_pair(selected_platform, metric):
+def draw_image_pair(selected_platform, metric):
     target_dir = os.path.join("emojis", selected_platform)
     merged_f = open(f"merged/{metric}.txt", "r")
-    
-    
     
     emojis = []
     for i, emoji in enumerate(sorted(os.listdir(target_dir))):
@@ -63,37 +84,82 @@ def get_image_pair(selected_platform, metric):
             
         row += 1
         
-    return img_result
+    labels = [i for i in range(0, len(img_result))]
+    print("draw start")
+    draw_table(img_result, 8, labels)
+
+def get_same_emotion_num(metric):
+    result = [] #행별 대표이모지와 같은 감정을 가지고 있는 이모지의 수를 나타낸다.
+    emoji_emotion_f = open(f"results/label-with-emotion.txt", "r")
+    merged_f = open(f"merged/{metric}.txt", "r")
+    
+    emoji_emotion = []
+    while True:
+        line = emoji_emotion_f.readline()
+        if not line:
+            break
+        emoji_emotion.append(list(line.split()))
+        
+    row = 0
+    while True:
+        line = merged_f.readline()
+        same_emotion_num = 0
+        if not line:
+            break
+        
+        line = list(line.split())
+        line = [int(value) for value in line] #merged file의 결과를 int로 변환
+        represent_emoji_emotion = emoji_emotion[row][2] #행의 대표 이모지의 감정 번호
+        for merged_result in line:
+            if emoji_emotion[merged_result][2] == represent_emoji_emotion: #행에 속하는 이모지 감정이 행의 대표 이모지 감정과 같을 경우
+                same_emotion_num += 1
+        
+        result.append(same_emotion_num)
+        row += 1
+        
+    return result
 
 if __name__ == "__main__":
-    # if len(argv) < 2 :
-    #     usage_msg = """
-    #     USAGE:
-    #            python draw_merge_platform.py {metric} {mark directory}
-    #     """
-    #     print(usage_msg)
-    #     quit()
+    if len(argv) < 2 :
+        usage_msg = """
+        USAGE:
+               python draw_merge_platform.py {mode} {metric or platform}
+        """
+        print(usage_msg)
+        quit()
     
-    metric = argv[1]
-    # mark_dir = argv[2]
+    mode = int(argv[1])
     
-    strange_f = open(f"strange/{metric}.txt", "r")
-    strange_line = strange_f.readline()
-    strange_line = list(strange_line.split())
-    strange_line = [int(value) for value in strange_line]
     
-    minRank = 80000
-    for plat in platforms:
-        rank = get_platform_rank(metric, plat)
-        if rank < minRank:
-            minRank = rank
-            selected_platform = plat
-            
-    print(f"finish getting platfrom. selected platform is {selected_platform}")
-            
-    img_result = get_image_pair(selected_platform, metric)
-    draw_table(img_result, 8, strange_line)
-    
+    if(mode == 0):
+        platform = argv[2]
+        print("Show imoji-emotion mapping")
+        draw_emoji_emotion(platform)
+        
+    elif(mode == 1):    
+        metric = argv[2]
+        print(f"merged된 {metric}을 바탕으로 통계 결과")
+        minRank = 80000
+        for plat in platforms:
+            rank = get_platform_rank(metric, plat)
+            if rank < minRank:
+                minRank = rank
+                selected_platform = plat
+
+        print(f"finish getting platfrom. selected platform is {selected_platform}")
+
+
+        result = get_same_emotion_num(metric)
+        mean_val = np.mean(np.array(result))
+        min_val = min(result)
+        max_val = max(result)
+        min_appear_num = result.count(min_val)
+        max_appear_num = result.count(max_val)
+        print(f"평균 : {mean_val}")
+        print(f"최소값 : {min_val}, 최소값 등장 횟수 : {min_appear_num}")
+        print(f"최대값 : {max_val}, 최대값 등장 횟수 : {max_appear_num}")
+        draw_image_pair(selected_platform, metric)
+
     
     
     

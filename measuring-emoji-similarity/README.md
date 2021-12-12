@@ -33,3 +33,13 @@ The preferred value of top_k is 8 or less.
 4. Repeat step 1..3 for i = 0..94
 5. Write merged result at "{output_dir}/{metric}.txt" with each ith line in format of `{index of most similar emoji with emoji_i} {index of next most similar emoji with emoji_i} ...`
 - Output shows statistic info. of value of k required to satisfy get intersection of size N for each metrics. (avg, min, max, std, histogram)
+
+### Visualization Merging
+-`python draw_merge_platform.py {mode} {metric or platform}`
+1. mode 0 : When mode is 0, the scond agrument is platform. 
+ex) python draw_merge_platform.py 0 Apple
+It renders emoji and emotion mapping on the screen.
+
+2. mode 1 : When mode is 1, the scond agrument is metric.
+ex) python draw_merge_platform.py 1 ssim
+Based on the result of merged, count the number of emojis with the same emotion of the representative emoji in each row. If the emotion of the representative emoji in the row is happiness, count the number of emojis with happiness.
