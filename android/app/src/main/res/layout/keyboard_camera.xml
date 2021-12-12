@@ -14,160 +14,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:id="@+id/disabled_indicator"
+    <com.seonjunkim.radialmenu.CircularButton
         android:layout_width="match_parent"
         android:layout_height="350dp"
-        android:background="@color/transparentBlack"
-        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-    <!--    <com.android.mca2021.keyboard.core.FaceContourOverlay-->
-    <!--        android:id="@+id/faceContourOverlay"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="350dp"-->
-    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent" />-->
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/emoji_graph"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-        <include
-            layout="@layout/emoji_item"
-            android:id="@+id/emoji0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:visibility="invisible"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/main_emoji"
-            app:layout_constraintEnd_toEndOf="@+id/main_emoji"
-            app:layout_constraintStart_toStartOf="@+id/main_emoji" />
-
-        <include
-            android:id="@+id/emoji1"
-            layout="@layout/emoji_item"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="16dp"
-            android:visibility="invisible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/main_emoji"
-            app:layout_constraintStart_toEndOf="@+id/main_emoji" />
-
-        <include
-            android:id="@+id/emoji2"
-            layout="@layout/emoji_item"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="38dp"
-            android:visibility="invisible"
-            app:layout_constraintTop_toBottomOf="@+id/main_emoji"
-            app:layout_constraintStart_toStartOf="@+id/main_emoji" />
-
-        <include
-            android:id="@+id/emoji3"
-            layout="@layout/emoji_item"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="38dp"
-            android:visibility="invisible"
-            app:layout_constraintTop_toBottomOf="@+id/main_emoji"
-            app:layout_constraintEnd_toEndOf="@+id/main_emoji" />
-
-        <include
-            android:id="@+id/emoji4"
-            layout="@layout/emoji_item"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="16dp"
-            android:visibility="invisible"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/main_emoji"
-            app:layout_constraintEnd_toStartOf="@+id/main_emoji" />
-
-        <include
-            layout="@layout/emoji_item"
-            android:id="@+id/main_emoji"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/anger_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Anger: "
-            android:textColor="@color/white" />
-
-        <TextView
-            android:id="@+id/disgust_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Disgust: "
-            android:textColor="@color/white" />
-
-        <TextView
-            android:id="@+id/fear_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Fear: "
-            android:textColor="@color/white" />
-
-        <TextView
-            android:id="@+id/happiness_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Happiness: "
-            android:textColor="@color/white" />
-
-        <TextView
-            android:id="@+id/neutral_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Neutral: "
-            android:textColor="@color/white" />
-
-        <TextView
-            android:id="@+id/sadness_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sadness: "
-            android:textColor="@color/white" />
-
-        <TextView
-            android:id="@+id/surprise_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Surprise: "
-            android:textColor="@color/white" />
-    </LinearLayout>
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
     <Button
         android:id="@+id/change_camera_input_mode"
@@ -177,7 +31,8 @@
         android:layout_marginBottom="10dp"
         android:background="@drawable/key_background"
         android:text="A"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="10dp"
         app:layout_constraintStart_toStartOf="@+id/view_finder" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
