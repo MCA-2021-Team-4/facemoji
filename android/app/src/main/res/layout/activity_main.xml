@@ -116,7 +116,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/btn_emotion_weight"
+                android:id="@+id/btn_emoji_platform"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:background="@drawable/preference_list_item"
@@ -125,6 +125,29 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/btn_vibration">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    android:text="@string/emoji_platform"
+                    android:textSize="17sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btn_emotion_weight"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:background="@drawable/preference_list_item"
+                android:gravity="start|center_vertical"
+                android:onClick="openKeyboardSetting"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_emoji_platform">
 
                 <TextView
                     android:layout_width="wrap_content"

@@ -12,6 +12,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
@@ -43,10 +44,14 @@ class MainActivity : AppCompatActivity() {
 
         binding.vibrationSwitch.setOnCheckedChangeListener { v, isChecked ->
             sharedPreferences.edit {
-                this.putInt("keyboardVibrate", if(isChecked) 1 else -1)
+                this.putInt("keyboardVibrate", if (isChecked) 1 else -1)
                 this.apply()
                 this.commit()
             }
+        }
+
+        binding.btnEmojiPlatform.setOnClickListener {
+            openPlatformDialog()
         }
     }
 
@@ -60,19 +65,40 @@ class MainActivity : AppCompatActivity() {
         checkKeyboardSettings()
     }
 
+    private fun openPlatformDialog() {
+        val platformList = EmojiPlatform.all.map { it.name.lowercase() }.toTypedArray()
+        val selectedPlatform = sharedPreferences.getString("emojiPlatform", "google")!!
+        val selectedIndex = platformList.indexOf(selectedPlatform)
+        AlertDialog.Builder(this).setSingleChoiceItems(
+            platformList,
+            selectedIndex
+        ) { dialog, which ->
+            sharedPreferences.edit {
+                this.putString("emojiPlatform", platformList[which])
+                this.apply()
+                this.commit()
+            }
+        }
+            .setPositiveButton(R.string.confirm, null)
+            .show()
+    }
+
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
 
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults:
-        IntArray) {
+        IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (!allPermissionsGranted()) {
-                Toast.makeText(this,
+                Toast.makeText(
+                    this,
                     R.string.not_permitted,
-                    Toast.LENGTH_SHORT).show()
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             finish()
         }
@@ -83,23 +109,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun openKeyboardSetting(view: View) {
-        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val inputMethodManager =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.showInputMethodPicker()
     }
 
     private fun checkKeyboardSettings() {
-        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val inputMethodManager =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         val enabledMethods = inputMethodManager.enabledInputMethodList
-        val enabled = enabledMethods.last { it.loadLabel(packageManager).toString().equals("Facemoji") } != null
-        if(!enabled){
+        val enabled = enabledMethods.last {
+            it.loadLabel(packageManager).toString().equals("Facemoji")
+        } != null
+        if (!enabled) {
             binding.defaultIndicator.setBackgroundColor(ContextCompat.getColor(this, R.color.red))
             binding.defaultIndicator.text = resources.getString(R.string.keyboard_not_added)
             return
         }
 
-        val defaultIME = Settings.Secure.getString(this.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
-        if(defaultIME.contains("facemoji", ignoreCase = true)) {
-            binding.defaultIndicator.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary))
+        val defaultIME =
+            Settings.Secure.getString(this.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
+        if (defaultIME.contains("facemoji", ignoreCase = true)) {
+            binding.defaultIndicator.setBackgroundColor(
+                ContextCompat.getColor(
+                    this,
+                    R.color.colorPrimary
+                )
+            )
             binding.defaultIndicator.text = resources.getString(R.string.set_as_default)
         } else {
             binding.defaultIndicator.setBackgroundColor(ContextCompat.getColor(this, R.color.red))

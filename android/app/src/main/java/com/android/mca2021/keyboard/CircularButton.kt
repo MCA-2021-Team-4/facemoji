@@ -19,7 +19,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     View(context, attrs, defStyle) {
 
     var emojiId = 71
-    var mPlatform = "Google"
+    var mPlatform: EmojiPlatform = EmojiPlatform.GOOGLE
 
     private var mWidth = 0
     private var mHeight = 0
@@ -388,7 +388,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                     mOuterRadius,
                     mCenterX,
                     mCenterY,
-                    mPlatform
+                    mPlatform.name.lowercase()
                 )
             )
         for(i in 0 until mSliceNum)
@@ -403,7 +403,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         canvas.drawCircle(mCenterX, mCenterY, circleRadius, mPaint)
 
         if(emojiId != -1){
-            val id = context.resources.getIdentifier("zzz_${mPlatform.lowercase()}_${emojiId}", "drawable", context.packageName)
+            val id = context.resources.getIdentifier("zzz_${mPlatform.name.lowercase()}_${emojiId}", "drawable", context.packageName)
             var bmp = BitmapFactory.decodeResource(context.resources, id)
             var mRectF =RectF()
             val scale = circleRadius*circleRadius/(mInnerRadius*2)

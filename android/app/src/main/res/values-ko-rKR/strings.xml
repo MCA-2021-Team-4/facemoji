@@ -8,6 +8,7 @@
     <string name="not_set_as_default">Facemoji가 기본 키보드가 아닙니다!</string>
     <string name="keyboard_not_added">Facemoji가 키보드로 추가되지 않았습니다!</string>
     <string name="vibration">진동</string>
+    <string name="emoji_platform">이모지 플랫폼</string>
     <string name="enable_facemoji">Facemoji 키보드 추가</string>
     <string name="select_as_default">Facemoji를 기본 키보드로 사용</string>
     <string name="emotion_weight">감정 가중치 설정</string>

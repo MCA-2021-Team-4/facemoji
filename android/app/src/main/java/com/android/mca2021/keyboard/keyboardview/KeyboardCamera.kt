@@ -111,6 +111,7 @@ class KeyboardCamera(
     @SuppressLint("ClickableViewAccessibility")
     override fun initKeyboard() {
         cameraLayout = layoutInflater.inflate(R.layout.keyboard_camera, null)
+        circularButton = cameraLayout.findViewById(R.id.circular_button)
         vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         val config = context.resources.configuration
@@ -118,6 +119,7 @@ class KeyboardCamera(
         sound = sharedPreferences.getInt("keyboardSound", -1)
         vibrate = sharedPreferences.getInt("keyboardVibrate", -1)
         cameraExecutor = Executors.newSingleThreadExecutor()
+        circularButton.mPlatform = EmojiPlatform.from(sharedPreferences.getString("emojiPlatform", "google")!!)
 
         if (allPermissionsGranted()) {
             startCamera(config)

@@ -15,6 +15,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.android.mca2021.keyboard.CircularButton
+        android:id="@+id/circular_button"
         android:layout_width="match_parent"
         android:layout_height="350dp"
         app:layout_constraintBottom_toBottomOf="parent"

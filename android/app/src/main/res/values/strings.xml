@@ -8,6 +8,7 @@
     <string name="not_set_as_default">Facemoji is not a default keyboard!</string>
     <string name="keyboard_not_added">Facemoji is not added!</string>
     <string name="vibration">Vibration</string>
+    <string name="emoji_platform">Emoji Platform</string>
     <string name="enable_facemoji">Enable Facemoji</string>
     <string name="select_as_default">Select Facemoji as default</string>
     <string name="emotion_weight">Customize emotion</string>
