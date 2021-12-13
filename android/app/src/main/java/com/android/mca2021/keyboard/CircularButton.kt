@@ -166,10 +166,11 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
 
         /* center */
         mCenterX = w / 2f
-        mCenterY = (h * 0.8f)
+        mCenterY = (h * 0.85f)
 
         /* select shorter one from width & height as diameter */
         mOuterRadius = if (w>h) (h/2).toFloat() else (w/2).toFloat()
+        mOuterRadius = (mOuterRadius * 0.8).toFloat()
         mInnerRadius = mOuterRadius * innerRadiusRatio
         circleRadius = mInnerRadius
 
