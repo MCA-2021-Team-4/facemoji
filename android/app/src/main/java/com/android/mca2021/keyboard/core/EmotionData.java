@@ -1,5 +1,8 @@
 package com.android.mca2021.keyboard.core;
 
+import android.util.Log;
+
+
 import java.io.Serializable;
 
 
@@ -8,7 +11,7 @@ import java.io.Serializable;
  */
 public class EmotionData implements ClassifierResult,Serializable {
     public float[] emotionScores=null;
-
+    private static float[] weightArray = {1f, 1f, 1f, 1f, 1f, 1f, 1f};
     public EmotionData(){
 
     }
@@ -19,7 +22,15 @@ public class EmotionData implements ClassifierResult,Serializable {
 
     private static String[] emotions={"Anger", "Disgust", "Fear", "Happiness", "Neutral", "Sadness", "Surprise"};
     public static String getEmotion(float[] emotionScores){
-        int bestInd=0;
+        for (int i = 0; i < 7; i++) {
+            emotionScores[i] *= weightArray[i];
+        }
+        String emotionScoreStr = String.format("Anger: %f, Disgust: %f, Fear: %f, Happiness: %f, Neutral: %f, Sadness: %f, Surprise: %f",
+                emotionScores[0], emotionScores[1], emotionScores[2], emotionScores[3], emotionScores[4], emotionScores[5],
+                emotionScores[6]);
+        Log.i("EmotionScore", emotionScoreStr);
+
+        int bestInd=-1;
         if (emotionScores!=null){
             float maxScore=0;
             for(int i=0;i<emotionScores.length;++i){
@@ -33,5 +44,8 @@ public class EmotionData implements ClassifierResult,Serializable {
     }
     public String toString(){
         return getEmotion(emotionScores);
+    }
+    public void changeWeight(float[] newWeightArray) {
+        weightArray = newWeightArray;
     }
 }

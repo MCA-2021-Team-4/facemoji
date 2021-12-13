@@ -24,6 +24,10 @@ class KeyboardEnglish constructor(
     override val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     private lateinit var sharedPreferences: SharedPreferences
 
+    val setting: String = "setting"
+    val vibrateSetting: String = "keyboardVibrate"
+    val soundSetting: String = "keyboardSound"
+
     private val numPadText = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0")
     private val firstLineText = listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p")
     private val secondLineText = listOf("a", "s", "d", "f", "g", "h", "j", "k", "l")
@@ -60,9 +64,9 @@ class KeyboardEnglish constructor(
         val fourthLine: LinearLayout = englishLayout.findViewById(R.id.fourth_line)
 
         val config = context.resources.configuration
-        sharedPreferences = context.getSharedPreferences("setting", Context.MODE_PRIVATE)
-        sound = sharedPreferences.getInt("keyboardSound", -1)
-        vibrate = sharedPreferences.getInt("keyboardVibrate", -1)
+        sharedPreferences = context.getSharedPreferences(setting, Context.MODE_PRIVATE)
+        sound = sharedPreferences.getInt(soundSetting, -1)
+        vibrate = sharedPreferences.getInt(vibrateSetting, -1)
 
         val preferredHeight = sharedPreferences.getFloat("keyboardHeight", 250f) / 5.0f
         val heightInDp =

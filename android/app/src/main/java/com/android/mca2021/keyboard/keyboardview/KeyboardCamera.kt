@@ -15,6 +15,7 @@ import android.util.TypedValue
 import android.view.*
 import android.view.inputmethod.InputConnection
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -95,7 +96,6 @@ class KeyboardCamera (
     )
 
     override fun changeCaps() {}
-
     private val lifecycleRegistry = LifecycleRegistry(this)
 
     init {
@@ -139,6 +139,7 @@ class KeyboardCamera (
         sharedPreferences = context.getSharedPreferences("setting", Context.MODE_PRIVATE)
         sound = sharedPreferences.getInt("keyboardSound", -1)
         vibrate = sharedPreferences.getInt("keyboardVibrate", -1)
+
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         if (allPermissionsGranted()) {
@@ -161,7 +162,7 @@ class KeyboardCamera (
         }
 
         cameraLayout.setOnTouchListener { v, event ->
-            when(event.action) {
+            when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     reloadEmotion = false
                     Log.i("FACEMOJI", "no reload")
@@ -176,6 +177,14 @@ class KeyboardCamera (
                 }
             }
             return@setOnTouchListener true
+        }
+
+        val optionButton = cameraLayout.findViewById<ImageButton>(R.id.option_button)
+        optionButton.setOnClickListener {
+            val intent = Intent(context, EmojiWeightSetActivity::class.java).apply {
+                addFlags(FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
         }
 
         setEmojiLayout()
