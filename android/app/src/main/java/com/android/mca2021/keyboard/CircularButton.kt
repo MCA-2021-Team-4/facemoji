@@ -12,9 +12,7 @@ import kotlin.math.atan2
 import android.animation.Animator
 
 import android.animation.AnimatorListenerAdapter
-
-
-
+import android.animation.AnimatorSet
 
 
 class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
@@ -61,6 +59,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             mPaint.color = Color.WHITE
 
             canvas.drawArc(mRectF, centerDegree - degreeStep/2, degreeStep, true, mPaint)
+
             mPaint.style = Paint.Style.FILL
             if(isPressed || isSelected){
                 mPaint.color = Color.WHITE
@@ -104,6 +103,8 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private lateinit var expandAnim_circle: ValueAnimator
     private lateinit var expandAnim_circleReverse: ValueAnimator
     private lateinit var expandAnim_circleBig: ValueAnimator
+    private lateinit var expandAnim_circleBigReverse: ValueAnimator
+    private lateinit var circleSelectedAnim : AnimatorSet
 
     private var spreadAnim = ValueAnimator.ofFloat(degreeStep, degreeStep * 1.2f).apply{
         duration = (animDuration * 1.5).toLong()
@@ -162,6 +163,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
 
         /* select shorter one from width & height as diameter */
         mOuterRadius = if (w>h) (h/2).toFloat() else (w/2).toFloat()
+        mOuterRadius = mOuterRadius * 0.8f
         mInnerRadius = mOuterRadius * innerRadiusRatio
         circleRadius = mInnerRadius
 
@@ -216,13 +218,26 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             }
         }
 
-        expandAnim_circleBig = ValueAnimator.ofFloat(mInnerRadius*1.0f, mInnerRadius * 2f).apply {
-            duration = (animDuration * 2.5).toLong()
-            interpolator = CycleInterpolator(1f)
+        expandAnim_circleBig = ValueAnimator.ofFloat(mInnerRadius*1.2f, mInnerRadius * 1.5f).apply {
+            duration = animDuration
+            interpolator = DecelerateInterpolator()
             addUpdateListener { updatedAnim ->
                 circleRadius = updatedAnim.animatedValue as Float
                 invalidate()
             }
+        }
+
+        expandAnim_circleBigReverse = ValueAnimator.ofFloat(mInnerRadius*1.5f, mInnerRadius).apply {
+            duration = animDuration
+            interpolator = OvershootInterpolator(5f)
+            addUpdateListener { updatedAnim ->
+                circleRadius = updatedAnim.animatedValue as Float
+                invalidate()
+            }
+        }
+
+        circleSelectedAnim = AnimatorSet().apply{
+            play(expandAnim_circleBigReverse).after(expandAnim_circleBig)
         }
 
         resetAll()
@@ -289,7 +304,8 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                             expandAnim_circleReverse.start()
                         } else {
                             Log.d("skim", "selected circle")
-                            expandAnim_circleBig.start()
+                            //expandAnim_circleBig.start()
+                            circleSelectedAnim.start()
                         }
                         expandAnim_reverseOthers.start()
                         //spinAnim_reverse.start()
