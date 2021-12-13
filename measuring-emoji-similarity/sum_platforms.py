@@ -13,7 +13,11 @@ def sum_and_sort_line(platform_lines: list, metric):
     else:
         sorted_sum = sorted(cnt_sum, reverse=True)
 
-    sorted_index = [cnt_sum.index(sorted_sum[i]) for i in range(95)]
+    sorted_index = []
+    for i in range(95):
+        ind = cnt_sum.index(sorted_sum[i])
+        sorted_index.append(ind)
+        cnt_sum[ind] = 'inf'
 
     return sorted_index
 
