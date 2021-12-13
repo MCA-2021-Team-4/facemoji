@@ -1,25 +1,25 @@
 package com.android.mca2021.keyboard
 
+import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.view.animation.*
+import android.view.animation.AnticipateInterpolator
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import kotlin.math.atan2
-import android.animation.Animator
-
-import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     View(context, attrs, defStyle) {
 
-    var currentEmoji = 0
-    var adjecentEmojis = arrayOfNulls<Int>(5)
+    var emojiId = 71
+    var mPlatform = "Google"
 
     private var mWidth = 0
     private var mHeight = 0
@@ -34,19 +34,20 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private val degreeStep :Float = 180f/mSliceNum
     private var currentStartingDegree = 0f
 
-    private var mCenterX = 0
-    private var mCenterY = 0
+    private var mCenterX = 0F
+    private var mCenterY = 0F
     private var mPressed = false
     private var mPressedButton = -1
     private var mPrevPressedButton = -1
     private val animDuration : Long= 200
 
 
-    class mSlice(var degreeStep: Float, var centerDegree: Float, var radius: Float, private val centerX: Int, private val centerY: Int){
+    class mSlice(val context: Context, var degreeStep: Float, var centerDegree: Float, var radius: Float, private val centerX: Float, private val centerY: Float, val platform: String){
         private val mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         private val mRectF = RectF()
         var isPressed = false
         var isSelected = false
+        var emojiId = 0
 
         fun draw(canvas: Canvas){
             mRectF.left = (centerX - radius)
@@ -58,19 +59,30 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             mPaint.style = Paint.Style.STROKE
             mPaint.color = Color.WHITE
 
+            /* draw slice body */
             canvas.drawArc(mRectF, centerDegree - degreeStep/2, degreeStep, true, mPaint)
 
+            /* draw slice line */
             mPaint.style = Paint.Style.FILL
-            if(isPressed || isSelected){
-                mPaint.color = Color.WHITE
-                mPaint.alpha = 100
-            }
-            else{
-                mPaint.color = Color.DKGRAY
-                mPaint.alpha = 100
-            }
+            mPaint.color = if(isPressed || isSelected) Color.WHITE else Color.DKGRAY
+            mPaint.alpha = 100
             canvas.drawArc(mRectF, centerDegree - degreeStep/2, degreeStep, true, mPaint)
-            Log.d("draw", "drew at ${centerDegree - 180}, with step ${degreeStep}!")
+
+
+            /* draw emoji */
+            if(emojiId != -1){
+                val eCenterX = centerX - radius*0.75 * cos(Math.toRadians(((centerDegree-180)).toDouble()))
+                val eCenterY = centerY - radius*0.75 * sin(Math.toRadians(((centerDegree-180)).toDouble()))
+                val id = context.resources.getIdentifier("zzz_${platform.lowercase()}_${emojiId}", "drawable", context.packageName)
+                var bmp = BitmapFactory.decodeResource(context.resources, id)
+                var mRectF =RectF()
+                val scale = bmp.width*degreeStep/(5*36)
+                mRectF.left = (eCenterX - scale).toFloat()
+                mRectF.right = (eCenterX + scale).toFloat()
+                mRectF.top = (eCenterY - scale).toFloat()
+                mRectF.bottom = (eCenterY + scale).toFloat()
+                canvas.drawBitmap(bmp, null, mRectF, null)
+            }
 
 
         }
@@ -79,7 +91,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private lateinit var spinAnim_reverse: ValueAnimator
 
     private val spinAnim = ValueAnimator.ofFloat(30f, 180f).apply {
-        duration = (animDuration * 2).toLong()
+        duration = (animDuration * 2)
         interpolator = OvershootInterpolator(1.5f)
         addUpdateListener { updatedAnim ->
             val value = updatedAnim.animatedValue
@@ -89,11 +101,6 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             }
             invalidate()
         }
-        addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                Log.d("draw", "spinDone at ${System.currentTimeMillis()}!")
-            }
-        })
     }
 
 
@@ -158,12 +165,11 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         mHeight = h
 
         /* center */
-        mCenterX = w / 2
-        mCenterY = (h * 0.8).toInt()
+        mCenterX = w / 2f
+        mCenterY = (h * 0.8f)
 
         /* select shorter one from width & height as diameter */
         mOuterRadius = if (w>h) (h/2).toFloat() else (w/2).toFloat()
-        mOuterRadius = mOuterRadius * 0.8f
         mInnerRadius = mOuterRadius * innerRadiusRatio
         circleRadius = mInnerRadius
 
@@ -247,8 +253,6 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         val currX = event.x
         val currY = event.y
         mPressedButton = xy2index(currX, currY)
-        //Log.d("mPressedButton", mPressedButton.toString())
-        //Log.d("mPressed", "$mPressed")
         val sliceIndex = mPressedButton -1
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
@@ -296,19 +300,15 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                         }
                     }
                     if(mPressedButton >= 0){
-                        Log.d("sliceIndex:", "$sliceIndex")
                         if(sliceIndex >= 0) {
                             /* selected slice */
                             mSlices[sliceIndex].isSelected = true
                             expandAnim_reverse.start()
                             expandAnim_circleReverse.start()
                         } else {
-                            Log.d("skim", "selected circle")
-                            //expandAnim_circleBig.start()
                             circleSelectedAnim.start()
                         }
                         expandAnim_reverseOthers.start()
-                        //spinAnim_reverse.start()
                     } else{
                         spinAnim_reverse.start()
                         expandAnim_circleReverse.start()
@@ -358,15 +358,12 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
 
     override fun onDraw(canvas: Canvas) {
         if(mPressed || !isAnimFinished()){
-            Log.d("draw start", "--------")
             for (i in 0 until mSliceNum)
                 if(!(mSlices[i].isPressed)){
-                    Log.d("draw notp", i.toString())
                     mSlices[i].draw(canvas)
                 }
             for (i in 0 until mSliceNum)
                 if(mSlices[i].isPressed){
-                    Log.d("draw yesp", i.toString())
                     mSlices[i].draw(canvas)
                 }
         }
@@ -374,7 +371,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         val mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         mPaint.style = Paint.Style.FILL
         mPaint.color = Color.BLACK
-        canvas.drawRect(0F, mCenterY.toFloat(), mWidth.toFloat(), mHeight.toFloat(), mPaint)
+        canvas.drawRect(0F, mCenterY, mWidth.toFloat(), mHeight.toFloat(), mPaint)
 
         drawCircle(canvas)
     }
@@ -384,13 +381,17 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         for(i in 0 until mSliceNum)
             mSlices.add(
                 mSlice(
+                    context,
                     degreeStep,
                     180 + degreeStep / 2 + (degreeStep * i),
                     mOuterRadius,
                     mCenterX,
-                    mCenterY
+                    mCenterY,
+                    mPlatform
                 )
             )
+        for(i in 0 until mSliceNum)
+            mSlices[i].emojiId = 72 + i
     }
 
     private fun drawCircle(canvas: Canvas){
@@ -398,7 +399,19 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         mPaint.style = Paint.Style.FILL
         mPaint.strokeWidth = 5F
         mPaint.color = Color.WHITE
-        canvas.drawCircle(mCenterX.toFloat(), mCenterY.toFloat(), circleRadius, mPaint)
+        canvas.drawCircle(mCenterX, mCenterY, circleRadius, mPaint)
+
+        if(emojiId != -1){
+            val id = context.resources.getIdentifier("zzz_${mPlatform.lowercase()}_${emojiId}", "drawable", context.packageName)
+            var bmp = BitmapFactory.decodeResource(context.resources, id)
+            var mRectF =RectF()
+            val scale = circleRadius*circleRadius/(mInnerRadius*2)
+            mRectF.left = mCenterX - scale
+            mRectF.right = mCenterX + scale
+            mRectF.top = mCenterY - scale
+            mRectF.bottom = mCenterY + scale
+            canvas.drawBitmap(bmp, null, mRectF, null)
+        }
     }
 
     init{
