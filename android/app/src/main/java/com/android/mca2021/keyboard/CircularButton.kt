@@ -9,6 +9,12 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.animation.*
 import kotlin.math.atan2
+import android.animation.Animator
+
+import android.animation.AnimatorListenerAdapter
+
+
+
 
 
 class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
@@ -37,6 +43,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private var mPrevPressedButton = -1
     private val animDuration : Long= 200
 
+
     class mSlice(var degreeStep: Float, var centerDegree: Float, var radius: Float, private val centerX: Int, private val centerY: Int){
         private val mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         private val mRectF = RectF()
@@ -52,15 +59,8 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             mPaint.strokeWidth = 5f
             mPaint.style = Paint.Style.STROKE
             mPaint.color = Color.WHITE
-            canvas.drawArc(mRectF,
-                centerDegree - degreeStep/2, degreeStep, true, mPaint)
-            if(isPressed){
-                val ctr = (centerDegree - degreeStep/2)
-                Log.d("asdf:centerDegree", (centerDegree - 180).toString())
-                Log.d("asdf:degreeStep", "$degreeStep")
-                Log.d("asdf:startingDegree", "$ctr")
-            }
 
+            canvas.drawArc(mRectF, centerDegree - degreeStep/2, degreeStep, true, mPaint)
             mPaint.style = Paint.Style.FILL
             if(isPressed || isSelected){
                 mPaint.color = Color.WHITE
@@ -70,8 +70,8 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                 mPaint.color = Color.DKGRAY
                 mPaint.alpha = 100
             }
-            canvas.drawArc(mRectF,
-                centerDegree - degreeStep/2, degreeStep, true, mPaint)
+            canvas.drawArc(mRectF, centerDegree - degreeStep/2, degreeStep, true, mPaint)
+            Log.d("draw", "drew at ${centerDegree - 180}, with step ${degreeStep}!")
 
 
         }
@@ -80,8 +80,8 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private lateinit var spinAnim_reverse: ValueAnimator
 
     private val spinAnim = ValueAnimator.ofFloat(30f, 180f).apply {
-        duration = animDuration * 2
-        interpolator = OvershootInterpolator()
+        duration = (animDuration * 2).toLong()
+        interpolator = OvershootInterpolator(1.5f)
         addUpdateListener { updatedAnim ->
             val value = updatedAnim.animatedValue
             currentStartingDegree = value as Float
@@ -90,6 +90,11 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             }
             invalidate()
         }
+        addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                Log.d("draw", "spinDone at ${System.currentTimeMillis()}!")
+            }
+        })
     }
 
 
@@ -101,24 +106,22 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private lateinit var expandAnim_circleBig: ValueAnimator
 
     private var spreadAnim = ValueAnimator.ofFloat(degreeStep, degreeStep * 1.2f).apply{
-        duration = animDuration/2
+        duration = (animDuration * 1.5).toLong()
         addUpdateListener { updatedAnim ->
             for(i in 0 until mSliceNum){
                 if(mSlices[i].isPressed){
                     val value = updatedAnim.animatedValue as Float
                     val diff = (value - degreeStep)
-                    /*
+                    mSlices[i].degreeStep = value
                     if(i-1 >= 0){
-                        mSlices[i-1].degreeStep = degreeStep - diff/4
-                        mSlices[i-1].centerDegree = mSlices[i-1].centerDegree - diff/8
+                        mSlices[i-1].degreeStep = degreeStep - diff/2f
+
+                        mSlices[i-1].centerDegree = mSlices[i].centerDegree - mSlices[i].degreeStep/2 - mSlices[i-1].degreeStep/2
                     }
                     if(i+1 < mSliceNum){
-                        mSlices[i+1].degreeStep = degreeStep - diff/4
-                        mSlices[i+1].centerDegree = mSlices[i+1].centerDegree + diff/8
+                        mSlices[i+1].degreeStep = degreeStep - diff/2f
+                        mSlices[i+1].centerDegree = mSlices[i].centerDegree + mSlices[i].degreeStep/2 + mSlices[i+1].degreeStep/2
                     }
-
-                     */
-                    mSlices[i].degreeStep = value
                 }
             }
             invalidate()
@@ -163,7 +166,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         circleRadius = mInnerRadius
 
         expandAnim = ValueAnimator.ofFloat(mOuterRadius, mOuterRadius*1.2f).apply {
-            duration = animDuration
+            duration = (animDuration*1.5).toLong()
             interpolator = OvershootInterpolator()
             addUpdateListener { updatedAnim ->
                 for(i in 0 until mSliceNum){
@@ -248,8 +251,8 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                 if(mPressed){
                     if(mPrevPressedButton != mPressedButton){
                         resetAll()
-                        expandAnim.start()
                         spreadAnim.start()
+                        expandAnim.start()
                         mPrevPressedButton = mPressedButton
                     }
                     if(sliceIndex >= 0) {
@@ -339,12 +342,17 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
 
     override fun onDraw(canvas: Canvas) {
         if(mPressed || !isAnimFinished()){
+            Log.d("draw start", "--------")
             for (i in 0 until mSliceNum)
-                if(!(mSlices[i].isPressed))
+                if(!(mSlices[i].isPressed)){
+                    Log.d("draw notp", i.toString())
                     mSlices[i].draw(canvas)
+                }
             for (i in 0 until mSliceNum)
-                if(mSlices[i].isPressed)
+                if(mSlices[i].isPressed){
+                    Log.d("draw yesp", i.toString())
                     mSlices[i].draw(canvas)
+                }
         }
 
         val mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
