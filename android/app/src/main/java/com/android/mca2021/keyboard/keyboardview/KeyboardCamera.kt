@@ -13,11 +13,8 @@ import android.util.Log
 import android.util.Size
 import android.util.TypedValue
 import android.view.*
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputConnection
 import android.widget.Button
-import android.widget.TextView
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -35,11 +32,9 @@ import com.android.mca2021.keyboard.core.FaceAnalyzer
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
-import com.seonjunkim.radialmenu.CircularButton
+import com.android.mca2021.keyboard.CircularButton
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.math.PI
-import kotlin.math.atan2
 
 
 class KeyboardCamera(

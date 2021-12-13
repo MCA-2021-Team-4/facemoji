@@ -1,4 +1,4 @@
-package com.seonjunkim.radialmenu
+package com.android.mca2021.keyboard
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -27,8 +27,8 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private var mInnerRadius = 0f
     private val innerRadiusRatio = 0.3f
     private var circleRadius = 0f
-    private val degreeStep = 180/mSliceNum
-    private var currentStartingDegree = 0
+    private val degreeStep :Float = 180f/mSliceNum
+    private var currentStartingDegree = 0f
 
     private var mCenterX = 0
     private var mCenterY = 0
@@ -37,12 +37,11 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private var mPrevPressedButton = -1
     private val animDuration : Long= 200
 
-    class mSlice(var degreeStep: Int, var centerDegree: Int, var radius: Float, private val centerX: Int, private val centerY: Int){
+    class mSlice(var degreeStep: Float, var centerDegree: Float, var radius: Float, private val centerX: Int, private val centerY: Int){
         private val mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         private val mRectF = RectF()
         var isPressed = false
         var isSelected = false
-
 
         fun draw(canvas: Canvas){
             mRectF.left = (centerX - radius)
@@ -50,22 +49,29 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             mRectF.top = (centerY - radius)
             mRectF.bottom = (centerY + radius)
 
-            mPaint.strokeWidth = 5F
+            mPaint.strokeWidth = 5f
             mPaint.style = Paint.Style.STROKE
             mPaint.color = Color.WHITE
             canvas.drawArc(mRectF,
-                (centerDegree - degreeStep/2).toFloat(), degreeStep.toFloat(), true, mPaint)
+                centerDegree - degreeStep/2, degreeStep, true, mPaint)
+            if(isPressed){
+                val ctr = (centerDegree - degreeStep/2)
+                Log.d("asdf:centerDegree", (centerDegree - 180).toString())
+                Log.d("asdf:degreeStep", "$degreeStep")
+                Log.d("asdf:startingDegree", "$ctr")
+            }
 
             mPaint.style = Paint.Style.FILL
             if(isPressed || isSelected){
                 mPaint.color = Color.WHITE
+                mPaint.alpha = 100
             }
             else{
                 mPaint.color = Color.DKGRAY
                 mPaint.alpha = 100
             }
             canvas.drawArc(mRectF,
-                (centerDegree - degreeStep/2).toFloat(), degreeStep.toFloat(), true, mPaint)
+                centerDegree - degreeStep/2, degreeStep, true, mPaint)
 
 
         }
@@ -73,12 +79,12 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
 
     private lateinit var spinAnim_reverse: ValueAnimator
 
-    private val spinAnim = ValueAnimator.ofInt(30, 180).apply {
+    private val spinAnim = ValueAnimator.ofFloat(30f, 180f).apply {
         duration = animDuration * 2
         interpolator = OvershootInterpolator()
         addUpdateListener { updatedAnim ->
-            val value = updatedAnim.animatedValue as Int
-            currentStartingDegree = value
+            val value = updatedAnim.animatedValue
+            currentStartingDegree = value as Float
             for(i in 0 until mSliceNum) {
                 mSlices[i].centerDegree = value + degreeStep/2 + (degreeStep * i)
             }
@@ -94,12 +100,26 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private lateinit var expandAnim_circleReverse: ValueAnimator
     private lateinit var expandAnim_circleBig: ValueAnimator
 
-    private var spreadAnim = ValueAnimator.ofInt(degreeStep, (degreeStep * 1.2).toInt()).apply{
+    private var spreadAnim = ValueAnimator.ofFloat(degreeStep, degreeStep * 1.2f).apply{
         duration = animDuration/2
         addUpdateListener { updatedAnim ->
             for(i in 0 until mSliceNum){
-                if(mSlices[i].isPressed)
-                    mSlices[i].degreeStep = updatedAnim.animatedValue as Int
+                if(mSlices[i].isPressed){
+                    val value = updatedAnim.animatedValue as Float
+                    val diff = (value - degreeStep)
+                    /*
+                    if(i-1 >= 0){
+                        mSlices[i-1].degreeStep = degreeStep - diff/4
+                        mSlices[i-1].centerDegree = mSlices[i-1].centerDegree - diff/8
+                    }
+                    if(i+1 < mSliceNum){
+                        mSlices[i+1].degreeStep = degreeStep - diff/4
+                        mSlices[i+1].centerDegree = mSlices[i+1].centerDegree + diff/8
+                    }
+
+                     */
+                    mSlices[i].degreeStep = value
+                }
             }
             invalidate()
         }
@@ -134,16 +154,15 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         mHeight = h
 
         /* center */
-        mCenterX = mWidth / 2
-        mCenterY = (mHeight * 0.8).toInt()
+        mCenterX = w / 2
+        mCenterY = (h * 0.8).toInt()
 
         /* select shorter one from width & height as diameter */
-        mOuterRadius = if (mWidth>mHeight) (mHeight/2).toFloat() else (mWidth/2).toFloat()
-        mOuterRadius = (mOuterRadius * 0.8).toFloat()
-        mInnerRadius = (mOuterRadius * innerRadiusRatio * 0.8).toFloat()
+        mOuterRadius = if (w>h) (h/2).toFloat() else (w/2).toFloat()
+        mInnerRadius = mOuterRadius * innerRadiusRatio
         circleRadius = mInnerRadius
 
-        expandAnim = ValueAnimator.ofFloat(mOuterRadius, (mOuterRadius*1.2).toFloat()).apply {
+        expandAnim = ValueAnimator.ofFloat(mOuterRadius, mOuterRadius*1.2f).apply {
             duration = animDuration
             interpolator = OvershootInterpolator()
             addUpdateListener { updatedAnim ->
@@ -155,7 +174,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             }
         }
 
-        expandAnim_reverse = ValueAnimator.ofFloat((mOuterRadius*1.2).toFloat(), 0F).apply {
+        expandAnim_reverse = ValueAnimator.ofFloat(mOuterRadius*1.2f, 0f).apply {
             duration = animDuration
             interpolator = AnticipateInterpolator()
             addUpdateListener { updatedAnim ->
@@ -167,7 +186,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             }
         }
 
-        expandAnim_reverseOthers = ValueAnimator.ofFloat(mOuterRadius, 0F).apply {
+        expandAnim_reverseOthers = ValueAnimator.ofFloat(mOuterRadius, 0f).apply {
             duration = animDuration
             addUpdateListener { updatedAnim ->
                 for(i in 0 until mSliceNum){
@@ -178,7 +197,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             }
         }
 
-        expandAnim_circle = ValueAnimator.ofFloat(mInnerRadius, (mInnerRadius * 1.2).toFloat()).apply {
+        expandAnim_circle = ValueAnimator.ofFloat(mInnerRadius, mInnerRadius * 1.2f).apply {
             duration = animDuration
             addUpdateListener { updatedAnim ->
                 circleRadius = updatedAnim.animatedValue as Float
@@ -186,7 +205,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             }
         }
 
-        expandAnim_circleReverse = ValueAnimator.ofFloat((mInnerRadius*1.2).toFloat(), mInnerRadius).apply {
+        expandAnim_circleReverse = ValueAnimator.ofFloat(mInnerRadius*1.2f, mInnerRadius).apply {
             duration = animDuration
             addUpdateListener { updatedAnim ->
                 circleRadius = updatedAnim.animatedValue as Float
@@ -194,11 +213,9 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             }
         }
 
-        expandAnim_circleBig = ValueAnimator.ofFloat((mInnerRadius*1.0).toFloat(),
-            (mInnerRadius * 2)
-        ).apply {
+        expandAnim_circleBig = ValueAnimator.ofFloat(mInnerRadius*1.0f, mInnerRadius * 2f).apply {
             duration = (animDuration * 2.5).toLong()
-            interpolator = CycleInterpolator(1F)
+            interpolator = CycleInterpolator(1f)
             addUpdateListener { updatedAnim ->
                 circleRadius = updatedAnim.animatedValue as Float
                 invalidate()
@@ -246,15 +263,15 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                 spinAnim.cancel()
                 if(mPressed){
                     resetAll()
-                    spinAnim_reverse = ValueAnimator.ofInt(currentStartingDegree, 0).apply {
+                    spinAnim_reverse = ValueAnimator.ofFloat(currentStartingDegree, 0f).apply {
                         duration = animDuration
                         interpolator = DecelerateInterpolator()
                         addUpdateListener { updatedAnim ->
-                            val value = updatedAnim.animatedValue as Int
+                            val value = updatedAnim.animatedValue as Float
                             for(i in 0 until mSliceNum) {
                                 mSlices[i].centerDegree = value + mSlices[i].degreeStep/2 + (mSlices[i].degreeStep * i)
                             }
-                            if(value == 0){
+                            if(value == 0f){
                                 resetAll()
                             }
                             invalidate()
@@ -312,7 +329,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                     val mSlice = mSlices[i]
                     val start = mSlice.centerDegree - (mSlice.degreeStep/2)
                     val end = mSlice.centerDegree + (mSlice.degreeStep/2)
-                    if(start <= angle && angle <= end)
+                    if(angle in start..end)
                         return i+1
                 }
             }
@@ -342,7 +359,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         mSlices.clear()
         for(i in 0 until mSliceNum)
             mSlices.add(
-                CircularButton.mSlice(
+                mSlice(
                     degreeStep,
                     180 + degreeStep / 2 + (degreeStep * i),
                     mOuterRadius,
