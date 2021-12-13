@@ -14,13 +14,14 @@ fear = [[21],
         [2, 37],
         []]
 
-neutral = [[16, 36, 58],
-           [19, 25, 26, 28, 29, 94],
-           [11, 24, 54, 67, 68, 69, 80, 83, 90, 92]]
-
 happiness = [[4, 33, 43, 46, 59, 65, 73, 81, 82],
              [14, 17, 20, 23, 35, 42, 44, 45, 48, 50, 51, 55, 72, 74, 75, 78, 88],
              [8, 52, 57, 64, 71, 76, 77, 79, 86, 89]]
+
+
+neutral = [[16, 36, 58],
+           [19, 25, 26, 28, 29, 94],
+           [11, 24, 54, 67, 68, 69, 80, 83, 90, 92]]
 
 sadness = [[53],
            [9, 62, 66],
@@ -33,11 +34,11 @@ surprise = [[15],
 anger_num = [2, 1, 1]
 disgust_num = [3, 10, 2]
 fear_num = [1, 2, 0]
-neutral_num = [3, 6, 10]
 happiness_num = [9, 17, 10]
+neutral_num = [3, 6, 10]
 sadness_num = [1, 3, 8]
 surprise_num = [1, 4, 1]
-emojis_num = [anger_num, disgust_num, fear_num, neutral_num, happiness_num, sadness_num, surprise_num]
+emojis_num = [anger_num, disgust_num, fear_num, happiness_num, neutral_num, sadness_num, surprise_num]
 
 emojis_list = [anger, disgust, fear, happiness, neutral, sadness, surprise]
 
