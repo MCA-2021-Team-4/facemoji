@@ -4,20 +4,16 @@ from sys import argv
 
 def sum_and_sort_line(platform_lines: list, metric):
     cnt_sum = [0] * 95
-    sorted_index = []
     for platform_line in platform_lines:
         for i, cnt in enumerate(platform_line):
             cnt_sum[i] = cnt_sum[i] + float(cnt)
 
-    for i in range(95):
-        if(metric == "rmse"):
-            ind = cnt_sum.index(min(cnt_sum))
-            sorted_index.append(ind)
-            cnt_sum[ind] = max(cnt_sum)
-        else:
-            ind = cnt_sum.index(max(cnt_sum))
-            sorted_index.append(ind)
-            cnt_sum[ind] = min(cnt_sum)
+    if(metric == "rmse"):
+        sorted_sum = sorted(cnt_sum)
+    else:
+        sorted_sum = sorted(cnt_sum, reverse=True)
+
+    sorted_index = [cnt_sum.index(sorted_sum[i]) for i in range(95)]
 
     return sorted_index
 
@@ -30,8 +26,6 @@ def summ(metric):
     done = False
     sorted_index_lines = []
 
-    linenumber = 0
-
     while True: # looping through lines
         platform_lines = []
         for i in range(5):
@@ -43,8 +37,8 @@ def summ(metric):
             listline = list(line.split(' '))[:-1]
             platform_lines.append(listline)
         if done: break
-        sorted_index_lines.append(sum_and_sort_line(platform_lines, metric)[1:])
-        linenumber = linenumber + 1
+        sorted_line = sum_and_sort_line(platform_lines, metric)[1:]
+        sorted_index_lines.append(sorted_line)
 
     return sorted_index_lines # list of list of indices
 
