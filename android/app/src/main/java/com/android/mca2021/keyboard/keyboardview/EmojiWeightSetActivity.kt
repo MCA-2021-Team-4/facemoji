@@ -19,7 +19,6 @@ import com.android.mca2021.keyboard.EmojiPlatform
 import com.android.mca2021.keyboard.R
 
 class EmojiWeightSetActivity: AppCompatActivity() {
-    private lateinit var btnConfirm: Button
     private lateinit var cameraFrame: FrameLayout
     private var weightArray: IntArray = IntArray(7) {0}
     private lateinit var seekBarAnger: SeekBar
@@ -33,16 +32,6 @@ class EmojiWeightSetActivity: AppCompatActivity() {
     lateinit var weightSetCamera: WeightSetCamera
     private var mEmojiPlatform : EmojiPlatform = EmojiPlatform.GOOGLE
 
-    private val emojisUnicode = listOf(
-        "\uD83D\uDE21",
-        "\uD83D\uDE23",
-        "\uD83D\uDE28",
-        "\uD83D\uDE42",
-        "\uD83D\uDE10",
-        "\uD83D\uDE1E",
-        "\uD83D\uDE2E",
-    )
-
     private val emojiItemtoEmojiId = mapOf(
         R.id.emoji_anger to 0,
         R.id.emoji_disgust to 6,
@@ -51,16 +40,6 @@ class EmojiWeightSetActivity: AppCompatActivity() {
         R.id.emoji_neutral to 58,
         R.id.emoji_sadness to 9,
         R.id.emoji_surprise to 3
-    )
-
-    private val emojiItemIds = listOf(
-        R.id.emoji_anger,
-        R.id.emoji_disgust,
-        R.id.emoji_fear,
-        R.id.emoji_happiness,
-        R.id.emoji_neutral,
-        R.id.emoji_sadness,
-        R.id.emoji_surprise
     )
 
     private val emojiNames = listOf(
@@ -79,31 +58,16 @@ class EmojiWeightSetActivity: AppCompatActivity() {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.weight_option)
         sharedPreferences = baseContext.getSharedPreferences("setting", Context.MODE_PRIVATE)
-        val sharedPreferencesEditor = sharedPreferences.edit()
 
         setEmojiLayout()
         /*
-
         Handler(Looper.getMainLooper()).post {
         }
          */
         cameraFrame = findViewById(R.id.camera_frame)
         weightSetCamera = WeightSetCamera(this, applicationContext, assets, layoutInflater)
 
-
         seekBarConfig()
-
-
-        btnConfirm = findViewById(R.id.confirm_button)
-        btnConfirm.setOnClickListener {
-            emojiNames.forEachIndexed { idx, emoji ->
-                sharedPreferencesEditor.putInt(emoji, weightArray[idx])
-            }
-            sharedPreferencesEditor.apply()
-            finish()
-        }
-
-
     }
 
     public override fun onStart() {
@@ -169,6 +133,11 @@ class EmojiWeightSetActivity: AppCompatActivity() {
                     seekBarSadness -> weightArray[5] = p0.progress
                     seekBarSurprise -> weightArray[6] = p0.progress
                 }
+                val sharedPreferencesEditor = sharedPreferences.edit()
+                emojiNames.forEachIndexed { idx, emoji ->
+                    sharedPreferencesEditor.putInt(emoji, weightArray[idx])
+                }
+                sharedPreferencesEditor.apply()
             }
         }
         seekBarAnger.setOnSeekBarChangeListener(listener)

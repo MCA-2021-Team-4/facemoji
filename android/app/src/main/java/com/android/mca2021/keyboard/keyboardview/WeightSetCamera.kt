@@ -8,6 +8,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.AssetManager
 import android.content.res.Configuration
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -19,6 +20,7 @@ import android.view.LayoutInflater
 import android.view.Surface
 import android.view.View
 import android.view.WindowManager
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -51,6 +53,7 @@ class WeightSetCamera(
     private var vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var cameraExecutor: ExecutorService
+    private var mPlatform: EmojiPlatform = EmojiPlatform.GOOGLE
     var sound = 0
     var vibrate = 0
     private val TAG: String = "PiMenuCamera"
@@ -78,17 +81,10 @@ class WeightSetCamera(
     )
 
     /* UI */
-    private lateinit var pieMenu: PieMenu
-    private lateinit var disabledIndicator: View
-
-    private var scaledEmojiIndex: Int? = null
+    private lateinit var imageView: ImageView
 
     private val faceAnalyzer: FaceAnalyzer by lazy {
         createFaceAnalyzer()
-    }
-
-    private fun getEmojiByUnicode(unicode: Int): String {
-        return String(Character.toChars(unicode))
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
@@ -101,7 +97,8 @@ class WeightSetCamera(
     @SuppressLint("ClickableViewAccessibility")
     fun initCamera() {
         cameraLayout = layoutInflater.inflate(R.layout.weight_camera, null)
-        pieMenu = cameraLayout.findViewById(R.id.circular_button)
+        //pieMenu = cameraLayout.findViewById(R.id.circular_button)
+        imageView = cameraLayout.findViewById(R.id.image_view)
         vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         val config = context.resources.configuration
@@ -110,7 +107,8 @@ class WeightSetCamera(
         vibrate = sharedPreferences.getInt("keyboardVibrate", -1)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
-        pieMenu.mPlatform = EmojiPlatform.from(sharedPreferences.getString("emojiPlatform", "google")!!)
+        mPlatform = EmojiPlatform.from(sharedPreferences.getString("emojiPlatform", "google")!!)
+        //pieMenu.mPlatform = EmojiPlatform.from(sharedPreferences.getString("emojiPlatform", "google")!!)
 
         if (allPermissionsGranted()) {
             startCamera(config)
@@ -122,32 +120,6 @@ class WeightSetCamera(
             context.startActivity(intent)
         }
     }
-
-    private fun startAnalysis(moveGraph: Boolean = true) {
-        faceAnalyzer.resumeAnalysis()
-    }
-
-    private fun startTraverse() {
-        faceAnalyzer.pauseAnalysis()
-        disabledIndicator.visibility = View.VISIBLE
-    }
-
-    private fun getAdjacentEmojis(emoji0: String): String {
-        /*
-        This function will return adjacent emojis of emoji0 (based on emoji graph) later.
-        As prototype, just get integer string and return doubled value of it.
-         */
-        return (emoji0.toInt() * 2).toString()
-    }
-
-    private fun degreesToFirebaseRotation(degrees: Int): Int = when (degrees) {
-        0 -> FirebaseVisionImageMetadata.ROTATION_0
-        90 -> FirebaseVisionImageMetadata.ROTATION_90
-        180 -> FirebaseVisionImageMetadata.ROTATION_180
-        270 -> FirebaseVisionImageMetadata.ROTATION_270
-        else -> throw Exception("Rotation must be 0, 90, 180, or 270.")
-    }
-
 
     @SuppressLint("UnsafeOptInUsageError")
     private fun startCamera(config: Configuration) {
@@ -169,9 +141,6 @@ class WeightSetCamera(
         val realTimeOpts = FirebaseVisionFaceDetectorOptions.Builder()
             .setContourMode(FirebaseVisionFaceDetectorOptions.ALL_CONTOURS)
             .build()
-
-        val detector = FirebaseVision.getInstance()
-            .getVisionFaceDetector(realTimeOpts)
 
         cameraProviderFuture.addListener({
             // Used to bind the lifecycle of cameras to the lifecycle owner
@@ -226,14 +195,19 @@ class WeightSetCamera(
         val faceAnalyzer = FaceAnalyzer(context, assets)
         faceAnalyzer.listener = object : FaceAnalyzer.Listener {
             override fun onFacesDetected(proxyWidth: Int, proxyHeight: Int, face: Face) {
-//                val faceContourOverlay = cameraLayout.findViewById<FaceContourOverlay>(R.id.faceContourOverlay)
-//                faceContourOverlay.post { faceContourOverlay.drawFaceBounds(proxyWidth, proxyHeight, face)}
             }
 
             override fun onEmotionDetected(emotion: String) {
                 Handler(Looper.getMainLooper()).post {
-                    Log.d("asdf", "emotion detected")
-                    pieMenu.updateCircle(labelEmojis[emotion]!!, faceAnalyzer)
+                    //pieMenu.updateCircle(labelEmojis[emotion]!!, faceAnalyzer)
+                    val emojiId = labelEmojis[emotion]
+                    var id: Int = if(emojiId == -1)
+                        context.resources.getIdentifier("zzz_${mPlatform.name.lowercase()}_no", "drawable", context.packageName)
+                    else
+                        context.resources.getIdentifier("zzz_${mPlatform.name.lowercase()}_${labelEmojis[emotion]}", "drawable", context.packageName)
+                    val bmp = BitmapFactory.decodeResource(context.resources, id)
+                    imageView.setImageBitmap(bmp)
+                    imageView.alpha = 0.5f
                 }
             }
 
