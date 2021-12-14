@@ -105,7 +105,7 @@ class WeightSetCamera(
 
     @SuppressLint("ClickableViewAccessibility")
     fun initKeyboard() {
-        cameraLayout = layoutInflater.inflate(R.layout.keyboard_camera, null)
+        cameraLayout = layoutInflater.inflate(R.layout.weight_camera, null)
         circularButton = cameraLayout.findViewById(R.id.circular_button)
         vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
@@ -128,12 +128,6 @@ class WeightSetCamera(
         }
 
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
-
-        val changeModeButton = cameraLayout.findViewById<Button>(R.id.change_camera_input_mode)
-        changeModeButton.setOnClickListener {
-            cameraExecutor.shutdown()
-            lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
-        }
 
     }
 

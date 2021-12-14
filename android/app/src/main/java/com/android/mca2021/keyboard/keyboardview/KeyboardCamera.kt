@@ -21,6 +21,7 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputConnection
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -49,6 +50,7 @@ class KeyboardCamera(
     private val layoutInflater: LayoutInflater,
     override val keyboardInteractionListener: KeyboardInteractionManager,
 ) : FacemojiKeyboard(), LifecycleOwner {
+
     private lateinit var cameraLayout: View
 
     override var inputConnection: InputConnection? = null
