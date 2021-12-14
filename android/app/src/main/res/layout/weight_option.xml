@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
+    android:gravity="center"
+    android:layout_gravity="center"
+    android:layout_marginLeft="60dp"
+    android:layout_marginRight="60dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="30dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
@@ -32,7 +36,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="30dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
@@ -57,7 +61,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="30dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
@@ -82,7 +86,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="30dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
@@ -107,7 +111,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="30dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
@@ -132,7 +136,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="30dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
@@ -157,7 +161,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="30dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
@@ -176,21 +180,13 @@
             android:layout_weight="4"
             android:max="7"
             android:progress="0" />
-
     </LinearLayout>
 
-    <LinearLayout
-        android:orientation="vertical"
+    <FrameLayout
+        android:id="@+id/camera_frame"
+        android:layout_marginTop="30dp"
         android:layout_width="match_parent"
-        android:layout_height="295dp"
-        android:layout_marginTop="50dp">
-
-        <FrameLayout
-            android:id="@+id/camera_frame"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </FrameLayout>
-
-    </LinearLayout>
+        android:layout_height="wrap_content">
+    </FrameLayout>
 
 </LinearLayout>
