@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.view.Window
+import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.SeekBar
@@ -26,6 +27,8 @@ class EmojiWeightSetActivity: AppCompatActivity() {
     private lateinit var seekBarSadness: SeekBar
     private lateinit var seekBarSurprise: SeekBar
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var sharedPreferencesEditor: SharedPreferences.Editor
+    private lateinit var resetButton: Button
     lateinit var weightSetCamera: WeightSetCamera
     private var mEmojiPlatform : EmojiPlatform = EmojiPlatform.GOOGLE
 
@@ -55,12 +58,30 @@ class EmojiWeightSetActivity: AppCompatActivity() {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.weight_option)
         sharedPreferences = baseContext.getSharedPreferences("setting", Context.MODE_PRIVATE)
+        sharedPreferencesEditor = sharedPreferences.edit()
 
         setEmojiLayout()
+        seekBarConfig()
+
         cameraFrame = findViewById(R.id.camera_frame)
         weightSetCamera = WeightSetCamera(this, applicationContext, assets, layoutInflater)
-
-        seekBarConfig()
+        resetButton = findViewById(R.id.button_reset)
+        resetButton.setOnClickListener {
+            for (i in weightArray.indices) {
+                weightArray[i] = 4
+            }
+            seekBarAnger.setProgress(weightArray[0], true)
+            seekBarDisgust.setProgress(weightArray[1], true)
+            seekBarFear.setProgress(weightArray[2], true)
+            seekBarHappiness.setProgress(weightArray[3], true)
+            seekBarNeutral.setProgress(weightArray[4], true)
+            seekBarSadness.setProgress(weightArray[5], true)
+            seekBarSurprise.setProgress(weightArray[6], true)
+            emojiNames.forEachIndexed { idx, emoji ->
+                sharedPreferencesEditor.putInt(emoji, weightArray[idx])
+            }
+            sharedPreferencesEditor.apply()
+        }
     }
 
     public override fun onStart() {
@@ -96,7 +117,7 @@ class EmojiWeightSetActivity: AppCompatActivity() {
         seekBarSurprise = findViewById(R.id.seekBar_surprise)
 
         emojiNames.forEachIndexed { idx, emoji ->
-            weightArray[idx] = sharedPreferences.getInt(emoji, 0)
+            weightArray[idx] = sharedPreferences.getInt(emoji, 4)
         }
 
         seekBarAnger.setProgress(weightArray[0], true)
@@ -120,7 +141,6 @@ class EmojiWeightSetActivity: AppCompatActivity() {
                     seekBarSadness -> weightArray[5] = p0.progress
                     seekBarSurprise -> weightArray[6] = p0.progress
                 }
-                val sharedPreferencesEditor = sharedPreferences.edit()
                 emojiNames.forEachIndexed { idx, emoji ->
                     sharedPreferencesEditor.putInt(emoji, weightArray[idx])
                 }
