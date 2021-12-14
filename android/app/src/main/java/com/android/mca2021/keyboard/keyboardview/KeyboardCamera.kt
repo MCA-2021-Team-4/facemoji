@@ -69,13 +69,13 @@ class KeyboardCamera(
 
     private val labelEmojis = mapOf(
         "Anger" to 0,
-        "Contempt" to -1,
         "Disgust" to 6,
         "Fear" to 37,
         "Happiness" to 45,
         "Neutral" to 58,
         "Sadness" to 9,
         "Surprise" to 3,
+        "Noface" to -1
     )
 
     private val emotions = arrayOf(
