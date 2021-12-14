@@ -514,7 +514,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
 
     private fun updateSlices(emojiId: Int){
         if(emojiId== -1){
-            resetSlices()
+            initSlices()
         }
         else{
             val adjs = emojiGraph.getAdj(emojiId)
@@ -529,8 +529,10 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     }
 
     internal fun updateCircle(emojiId: Int, faceAnalyzer: FaceAnalyzer){
+        Log.d("asdf", "updateCircle, ${emojiId}")
         this.faceAnalyzer = faceAnalyzer
         mCurrentEmojiId = emojiId
+        updateSlices(mCurrentEmojiId)
         invalidate()
     }
 
