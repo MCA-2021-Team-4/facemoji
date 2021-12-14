@@ -68,14 +68,14 @@ class KeyboardCamera(
      */
 
     private val labelEmojis = mapOf(
-        "Anger" to "\uD83D\uDE21",
-        "Contempt" to "\uD83D\uDE12",
-        "Disgust" to "\uD83D\uDE23",
-        "Fear" to "\uD83D\uDE28",
-        "Happiness" to "\uD83D\uDE42",
-        "Neutral" to "\uD83D\uDE10",
-        "Sadness" to "\uD83D\uDE1E",
-        "Surprise" to "\uD83D\uDE2E",
+        "Anger" to 0,
+        "Contempt" to -1,
+        "Disgust" to 6,
+        "Fear" to 37,
+        "Happiness" to 45,
+        "Neutral" to 58,
+        "Sadness" to 9,
+        "Surprise" to 3,
     )
 
     private val emotions = arrayOf(
@@ -89,7 +89,7 @@ class KeyboardCamera(
     )
 
     /* UI */
-    private lateinit var circularButton: PieMenu
+    private lateinit var pieMenu: PieMenu
     private lateinit var disabledIndicator: View
 
     private var scaledEmojiIndex: Int? = null
@@ -115,7 +115,7 @@ class KeyboardCamera(
     @SuppressLint("ClickableViewAccessibility")
     override fun initKeyboard() {
         cameraLayout = layoutInflater.inflate(R.layout.keyboard_camera, null)
-        circularButton = cameraLayout.findViewById(R.id.circular_button)
+        pieMenu = cameraLayout.findViewById(R.id.pie_menu)
         vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         val config = context.resources.configuration
@@ -124,7 +124,7 @@ class KeyboardCamera(
         vibrate = sharedPreferences.getInt("keyboardVibrate", -1)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
-        circularButton.mPlatform = EmojiPlatform.from(sharedPreferences.getString("emojiPlatform", "google")!!)
+        pieMenu.mPlatform = EmojiPlatform.from(sharedPreferences.getString("emojiPlatform", "google")!!)
 
         if (allPermissionsGranted()) {
             startCamera(config)
@@ -255,7 +255,8 @@ class KeyboardCamera(
 
             override fun onEmotionDetected(emotion: String) {
                 Handler(Looper.getMainLooper()).post {
-                    //mainEmojiText.text = labelEmojis[emotion]
+                    Log.d("asdf", "emotion detected")
+                    pieMenu.updateCircle(labelEmojis[emotion]!!, faceAnalyzer)
                 }
             }
 

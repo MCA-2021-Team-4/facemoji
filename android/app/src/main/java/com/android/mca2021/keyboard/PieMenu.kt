@@ -16,17 +16,19 @@ import kotlin.math.sin
 import android.animation.Animator
 
 import android.animation.AnimatorListenerAdapter
+import com.android.mca2021.keyboard.core.FaceAnalyzer
 import com.seonjunkim.radialmenu.EmojiGraph
 
 
 class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     View(context, attrs, defStyle) {
 
-    private var mCurrentEmojiId = 71
+    var mCurrentEmojiId = -1
     private var mPrevEmojiId = -1
     private var mEmojiUpdated = false
     var mPlatform: EmojiPlatform = EmojiPlatform.GOOGLE
     val emojiGraph = EmojiGraph()
+    private lateinit var faceAnalyzer: FaceAnalyzer
 
     /* scales */
     var mTotalScale = 1f
@@ -312,6 +314,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                 if(!mPressed){
                     if(mPressedButton == 0){
                         mPressed = true
+                        faceAnalyzer.pauseAnalysis()
                         if(mCurrentEmojiId != -1)
                             updateSlices(mCurrentEmojiId)
                         spinAnim.start()
@@ -354,6 +357,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                             invalidate()
                         }
                     }
+
                     if(mPressedButton >= 0){
                         if(sliceIndex >= 0) {
                             /* selected slice */
@@ -365,6 +369,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                             expandAnim_reverseTo0.start()
                             expandAnim_circleReverse.start()
                         } else {
+                            faceAnalyzer.resumeAnalysis()
                             circleSelectedAnim.start()
                         }
                         expandAnim_reverseOthersTo0.start()
@@ -507,6 +512,12 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             else
                 mSlices[i].mEmojiId = -1
         }
+    }
+
+    internal fun updateCircle(emojiId: Int, faceAnalyzer: FaceAnalyzer){
+        this.faceAnalyzer = faceAnalyzer
+        mCurrentEmojiId = emojiId
+        invalidate()
     }
 
     private fun drawCircle(canvas: Canvas){
