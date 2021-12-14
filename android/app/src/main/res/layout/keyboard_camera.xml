@@ -16,64 +16,14 @@
 
     </androidx.camera.view.PreviewView>
 
-<!--    <com.android.mca2021.keyboard.core.FaceContourOverlay-->
-<!--        android:id="@+id/faceContourOverlay"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="350dp"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-        <TextView
-            android:id="@+id/anger_text"
-            android:textColor="@color/white"
-            android:text="Anger: "
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:id="@+id/disgust_text"
-            android:textColor="@color/white"
-            android:text="Disgust: "
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:id="@+id/fear_text"
-            android:textColor="@color/white"
-            android:text="Fear: "
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:id="@+id/happiness_text"
-            android:textColor="@color/white"
-            android:text="Happiness: "
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:id="@+id/neutral_text"
-            android:textColor="@color/white"
-            android:text="Neutral: "
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:id="@+id/sadness_text"
-            android:textColor="@color/white"
-            android:text="Sadness: "
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:id="@+id/surprise_text"
-            android:textColor="@color/white"
-            android:text="Surprise: "
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
+    <com.android.mca2021.keyboard.PieMenu
+        android:id="@+id/circular_button"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
 
     <ImageButton
         android:id="@+id/option_button"
@@ -94,55 +44,8 @@
         android:layout_marginBottom="10dp"
         android:background="@drawable/key_background"
         android:text="A"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="10dp"
         app:layout_constraintStart_toStartOf="@+id/view_finder" />
 
-    <LinearLayout
-        android:background="@drawable/recommendation_background"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="10dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/view_finder">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:baselineAligned="false"
-            android:orientation="horizontal">
-            <include
-                layout="@layout/emoji_item"
-                android:id="@+id/recommendation_1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
-            <include
-                layout="@layout/emoji_item"
-                android:id="@+id/recommendation_2"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:baselineAligned="false"
-            android:orientation="horizontal">
-            <include
-                layout="@layout/emoji_item"
-                android:id="@+id/recommendation_3"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
-            <include
-                layout="@layout/emoji_item"
-                android:id="@+id/recommendation_4"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
-        </LinearLayout>
-    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
