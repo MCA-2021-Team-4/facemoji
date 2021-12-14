@@ -17,6 +17,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import com.android.mca2021.keyboard.databinding.ActivityMainBinding
+import com.android.mca2021.keyboard.keyboardview.EmojiWeightSetActivity
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -52,6 +53,11 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnEmojiPlatform.setOnClickListener {
             openPlatformDialog()
+        }
+
+        binding.btnEmotionWeight.setOnClickListener {
+            val intent = Intent(this, EmojiWeightSetActivity::class.java)
+            startActivity(intent)
         }
     }
 
