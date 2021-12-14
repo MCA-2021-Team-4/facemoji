@@ -11,8 +11,7 @@
         android:gravity="center"
         android:layout_marginTop="5dp">
 
-        <include
-            layout="@layout/emoji_item"
+        <ImageView
             android:id="@+id/emoji_anger"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -37,8 +36,7 @@
         android:gravity="center"
         android:layout_marginTop="5dp">
 
-        <include
-            layout="@layout/emoji_item"
+        <ImageView
             android:id="@+id/emoji_disgust"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -63,8 +61,7 @@
         android:gravity="center"
         android:layout_marginTop="5dp">
 
-        <include
-            layout="@layout/emoji_item"
+        <ImageView
             android:id="@+id/emoji_fear"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -89,8 +86,7 @@
         android:gravity="center"
         android:layout_marginTop="5dp">
 
-        <include
-            layout="@layout/emoji_item"
+        <ImageView
             android:id="@+id/emoji_happiness"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -115,8 +111,7 @@
         android:gravity="center"
         android:layout_marginTop="5dp">
 
-        <include
-            layout="@layout/emoji_item"
+        <ImageView
             android:id="@+id/emoji_neutral"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -141,8 +136,7 @@
         android:gravity="center"
         android:layout_marginTop="5dp">
 
-        <include
-            layout="@layout/emoji_item"
+        <ImageView
             android:id="@+id/emoji_sadness"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -167,8 +161,7 @@
         android:gravity="center"
         android:layout_marginTop="5dp">
 
-        <include
-            layout="@layout/emoji_item"
+        <ImageView
             android:id="@+id/emoji_surprise"
             android:layout_width="0dp"
             android:layout_height="match_parent"

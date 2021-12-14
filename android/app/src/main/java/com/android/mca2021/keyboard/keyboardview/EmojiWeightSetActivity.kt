@@ -3,6 +3,8 @@ package com.android.mca2021.keyboard.keyboardview
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.BitmapFactory
+import android.graphics.RectF
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -10,12 +12,10 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.Window
-import android.widget.Button
-import android.widget.FrameLayout
-import android.widget.SeekBar
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.android.mca2021.keyboard.EmojiPlatform
 import com.android.mca2021.keyboard.R
 
 class EmojiWeightSetActivity: AppCompatActivity() {
@@ -31,6 +31,7 @@ class EmojiWeightSetActivity: AppCompatActivity() {
     private lateinit var seekBarSurprise: SeekBar
     private lateinit var sharedPreferences: SharedPreferences
     lateinit var weightSetCamera: WeightSetCamera
+    private var mEmojiPlatform : EmojiPlatform = EmojiPlatform.GOOGLE
 
     private val emojisUnicode = listOf(
         "\uD83D\uDE21",
@@ -40,6 +41,16 @@ class EmojiWeightSetActivity: AppCompatActivity() {
         "\uD83D\uDE10",
         "\uD83D\uDE1E",
         "\uD83D\uDE2E",
+    )
+
+    private val emojiItemtoEmojiId = mapOf(
+        R.id.emoji_anger to 0,
+        R.id.emoji_disgust to 6,
+        R.id.emoji_fear to 37,
+        R.id.emoji_happiness to 45,
+        R.id.emoji_neutral to 58,
+        R.id.emoji_sadness to 9,
+        R.id.emoji_surprise to 3
     )
 
     private val emojiItemIds = listOf(
@@ -70,15 +81,15 @@ class EmojiWeightSetActivity: AppCompatActivity() {
         sharedPreferences = baseContext.getSharedPreferences("setting", Context.MODE_PRIVATE)
         val sharedPreferencesEditor = sharedPreferences.edit()
 
+        Handler(Looper.getMainLooper()).post {
+            setEmojiLayout()
+        }
         cameraFrame = findViewById(R.id.camera_frame)
         weightSetCamera = WeightSetCamera(this, applicationContext, assets, layoutInflater)
 
 
         seekBarConfig()
 
-        Handler(Looper.getMainLooper()).post {
-            setEmojiLayout()
-        }
 
         btnConfirm = findViewById(R.id.confirm_button)
         btnConfirm.setOnClickListener {
@@ -88,6 +99,7 @@ class EmojiWeightSetActivity: AppCompatActivity() {
             sharedPreferencesEditor.apply()
             finish()
         }
+
 
     }
 
@@ -104,10 +116,13 @@ class EmojiWeightSetActivity: AppCompatActivity() {
     }
 
     private fun setEmojiLayout() {
-            emojiItemIds.forEachIndexed { index, id ->
-                val textView = findViewById<View>(id).findViewById<TextView>(R.id.emoji_text)
-                textView.text = emojisUnicode[index]
-            }
+        mEmojiPlatform = EmojiPlatform.from(sharedPreferences.getString("emojiPlatform", "google")!!)
+        for(itemId in emojiItemtoEmojiId.keys){
+            val imageView = findViewById<ImageView>(itemId)
+            val id: Int = applicationContext.resources.getIdentifier("zzz_${mEmojiPlatform.name.lowercase()}_${emojiItemtoEmojiId.get(itemId)}", "drawable", applicationContext.packageName)
+            val bmp = BitmapFactory.decodeResource(applicationContext.resources, id)
+            imageView.setImageBitmap(bmp)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.N)

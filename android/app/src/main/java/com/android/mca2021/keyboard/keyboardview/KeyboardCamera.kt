@@ -57,16 +57,6 @@ class KeyboardCamera(
     private lateinit var cameraExecutor: ExecutorService
     private val TAG: String = "mojiface"
 
-    /*
-
-    private var emojiItemIds = listOf(
-        R.id.recommendation_1,
-        R.id.recommendation_2,
-        R.id.recommendation_3,
-        R.id.recommendation_4
-    )
-     */
-
     private val labelEmojis = mapOf(
         "Anger" to 0,
         "Disgust" to 6,
@@ -78,21 +68,9 @@ class KeyboardCamera(
         "Noface" to -1
     )
 
-    private val emotions = arrayOf(
-        "Anger",
-        "Disgust",
-        "Fear",
-        "Happiness",
-        "Neutral",
-        "Sadness",
-        "Surprise",
-    )
-
     /* UI */
     private lateinit var pieMenu: PieMenu
     private lateinit var disabledIndicator: View
-
-    private var scaledEmojiIndex: Int? = null
 
     override fun changeCaps() {}
     private val lifecycleRegistry = LifecycleRegistry(this)
