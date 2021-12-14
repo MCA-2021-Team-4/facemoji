@@ -417,19 +417,27 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
 
     private fun resetAll(){
         mSlices.clear()
-        for(i in 0 until mSliceNum)
+        for(i in 0 until mSliceNum){
+            /* platform size scaling */
+            var platformEmojiScale = mSliceEmojiScale
+            when (mPlatform){
+                EmojiPlatform.SAMSUNG -> platformEmojiScale *= 1.1f
+                EmojiPlatform.TWITTER -> platformEmojiScale *= 0.9f
+            }
+
             mSlices.add(
                 mSlice(
                     context,
                     degreeStep,
                     180 + degreeStep / 2 + (degreeStep * i),
                     mOuterRadius * mSliceRadiusScale,
-                    mSliceEmojiScale,
+                    platformEmojiScale,
                     mCenterX,
                     mCenterY,
                     mPlatform.name.lowercase()
                 )
             )
+        }
         for(i in 0 until mSliceNum)
             mSlices[i].mEmojiId = 72 + i
     }
