@@ -17,6 +17,7 @@ import android.animation.Animator
 
 import android.animation.AnimatorListenerAdapter
 import android.util.Log
+import android.view.inputmethod.InputConnection
 import com.android.mca2021.keyboard.core.FaceAnalyzer
 import com.seonjunkim.radialmenu.EmojiGraph
 
@@ -29,6 +30,9 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private var mEmojiUpdated = false
     var mPlatform: EmojiPlatform = EmojiPlatform.GOOGLE
     val emojiGraph = EmojiGraph()
+
+    var inputConnection: InputConnection? = null
+
     private lateinit var faceAnalyzer: FaceAnalyzer
 
     /* scales */
@@ -338,6 +342,12 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                     }
                     if(sliceIndex >= 0 && mSlices[sliceIndex].mEmojiId != -1) {
                         mSlices[sliceIndex].isPressed = true
+                    }else{
+                        /*
+
+                        if(this::faceAnalyzer.isInitialized)
+                            faceAnalyzer.resumeAnalysis()
+                         */
                     }
                 }
                 invalidate()
@@ -375,9 +385,11 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                                 expandAnim_circleReverse.start()
                             }
                         } else {
-                            /* circle */
+                            /* selected circle */
                             if(this::faceAnalyzer.isInitialized)
                                 faceAnalyzer.resumeAnalysis()
+                            if(mCurrentEmojiId != -1)
+                                inputConnection?.commitText(emojiIdtoString(mCurrentEmojiId), 1)
                             circleSelectedAnim.start()
                         }
                         expandAnim_reverseOthersTo0.start()
@@ -395,6 +407,10 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             }
         }
         return true
+    }
+
+    private fun emojiIdtoString(mCurrentEmojiId: Int): CharSequence {
+        return emojiGraph.emojiIdtoString(mCurrentEmojiId)
     }
 
     private fun xy2index(x: Float, y: Float): Int {

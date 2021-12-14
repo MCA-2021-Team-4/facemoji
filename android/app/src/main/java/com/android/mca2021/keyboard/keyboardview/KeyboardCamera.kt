@@ -34,6 +34,8 @@ import com.android.mca2021.keyboard.*
 import com.android.mca2021.keyboard.MainActivity.Companion.REQUEST_PERMISSION
 import com.android.mca2021.keyboard.MainActivity.Companion.REQUIRED_PERMISSIONS
 import com.android.mca2021.keyboard.core.FaceAnalyzer
+import com.google.firebase.ml.vision.FirebaseVision
+import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import com.google.mlkit.vision.face.Face
 import java.util.concurrent.ExecutorService
@@ -100,6 +102,7 @@ class KeyboardCamera(
 
         cameraExecutor = Executors.newSingleThreadExecutor()
         pieMenu.mPlatform = EmojiPlatform.from(sharedPreferences.getString("emojiPlatform", "google")!!)
+        pieMenu.inputConnection = inputConnection
 
         if (allPermissionsGranted()) {
             startCamera(config)
@@ -137,11 +140,6 @@ class KeyboardCamera(
             context.resources.displayMetrics
         ).toInt()
         viewFinder.layoutParams.height = height
-
-        //Face Detect option
-        val realTimeOpts = FirebaseVisionFaceDetectorOptions.Builder()
-            .setContourMode(FirebaseVisionFaceDetectorOptions.ALL_CONTOURS)
-            .build()
 
         cameraProviderFuture.addListener({
             // Used to bind the lifecycle of cameras to the lifecycle owner
