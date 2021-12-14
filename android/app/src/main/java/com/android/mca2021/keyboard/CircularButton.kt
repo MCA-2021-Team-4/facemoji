@@ -5,7 +5,6 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AnticipateInterpolator
@@ -17,9 +16,7 @@ import kotlin.math.sin
 import android.animation.Animator
 
 import android.animation.AnimatorListenerAdapter
-
-
-
+import android.util.Log
 
 
 class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
@@ -28,8 +25,14 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private var mCurrentEmojiId = 71
     private var mPrevEmojiId = -1
     private var mEmojiUpdated = false
-    //private var mPlatform = "Google"
     var mPlatform: EmojiPlatform = EmojiPlatform.GOOGLE
+
+    /* scales */
+    var mTotalScale = 0.8f
+    var mCircleEmojiScale = 1f
+    var mCircleRadiusScale = 1f
+    var mSliceEmojiScale = 1f
+    var mSliceRadiusScale = 1f
 
     private var mWidth = 0
     private var mHeight = 0
@@ -45,6 +48,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private val degreeStep :Float = 180f/mSliceNum
     private var currentStartingDegree = 0f
 
+
     private var mCenterX = 0F
     private var mCenterY = 0F
     private var mPressed = false
@@ -53,12 +57,14 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private val animDuration : Long= 200
 
 
-    class mSlice(val context: Context, var degreeStep: Float, var centerDegree: Float, var radius: Float, private val centerX: Float, private val centerY: Float, val platform: String){
-        private val mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        private val mRectF = RectF()
+    class mSlice(val context: Context, var degreeStep: Float, var centerDegree: Float, var radius: Float, var emojiScale: Float, private val centerX: Float, private val centerY: Float, val platform: String){
         var isPressed = false
         var isSelected = false
-        var emojiId = 0
+
+        var mEmojiId = 0
+
+        private val mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private val mRectF = RectF()
 
         fun draw(canvas: Canvas){
             mRectF.left = (centerX - radius)
@@ -80,17 +86,19 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
 
 
             /* draw emoji */
-            if(emojiId != -1){
+            if(mEmojiId != -1){
                 val eCenterX = centerX - radius*0.75 * cos(Math.toRadians(((centerDegree-180)).toDouble()))
                 val eCenterY = centerY - radius*0.75 * sin(Math.toRadians(((centerDegree-180)).toDouble()))
-                val id = context.resources.getIdentifier("zzz_${platform.lowercase()}_${emojiId}", "drawable", context.packageName)
+                val id = context.resources.getIdentifier("zzz_${platform.lowercase()}_${mEmojiId}", "drawable", context.packageName)
                 var bmp = BitmapFactory.decodeResource(context.resources, id)
                 var mRectF =RectF()
-                val scale = bmp.width*degreeStep/(5*36)
-                mRectF.left = (eCenterX - scale).toFloat()
-                mRectF.right = (eCenterX + scale).toFloat()
-                mRectF.top = (eCenterY - scale).toFloat()
-                mRectF.bottom = (eCenterY + scale).toFloat()
+
+                val mEmojiSize = emojiScale* bmp.width*degreeStep*radius/(5*36*450)
+                Log.d("Radi", radius.toString())
+                mRectF.left = (eCenterX - mEmojiSize).toFloat()
+                mRectF.right = (eCenterX + mEmojiSize).toFloat()
+                mRectF.top = (eCenterY - mEmojiSize).toFloat()
+                mRectF.bottom = (eCenterY + mEmojiSize).toFloat()
                 canvas.drawBitmap(bmp, null, mRectF, null)
             }
 
@@ -181,10 +189,10 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
 
         /* select shorter one from width & height as diameter */
         mOuterRadius = if (w>h) (h/2).toFloat() else (w/2).toFloat()
-        mOuterRadius = (mOuterRadius * 0.8).toFloat()
+        mOuterRadius = mOuterRadius * mTotalScale
         mInnerRadius = mOuterRadius * innerRadiusRatio
         circleRadius = mInnerRadius
-        circleEmojiSize = circleRadius
+        circleEmojiSize = circleRadius * 1.2f
 
         expandAnim = ValueAnimator.ofFloat(mOuterRadius, mOuterRadius*1.2f).apply {
             duration = (animDuration*1.5).toLong()
@@ -259,7 +267,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             play(expandAnim_circleBigReverse).after(expandAnim_circleBig)
         }
 
-        expandAnim_emoji = ValueAnimator.ofFloat(0f, mInnerRadius/2f).apply {
+        expandAnim_emoji = ValueAnimator.ofFloat(0f, 1.2f*mInnerRadius/2f).apply {
             duration = animDuration*2
             interpolator = OvershootInterpolator()
             addUpdateListener { updatedAnim ->
@@ -331,7 +339,7 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                             /* selected slice */
                             mSlices[sliceIndex].isSelected = true
                             mPrevEmojiId = mCurrentEmojiId
-                            mCurrentEmojiId = mSlices[sliceIndex].emojiId
+                            mCurrentEmojiId = mSlices[sliceIndex].mEmojiId
                             mEmojiUpdated = true
                             expandAnim_emoji.start()
                             expandAnim_reverse.start()
@@ -415,14 +423,15 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                     context,
                     degreeStep,
                     180 + degreeStep / 2 + (degreeStep * i),
-                    mOuterRadius,
+                    mOuterRadius * mSliceRadiusScale,
+                    mSliceEmojiScale,
                     mCenterX,
                     mCenterY,
                     mPlatform.name.lowercase()
                 )
             )
         for(i in 0 until mSliceNum)
-            mSlices[i].emojiId = 72 + i
+            mSlices[i].mEmojiId = 72 + i
     }
 
     private fun drawCircle(canvas: Canvas){
@@ -430,16 +439,15 @@ class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         mPaint.style = Paint.Style.FILL
         mPaint.strokeWidth = 5F
         mPaint.color = Color.WHITE
-        canvas.drawCircle(mCenterX, mCenterY, circleRadius, mPaint)
+        canvas.drawCircle(mCenterX, mCenterY, mCircleRadiusScale * circleRadius, mPaint)
 
         if(mCurrentEmojiId != -1){
             val id = context.resources.getIdentifier("zzz_${mPlatform.name.lowercase()}_${mCurrentEmojiId}", "drawable", context.packageName)
             var bmp = BitmapFactory.decodeResource(context.resources, id)
             var mRectF =RectF()
             if(!mEmojiUpdated){
-                circleEmojiSize = circleRadius*circleRadius/(mInnerRadius*2)
+                circleEmojiSize = mCircleEmojiScale * 1.2f * (mCircleRadiusScale * mCircleRadiusScale * circleRadius * circleRadius)/(mInnerRadius*2)
             }
-            Log.d("emojisize", "${circleEmojiSize/circleRadius}")
             mRectF.left = mCenterX - circleEmojiSize
             mRectF.right = mCenterX + circleEmojiSize
             mRectF.top = mCenterY - circleEmojiSize
