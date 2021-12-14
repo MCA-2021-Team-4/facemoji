@@ -12,13 +12,21 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
+import com.android.mca2021.keyboard.databinding.ActivityMainBinding
+import com.android.mca2021.keyboard.keyboardview.EmojiWeightSetActivity
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var sharedPreferences: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         intent.getBooleanExtra(REQUEST_PERMISSION, false).also {
             if (it) ActivityCompat.requestPermissions(
@@ -27,6 +35,35 @@ class MainActivity : AppCompatActivity() {
                 REQUEST_CODE_PERMISSIONS
             )
         }
+
+        sharedPreferences = getSharedPreferences("setting", Context.MODE_PRIVATE)
+        binding.btnVibration.setOnClickListener {
+            binding.vibrationSwitch.toggle()
+        }
+
+        binding.vibrationSwitch.isChecked = sharedPreferences.getInt("keyboardVibrate", -1) > 0
+
+        binding.vibrationSwitch.setOnCheckedChangeListener { v, isChecked ->
+            sharedPreferences.edit {
+                this.putInt("keyboardVibrate", if (isChecked) 1 else -1)
+                this.apply()
+                this.commit()
+            }
+        }
+
+        binding.btnEmojiPlatform.setOnClickListener {
+            openPlatformDialog()
+        }
+
+        binding.btnEmotionWeight.setOnClickListener {
+            val intent = Intent(this, EmojiWeightSetActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) checkKeyboardSettings()
     }
 
     override fun onResume() {
@@ -34,6 +71,23 @@ class MainActivity : AppCompatActivity() {
         checkKeyboardSettings()
     }
 
+    private fun openPlatformDialog() {
+        val platformList = EmojiPlatform.all.map { it.name.lowercase() }.toTypedArray()
+        val selectedPlatform = sharedPreferences.getString("emojiPlatform", "google")!!
+        val selectedIndex = platformList.indexOf(selectedPlatform)
+        AlertDialog.Builder(this).setSingleChoiceItems(
+            platformList,
+            selectedIndex
+        ) { dialog, which ->
+            sharedPreferences.edit {
+                this.putString("emojiPlatform", platformList[which])
+                this.apply()
+                this.commit()
+            }
+        }
+            .setPositiveButton(R.string.confirm, null)
+            .show()
+    }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
@@ -41,69 +95,57 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults:
-        IntArray) {
+        IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (!allPermissionsGranted()) {
-                Toast.makeText(this,
+                Toast.makeText(
+                    this,
                     R.string.not_permitted,
-                    Toast.LENGTH_SHORT).show()
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             finish()
         }
     }
 
-    fun enableKeyboard(view: android.view.View) {
+    fun enableKeyboard(view: View) {
         startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
     }
 
-    fun openKeyboardSetting(view: android.view.View) {
-        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    fun openKeyboardSetting(view: View) {
+        val inputMethodManager =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.showInputMethodPicker()
     }
 
-    fun checkKeyboardSettings() {
-        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    private fun checkKeyboardSettings() {
+        val inputMethodManager =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         val enabledMethods = inputMethodManager.enabledInputMethodList
-        val btn_enablekeyboard = findViewById<Button>(R.id.btn_enablekeyboard)
-        var enabled = false
-        for(i in 0 until enabledMethods.size){
-            val imi = enabledMethods[i]
-            val name = imi.loadLabel(packageManager).toString()
-            Log.d(TAG, name)
-            if(name.equals("Facemoji")){
-                enabled = true
-                btn_enablekeyboard.setBackgroundColor(Color.BLUE)
-                btn_enablekeyboard.setText("facemoji enabled! ✓")
-            }
-        }
-        if(enabled == false){
-            btn_enablekeyboard.setBackgroundColor(Color.DKGRAY)
-            btn_enablekeyboard.setText("enable facemoji")
+        val enabled = enabledMethods.last {
+            it.loadLabel(packageManager).toString().equals("Facemoji")
+        } != null
+        if (!enabled) {
+            binding.defaultIndicator.setBackgroundColor(ContextCompat.getColor(this, R.color.red))
+            binding.defaultIndicator.text = resources.getString(R.string.keyboard_not_added)
+            return
         }
 
-        val defaultIME = Settings.Secure.getString(this.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
-        val btn_selectkeyboard = findViewById<Button>(R.id.btn_selectkeyboard)
-        if(defaultIME.contains("facemoji", ignoreCase = true)) {
-            btn_selectkeyboard.setBackgroundColor(Color.BLUE)
-            btn_selectkeyboard.setText("facemoji selected! ✓")
-        }else{
-            btn_selectkeyboard.setBackgroundColor(Color.DKGRAY)
-            btn_selectkeyboard.setText("select facemoji as default")
-        }
-    }
-
-    fun checkIfDefault(view: android.view.View) {
-        val defaultIME = Settings.Secure.getString(this.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
-        val btn_selectkeyboard = findViewById<Button>(R.id.btn_selectkeyboard)
-        if(defaultIME.contains("facemoji", ignoreCase = true)) {
-            btn_selectkeyboard.setBackgroundColor(Color.BLUE)
-            btn_selectkeyboard.setText("facemoji selected! ✓")
-            Toast.makeText(this.applicationContext, "facemoji is set as default keyboard", Toast.LENGTH_SHORT).show()
-        }else{
-            btn_selectkeyboard.setBackgroundColor(Color.DKGRAY)
-            btn_selectkeyboard.setText("select facemoji as default")
-            Toast.makeText(this.applicationContext, "facemoji not set as default keyboard", Toast.LENGTH_SHORT).show()
+        val defaultIME =
+            Settings.Secure.getString(this.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
+        if (defaultIME.contains("facemoji", ignoreCase = true)) {
+            binding.defaultIndicator.setBackgroundColor(
+                ContextCompat.getColor(
+                    this,
+                    R.color.colorPrimary
+                )
+            )
+            binding.defaultIndicator.text = resources.getString(R.string.set_as_default)
+        } else {
+            binding.defaultIndicator.setBackgroundColor(ContextCompat.getColor(this, R.color.red))
+            binding.defaultIndicator.text = resources.getString(R.string.not_set_as_default)
         }
     }
 
@@ -114,6 +156,4 @@ class MainActivity : AppCompatActivity() {
         const val REQUEST_PERMISSION = "com.android.mca2021.keyboard.requestPermission"
         val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
-
-
 }

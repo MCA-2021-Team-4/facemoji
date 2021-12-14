@@ -20,7 +20,7 @@ public class EmotionData implements ClassifierResult,Serializable {
         System.arraycopy(emotionScores, 0, this.emotionScores, 0, emotionScores.length);
     }
 
-    private static String[] emotions={"","Anger", "Disgust", "Fear", "Happiness", "Neutral", "Sadness", "Surprise"};
+    private static String[] emotions={"Anger", "Disgust", "Fear", "Happiness", "Neutral", "Sadness", "Surprise"};
     public static String getEmotion(float[] emotionScores){
         for (int i = 0; i < 7; i++) {
             emotionScores[i] *= weightArray[i];
@@ -40,7 +40,7 @@ public class EmotionData implements ClassifierResult,Serializable {
                 }
             }
         }
-        return emotions[bestInd+1];
+        return emotions[bestInd];
     }
     public String toString(){
         return getEmotion(emotionScores);

@@ -1,6 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Facemoji</string>
-    <string name="not_permitted">카메라 권한이 거부되었습니다.</string>
-    <string name="confirm">확인</string>
-    <string name="cancel">취소</string>
+    <string name="not_permitted">Camera access has been denied.</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="set_as_default">Facemoji is a default keyboard!</string>
+    <string name="not_set_as_default">Facemoji is not a default keyboard!</string>
+    <string name="keyboard_not_added">Facemoji is not added!</string>
+    <string name="vibration">Vibration</string>
+    <string name="emoji_platform">Emoji Platform</string>
+    <string name="enable_facemoji">Enable Facemoji</string>
+    <string name="select_as_default">Select Facemoji as default</string>
+    <string name="emotion_weight">Customize emotion</string>
+    <string name="test_here">Test Here!</string>
 </resources>

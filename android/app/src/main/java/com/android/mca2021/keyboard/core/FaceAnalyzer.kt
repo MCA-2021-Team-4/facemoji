@@ -20,6 +20,10 @@ import java.util.Collections.max
 import kotlin.math.max
 import android.graphics.YuvImage
 import android.media.Image
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
 import java.util.Collections.min
 import kotlin.math.min
@@ -32,6 +36,7 @@ internal class FaceAnalyzer(
     private val minFaceSize = 32
     private var mtcnnFaceDetector: MTCNNModel? = null
     private var emotionClassifierTfLite: EmotionTfLiteClassifier? = null
+    private var paused: Boolean = false
 
     var listener: Listener? = null
 
@@ -48,21 +53,36 @@ internal class FaceAnalyzer(
         }
     }
 
+    fun pauseAnalysis() {
+        paused = true
+    }
+
+    fun resumeAnalysis() {
+        paused = false
+    }
+
     override fun analyze(imageProxy: ImageProxy) {
-        val bitmapImage = imageProxy.toBitmap()!!
+        val currentTimestamp = System.currentTimeMillis()
 
-        val rotateMatrix = Matrix()
-        rotateMatrix.postRotate(-90f)
+        if (!paused) {
+            val bitmapImage = imageProxy.toBitmap()!!
 
-        val rotated = Bitmap.createBitmap(bitmapImage, 0, 0,
-        bitmapImage.width, bitmapImage.height, rotateMatrix, false);
-        mtcnnDetectionAndAttributesRecognition(rotated, emotionClassifierTfLite)
+            val rotateMatrix = Matrix()
+            rotateMatrix.postRotate(-90f)
+
+            val rotated = Bitmap.createBitmap(bitmapImage, 0, 0,
+                bitmapImage.width, bitmapImage.height, rotateMatrix, false);
+            mtcnnDetectionAndAttributesRecognition(rotated, emotionClassifierTfLite)
 //        if (image != null) {
 //            val bitmapImage = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
 //            yuvToRgbConverter.yuvToRgb(image, bitmapImage)
 //        }
-        imageProxy.image?.close()
-        imageProxy.close()
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(1000 - (System.currentTimeMillis() - currentTimestamp))
+            imageProxy.close()
+        }
     }
 
     fun Image.toBitmap(): Bitmap {
@@ -117,8 +137,9 @@ internal class FaceAnalyzer(
                 classifier.imageSizeY,
                 false
             )
-            val res = classifier.classifyFrame(resultBitmap)
+            val res = classifier.classifyFrame(resultBitmap) as EmotionData
             listener?.onEmotionDetected(res.toString())
+            listener?.onEmotionScoreDetected(res.emotionScores)
         }
     }
 
@@ -127,8 +148,11 @@ internal class FaceAnalyzer(
         /** Callback that receives face bounds that can be drawn on top of the viewfinder.  */
         fun onFacesDetected(proxyWidth: Int, proxyHeight: Int, face: Face)
 
-        /** Callback that receives face bounds that can be drawn on top of the viewfinder.  */
+        /** Callback that receives emotion string can be mapped to emojis.  */
         fun onEmotionDetected(emotion: String)
+
+        /** Callback that receives emotion scores that can be drawn on top of the viewfinder.  */
+        fun onEmotionScoreDetected(scores: FloatArray)
 
         /** Invoked when an error is encounter during face detection.  */
         fun onError(exception: Exception)

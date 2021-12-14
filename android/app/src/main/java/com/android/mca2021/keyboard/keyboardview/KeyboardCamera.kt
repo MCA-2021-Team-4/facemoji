@@ -3,20 +3,24 @@ package com.android.mca2021.keyboard.keyboardview
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.*
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.AssetManager
 import android.content.res.Configuration
-import android.os.*
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.os.Vibrator
 import android.util.Log
 import android.util.Size
 import android.util.TypedValue
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Surface
+import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.InputConnection
 import android.widget.Button
-import android.widget.ImageButton
-import android.widget.TextView
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -26,7 +30,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
-import com.google.mlkit.vision.face.Face
 import com.android.mca2021.keyboard.*
 import com.android.mca2021.keyboard.MainActivity.Companion.REQUEST_PERMISSION
 import com.android.mca2021.keyboard.MainActivity.Companion.REQUIRED_PERMISSIONS
@@ -34,17 +37,18 @@ import com.android.mca2021.keyboard.core.FaceAnalyzer
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
+import com.google.mlkit.vision.face.Face
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 
-class KeyboardCamera (
+class KeyboardCamera(
     private val service: FacemojiService,
     override val context: Context,
     private val assets: AssetManager,
     private val layoutInflater: LayoutInflater,
     override val keyboardInteractionListener: KeyboardInteractionManager,
-): FacemojiKeyboard(), LifecycleOwner {
+) : FacemojiKeyboard(), LifecycleOwner {
     private lateinit var cameraLayout: View
 
     override var inputConnection: InputConnection? = null
@@ -53,7 +57,7 @@ class KeyboardCamera (
     private lateinit var cameraExecutor: ExecutorService
     private val TAG: String = "mojiface"
 
-    private var emojiList: List<String>
+    /*
 
     private var emojiItemIds = listOf(
         R.id.recommendation_1,
@@ -61,6 +65,7 @@ class KeyboardCamera (
         R.id.recommendation_3,
         R.id.recommendation_4
     )
+     */
 
     private val labelEmojis = mapOf(
         "Anger" to "\uD83D\uDE21",
@@ -72,13 +77,31 @@ class KeyboardCamera (
         "Sadness" to "\uD83D\uDE1E",
         "Surprise" to "\uD83D\uDE2E",
     )
-    private var weightArray: FloatArray = FloatArray(7) {1f}
+
+    private val emotions = arrayOf(
+        "Anger",
+        "Disgust",
+        "Fear",
+        "Happiness",
+        "Neutral",
+        "Sadness",
+        "Surprise",
+    )
+
+    /* UI */
+    private lateinit var circularButton: PieMenu
+    private lateinit var disabledIndicator: View
+
+    private var scaledEmojiIndex: Int? = null
+
     override fun changeCaps() {}
     private val lifecycleRegistry = LifecycleRegistry(this)
+    private val faceAnalyzer: FaceAnalyzer by lazy {
+        createFaceAnalyzer()
+    }
 
     init {
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
-        emojiList = listOf(0x1F600, 0x1F601, 0x1F600, 0x1F600).map{ getEmojiByUnicode(it) }
     }
 
     private fun getEmojiByUnicode(unicode: Int): String {
@@ -89,21 +112,10 @@ class KeyboardCamera (
         ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun setEmojiLayout() {
-        emojiList.forEachIndexed { idx, emoji ->
-            val textView = cameraLayout
-                .findViewById<View>(emojiItemIds[idx])
-                .findViewById<TextView>(R.id.emoji_text)
-
-            textView.text = emoji
-            textView.setOnClickListener {
-                inputConnection?.commitText((it as TextView).text.toString(), 1)
-            }
-        }
-    }
-
+    @SuppressLint("ClickableViewAccessibility")
     override fun initKeyboard() {
         cameraLayout = layoutInflater.inflate(R.layout.keyboard_camera, null)
+        circularButton = cameraLayout.findViewById(R.id.circular_button)
         vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         val config = context.resources.configuration
@@ -112,6 +124,7 @@ class KeyboardCamera (
         vibrate = sharedPreferences.getInt("keyboardVibrate", -1)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+        circularButton.mPlatform = EmojiPlatform.from(sharedPreferences.getString("emojiPlatform", "google")!!)
 
         if (allPermissionsGranted()) {
             startCamera(config)
@@ -132,18 +145,26 @@ class KeyboardCamera (
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
         }
 
-        val optionButton = cameraLayout.findViewById<ImageButton>(R.id.option_button)
-        optionButton.setOnClickListener {
-            val intent = Intent(context, EmojiWeightSetActivity::class.java).apply {
-                addFlags(FLAG_ACTIVITY_NEW_TASK)
-            }
-            context.startActivity(intent)
-        }
-
-        setEmojiLayout()
     }
 
-    private fun degreesToFirebaseRotation(degrees: Int): Int = when(degrees) {
+    private fun startAnalysis(moveGraph: Boolean = true) {
+        faceAnalyzer.resumeAnalysis()
+    }
+
+    private fun startTraverse() {
+        faceAnalyzer.pauseAnalysis()
+        disabledIndicator.visibility = View.VISIBLE
+    }
+
+    private fun getAdjacentEmojis(emoji0: String): String {
+        /*
+        This function will return adjacent emojis of emoji0 (based on emoji graph) later.
+        As prototype, just get integer string and return doubled value of it.
+         */
+        return (emoji0.toInt() * 2).toString()
+    }
+
+    private fun degreesToFirebaseRotation(degrees: Int): Int = when (degrees) {
         0 -> FirebaseVisionImageMetadata.ROTATION_0
         90 -> FirebaseVisionImageMetadata.ROTATION_90
         180 -> FirebaseVisionImageMetadata.ROTATION_180
@@ -198,8 +219,8 @@ class KeyboardCamera (
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .setTargetRotation(Surface.ROTATION_90)
                 .build()
-                .also{
-                    it.setAnalyzer(cameraExecutor, createFaceDetector())
+                .also {
+                    it.setAnalyzer(cameraExecutor, faceAnalyzer)
                 }
 
             // Select front camera as a default
@@ -211,9 +232,10 @@ class KeyboardCamera (
 
                 // Bind use cases to camera
                 cameraProvider.bindToLifecycle(
-                    this, cameraSelector, imageAnalysis, preview)
+                    this, cameraSelector, imageAnalysis, preview
+                )
 
-            } catch(exc: Exception) {
+            } catch (exc: Exception) {
                 Log.e("facemoji", "Use case binding failed", exc)
             }
         }, ContextCompat.getMainExecutor(service))
@@ -223,27 +245,31 @@ class KeyboardCamera (
         return cameraLayout
     }
 
-    private fun createFaceDetector(): ImageAnalysis.Analyzer {
-        val faceDetector = FaceAnalyzer(context, assets)
-        faceDetector.listener = object : FaceAnalyzer.Listener {
+    private fun createFaceAnalyzer(): FaceAnalyzer {
+        val faceAnalyzer = FaceAnalyzer(context, assets)
+        faceAnalyzer.listener = object : FaceAnalyzer.Listener {
             override fun onFacesDetected(proxyWidth: Int, proxyHeight: Int, face: Face) {
 //                val faceContourOverlay = cameraLayout.findViewById<FaceContourOverlay>(R.id.faceContourOverlay)
 //                faceContourOverlay.post { faceContourOverlay.drawFaceBounds(proxyWidth, proxyHeight, face)}
             }
 
             override fun onEmotionDetected(emotion: String) {
-                emojiList = listOf(labelEmojis[emotion]!!) + emojiList
-                emojiList = emojiList.subList(0, 4)
                 Handler(Looper.getMainLooper()).post {
-                    setEmojiLayout()
+                    //mainEmojiText.text = labelEmojis[emotion]
                 }
+            }
+
+            override fun onEmotionScoreDetected(scores: FloatArray) {
+//                Handler(Looper.getMainLooper()).post {
+//                    setEmotionText(scores)
+//                }
             }
 
             override fun onError(exception: Exception) {
                 Log.e(TAG, "Face detection error", exception)
             }
         }
-        return faceDetector
+        return faceAnalyzer
     }
 
     override fun getLifecycle(): Lifecycle {
