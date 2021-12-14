@@ -124,9 +124,15 @@ class MainActivity : AppCompatActivity() {
         val inputMethodManager =
             getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         val enabledMethods = inputMethodManager.enabledInputMethodList
-        val enabled = enabledMethods.last {
-            it.loadLabel(packageManager).toString().equals("Facemoji")
-        } != null
+        var enabled = false
+        for(i in 0 until enabledMethods.size){
+            val imi = enabledMethods[i]
+            val name = imi.loadLabel(packageManager).toString()
+            Log.d(TAG, name)
+            if(name.equals("Facemoji")){
+                enabled = true
+            }
+        }
         if (!enabled) {
             binding.defaultIndicator.setBackgroundColor(ContextCompat.getColor(this, R.color.red))
             binding.defaultIndicator.text = resources.getString(R.string.keyboard_not_added)
