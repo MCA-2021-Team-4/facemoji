@@ -225,7 +225,7 @@ abstract class FacemojiKeyboard {
     open fun playVibrate() {
         if (vibrate > 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrator.vibrate(VibrationEffect.createOneShot(10, DEFAULT_AMPLITUDE))
+                vibrator.vibrate(VibrationEffect.createOneShot(10, 100))
             } else {
                 vibrator.vibrate(10)
             }
