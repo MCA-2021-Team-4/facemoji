@@ -19,7 +19,7 @@ import android.animation.AnimatorListenerAdapter
 import com.seonjunkim.radialmenu.EmojiGraph
 
 
-class CircularButton(context: Context?, attrs: AttributeSet?, defStyle: Int) :
+class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     View(context, attrs, defStyle) {
 
     private var mCurrentEmojiId = 71

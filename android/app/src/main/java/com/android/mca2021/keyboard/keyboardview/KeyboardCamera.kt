@@ -32,7 +32,7 @@ import com.android.mca2021.keyboard.core.FaceAnalyzer
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
-import com.android.mca2021.keyboard.CircularButton
+import com.android.mca2021.keyboard.PieMenu
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -84,7 +84,7 @@ class KeyboardCamera(
     )
 
     /* UI */
-    private lateinit var circularButton: CircularButton
+    private lateinit var circularButton: PieMenu
     private lateinit var disabledIndicator: View
 
     private var scaledEmojiIndex: Int? = null

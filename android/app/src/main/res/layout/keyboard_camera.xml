@@ -14,7 +14,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.android.mca2021.keyboard.CircularButton
+    <com.android.mca2021.keyboard.PieMenu
         android:id="@+id/circular_button"
         android:layout_width="match_parent"
         android:layout_height="300dp"
