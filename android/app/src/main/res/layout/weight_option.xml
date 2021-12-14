@@ -1,17 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:gravity="center"
     android:layout_gravity="center"
-    android:layout_marginLeft="60dp"
-    android:layout_marginRight="60dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/button_reset"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/teal_200"
+            android:textColor="@color/black"
+            android:layout_marginBottom="10dp"
+            android:text="@string/reset"
+            android:textSize="10sp"/>
+
+
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="30dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
@@ -37,6 +50,8 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="30dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
@@ -62,6 +77,8 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="30dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
@@ -87,6 +104,8 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="30dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
@@ -112,6 +131,8 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="30dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
@@ -137,6 +158,8 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="30dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
@@ -162,6 +185,8 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="30dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
         android:gravity="center"
         android:layout_marginTop="5dp">
 
@@ -182,15 +207,11 @@
             android:progress="0" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/button_reset"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:text="Reset" />
-
     <FrameLayout
         android:id="@+id/camera_frame"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     </FrameLayout>

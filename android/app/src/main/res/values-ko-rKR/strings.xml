@@ -13,4 +13,5 @@
     <string name="select_as_default">Facemoji를 기본 키보드로 사용</string>
     <string name="emotion_weight">감정 가중치 설정</string>
     <string name="test_here">키보드 사용해보기</string>
+    <string name="reset">초기화</string>
 </resources>
