@@ -34,8 +34,6 @@ import com.android.mca2021.keyboard.*
 import com.android.mca2021.keyboard.MainActivity.Companion.REQUEST_PERMISSION
 import com.android.mca2021.keyboard.MainActivity.Companion.REQUIRED_PERMISSIONS
 import com.android.mca2021.keyboard.core.FaceAnalyzer
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import com.google.mlkit.vision.face.Face
 import java.util.concurrent.ExecutorService
@@ -70,7 +68,6 @@ class KeyboardCamera(
 
     /* UI */
     private lateinit var pieMenu: PieMenu
-    private lateinit var disabledIndicator: View
 
     override fun changeCaps() {}
     private val lifecycleRegistry = LifecycleRegistry(this)
@@ -125,31 +122,6 @@ class KeyboardCamera(
 
     }
 
-    private fun startAnalysis(moveGraph: Boolean = true) {
-        faceAnalyzer.resumeAnalysis()
-    }
-
-    private fun startTraverse() {
-        faceAnalyzer.pauseAnalysis()
-        disabledIndicator.visibility = View.VISIBLE
-    }
-
-    private fun getAdjacentEmojis(emoji0: String): String {
-        /*
-        This function will return adjacent emojis of emoji0 (based on emoji graph) later.
-        As prototype, just get integer string and return doubled value of it.
-         */
-        return (emoji0.toInt() * 2).toString()
-    }
-
-    private fun degreesToFirebaseRotation(degrees: Int): Int = when (degrees) {
-        0 -> FirebaseVisionImageMetadata.ROTATION_0
-        90 -> FirebaseVisionImageMetadata.ROTATION_90
-        180 -> FirebaseVisionImageMetadata.ROTATION_180
-        270 -> FirebaseVisionImageMetadata.ROTATION_270
-        else -> throw Exception("Rotation must be 0, 90, 180, or 270.")
-    }
-
     @SuppressLint("UnsafeOptInUsageError")
     private fun startCamera(config: Configuration) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(service)
@@ -170,9 +142,6 @@ class KeyboardCamera(
         val realTimeOpts = FirebaseVisionFaceDetectorOptions.Builder()
             .setContourMode(FirebaseVisionFaceDetectorOptions.ALL_CONTOURS)
             .build()
-
-        val detector = FirebaseVision.getInstance()
-            .getVisionFaceDetector(realTimeOpts)
 
         cameraProviderFuture.addListener({
             // Used to bind the lifecycle of cameras to the lifecycle owner
@@ -226,23 +195,15 @@ class KeyboardCamera(
     private fun createFaceAnalyzer(): FaceAnalyzer {
         val faceAnalyzer = FaceAnalyzer(context, assets)
         faceAnalyzer.listener = object : FaceAnalyzer.Listener {
-            override fun onFacesDetected(proxyWidth: Int, proxyHeight: Int, face: Face) {
-//                val faceContourOverlay = cameraLayout.findViewById<FaceContourOverlay>(R.id.faceContourOverlay)
-//                faceContourOverlay.post { faceContourOverlay.drawFaceBounds(proxyWidth, proxyHeight, face)}
-            }
+            override fun onFacesDetected(proxyWidth: Int, proxyHeight: Int, face: Face) {}
 
             override fun onEmotionDetected(emotion: String) {
                 Handler(Looper.getMainLooper()).post {
-                    Log.d("asdf", "emotion detected")
                     pieMenu.updateCircle(labelEmojis[emotion]!!, faceAnalyzer)
                 }
             }
 
-            override fun onEmotionScoreDetected(scores: FloatArray) {
-//                Handler(Looper.getMainLooper()).post {
-//                    setEmotionText(scores)
-//                }
-            }
+            override fun onEmotionScoreDetected(scores: FloatArray) {}
 
             override fun onError(exception: Exception) {
                 Log.e(TAG, "Face detection error", exception)

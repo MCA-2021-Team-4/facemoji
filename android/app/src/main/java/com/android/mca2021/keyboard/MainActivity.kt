@@ -1,18 +1,17 @@
 package com.android.mca2021.keyboard
 
 import android.Manifest
-import android.content.*
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
@@ -128,8 +127,7 @@ class MainActivity : AppCompatActivity() {
         for(i in 0 until enabledMethods.size){
             val imi = enabledMethods[i]
             val name = imi.loadLabel(packageManager).toString()
-            Log.d(TAG, name)
-            if(name.equals("Facemoji")){
+            if(name == "Facemoji"){
                 enabled = true
             }
         }
@@ -156,8 +154,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val TAG = "CameraXBasic"
-        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 10
         const val REQUEST_PERMISSION = "com.android.mca2021.keyboard.requestPermission"
         val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)

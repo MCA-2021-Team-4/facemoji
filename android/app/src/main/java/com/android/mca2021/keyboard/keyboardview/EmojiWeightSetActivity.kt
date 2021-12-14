@@ -4,15 +4,12 @@ package com.android.mca2021.keyboard.keyboardview
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.BitmapFactory
-import android.graphics.RectF
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
-import android.view.View
 import android.view.Window
-import android.widget.*
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.SeekBar
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.android.mca2021.keyboard.EmojiPlatform
@@ -60,10 +57,6 @@ class EmojiWeightSetActivity: AppCompatActivity() {
         sharedPreferences = baseContext.getSharedPreferences("setting", Context.MODE_PRIVATE)
 
         setEmojiLayout()
-        /*
-        Handler(Looper.getMainLooper()).post {
-        }
-         */
         cameraFrame = findViewById(R.id.camera_frame)
         weightSetCamera = WeightSetCamera(this, applicationContext, assets, layoutInflater)
 
@@ -115,14 +108,8 @@ class EmojiWeightSetActivity: AppCompatActivity() {
         seekBarSurprise.setProgress(weightArray[6], true)
 
         val listener = object: SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-
-            }
-
-            override fun onStartTrackingTouch(p0: SeekBar?) {
-
-            }
-
+            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {}
+            override fun onStartTrackingTouch(p0: SeekBar?) {}
             override fun onStopTrackingTouch(p0: SeekBar?) {
                 when (p0) {
                     seekBarAnger -> weightArray[0] = p0.progress
@@ -133,7 +120,6 @@ class EmojiWeightSetActivity: AppCompatActivity() {
                     seekBarSadness -> weightArray[5] = p0.progress
                     seekBarSurprise -> weightArray[6] = p0.progress
                 }
-
                 val sharedPreferencesEditor = sharedPreferences.edit()
                 emojiNames.forEachIndexed { idx, emoji ->
                     sharedPreferencesEditor.putInt(emoji, weightArray[idx])
