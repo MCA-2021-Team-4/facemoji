@@ -81,9 +81,12 @@ class EmojiWeightSetActivity: AppCompatActivity() {
         sharedPreferences = baseContext.getSharedPreferences("setting", Context.MODE_PRIVATE)
         val sharedPreferencesEditor = sharedPreferences.edit()
 
+        setEmojiLayout()
+        /*
+
         Handler(Looper.getMainLooper()).post {
-            setEmojiLayout()
         }
+         */
         cameraFrame = findViewById(R.id.camera_frame)
         weightSetCamera = WeightSetCamera(this, applicationContext, assets, layoutInflater)
 
