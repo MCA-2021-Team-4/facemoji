@@ -9,6 +9,7 @@ import android.os.Looper
 import android.view.View
 import android.view.Window
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,7 @@ import com.android.mca2021.keyboard.R
 
 class EmojiWeightSetActivity: AppCompatActivity() {
     private lateinit var btnConfirm: Button
+    private lateinit var cameraFrame: FrameLayout
     private var weightArray: IntArray = IntArray(7) {0}
     private lateinit var seekBarAnger: SeekBar
     private lateinit var seekBarDisgust: SeekBar
@@ -25,6 +27,7 @@ class EmojiWeightSetActivity: AppCompatActivity() {
     private lateinit var seekBarSadness: SeekBar
     private lateinit var seekBarSurprise: SeekBar
     private lateinit var sharedPreferences: SharedPreferences
+    lateinit var weightSetCamera: WeightSetCamera
 
     private val emojisUnicode = listOf(
         "\uD83D\uDE21",
@@ -62,6 +65,12 @@ class EmojiWeightSetActivity: AppCompatActivity() {
         setContentView(R.layout.weight_option)
         sharedPreferences = this.baseContext.getSharedPreferences("setting", Context.MODE_PRIVATE)
         val sharedPreferencesEditor = sharedPreferences.edit()
+
+        cameraFrame = findViewById(R.id.camera_frame)
+        weightSetCamera = WeightSetCamera(this, applicationContext, assets, layoutInflater)
+        weightSetCamera.initKeyboard()
+        cameraFrame.addView(weightSetCamera.getLayout())
+
 
         seekBarConfig()
 

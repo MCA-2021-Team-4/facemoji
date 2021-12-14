@@ -204,4 +204,11 @@
         android:text="CONFIRM"
         android:textSize="12dp" />
 
+    <FrameLayout
+        android:id="@+id/camera_frame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </FrameLayout>
+
 </LinearLayout>
