@@ -68,8 +68,6 @@ class EmojiWeightSetActivity: AppCompatActivity() {
 
         cameraFrame = findViewById(R.id.camera_frame)
         weightSetCamera = WeightSetCamera(this, applicationContext, assets, layoutInflater)
-        weightSetCamera.initKeyboard()
-        cameraFrame.addView(weightSetCamera.getLayout())
 
 
         seekBarConfig()
@@ -86,6 +84,18 @@ class EmojiWeightSetActivity: AppCompatActivity() {
             sharedPreferencesEditor.apply()
             finish()
         }
+
+    }
+
+    public override fun onStart() {
+        super.onStart()
+        weightSetCamera.initCamera()
+        cameraFrame.addView(weightSetCamera.getLayout())
+    }
+
+    public override fun onStop() {
+        super.onStop()
+        weightSetCamera.finishCamera()
 
     }
 

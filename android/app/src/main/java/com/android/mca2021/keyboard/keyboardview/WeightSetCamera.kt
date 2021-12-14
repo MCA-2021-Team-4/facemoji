@@ -27,9 +27,6 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
 import com.android.mca2021.keyboard.*
 import com.android.mca2021.keyboard.MainActivity.Companion.REQUEST_PERMISSION
 import com.android.mca2021.keyboard.MainActivity.Companion.REQUIRED_PERMISSIONS
@@ -47,7 +44,7 @@ class WeightSetCamera(
     private val context: Context,
     private val assets: AssetManager,
     private val layoutInflater: LayoutInflater,
-) : LifecycleOwner {
+){
 
     private lateinit var cameraLayout: View
 
@@ -86,13 +83,8 @@ class WeightSetCamera(
 
     private var scaledEmojiIndex: Int? = null
 
-    private val lifecycleRegistry = LifecycleRegistry(this)
     private val faceAnalyzer: FaceAnalyzer by lazy {
         createFaceAnalyzer()
-    }
-
-    init {
-        lifecycleRegistry.currentState = Lifecycle.State.CREATED
     }
 
     private fun getEmojiByUnicode(unicode: Int): String {
@@ -103,8 +95,11 @@ class WeightSetCamera(
         ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
     }
 
+    fun finishCamera(){
+        cameraExecutor.shutdown()
+    }
     @SuppressLint("ClickableViewAccessibility")
-    fun initKeyboard() {
+    fun initCamera() {
         cameraLayout = layoutInflater.inflate(R.layout.weight_camera, null)
         circularButton = cameraLayout.findViewById(R.id.circular_button)
         vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -126,9 +121,6 @@ class WeightSetCamera(
             }
             context.startActivity(intent)
         }
-
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
-
     }
 
     private fun startAnalysis(moveGraph: Boolean = true) {
@@ -155,6 +147,7 @@ class WeightSetCamera(
         270 -> FirebaseVisionImageMetadata.ROTATION_270
         else -> throw Exception("Rotation must be 0, 90, 180, or 270.")
     }
+
 
     @SuppressLint("UnsafeOptInUsageError")
     private fun startCamera(config: Configuration) {
@@ -216,7 +209,7 @@ class WeightSetCamera(
 
                 // Bind use cases to camera
                 cameraProvider.bindToLifecycle(
-                    this, cameraSelector, imageAnalysis, preview
+                    service, cameraSelector, imageAnalysis, preview
                 )
 
             } catch (exc: Exception) {
@@ -254,9 +247,5 @@ class WeightSetCamera(
             }
         }
         return faceAnalyzer
-    }
-
-    override fun getLifecycle(): Lifecycle {
-        return lifecycleRegistry
     }
 }
