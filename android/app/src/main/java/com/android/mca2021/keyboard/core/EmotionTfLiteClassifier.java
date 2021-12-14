@@ -25,13 +25,13 @@ public class EmotionTfLiteClassifier extends TfLiteClassifier{
     }
 
     private void setEmojiWeight(SharedPreferences sharedPreferences) {
-        weight[0] = 1f + (maxWeight - 1) * sharedPreferences.getInt("anger", 0) / 7f;
-        weight[1] = 1f + (maxWeight - 1) * sharedPreferences.getInt("disgust", 0) / 7f;
-        weight[2] = 1f + (maxWeight - 1) * sharedPreferences.getInt("fear", 0) / 7f;
-        weight[3] = 1f + (maxWeight - 1) * sharedPreferences.getInt("happiness", 0) / 7f;
-        weight[4] = 1f + (maxWeight - 1) * sharedPreferences.getInt("neutral", 0) / 7f;
-        weight[5] = 1f + (maxWeight - 1) * sharedPreferences.getInt("sadness", 0) / 7f;
-        weight[6] = 1f + (maxWeight - 1) * sharedPreferences.getInt("surprise", 0) / 7f;
+        weight[0] = 1f + (maxWeight - 1) * sharedPreferences.getInt("anger", 4) / 8f;
+        weight[1] = 1f + (maxWeight - 1) * sharedPreferences.getInt("disgust", 4) / 8f;
+        weight[2] = 1f + (maxWeight - 1) * sharedPreferences.getInt("fear", 4) / 8f;
+        weight[3] = 1f + (maxWeight - 1) * sharedPreferences.getInt("happiness", 4) / 8f;
+        weight[4] = 1f + (maxWeight - 1) * sharedPreferences.getInt("neutral", 4) / 8f;
+        weight[5] = 1f + (maxWeight - 1) * sharedPreferences.getInt("sadness", 4) / 8f;
+        weight[6] = 1f + (maxWeight - 1) * sharedPreferences.getInt("surprise", 4) / 8f;
     }
 
     protected void addPixelValue(int val) {
