@@ -133,6 +133,7 @@ class EmojiWeightSetActivity: AppCompatActivity() {
                     seekBarSadness -> weightArray[5] = p0.progress
                     seekBarSurprise -> weightArray[6] = p0.progress
                 }
+
                 val sharedPreferencesEditor = sharedPreferences.edit()
                 emojiNames.forEachIndexed { idx, emoji ->
                     sharedPreferencesEditor.putInt(emoji, weightArray[idx])
