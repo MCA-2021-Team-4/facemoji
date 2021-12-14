@@ -19,7 +19,6 @@ import android.view.LayoutInflater
 import android.view.Surface
 import android.view.View
 import android.view.WindowManager
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -37,6 +36,7 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import com.google.mlkit.vision.face.Face
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import com.android.mca2021.keyboard.PieMenu
 
 
 class WeightSetCamera(
@@ -57,14 +57,14 @@ class WeightSetCamera(
 
 
     private val labelEmojis = mapOf(
-        "Anger" to "\uD83D\uDE21",
-        "Contempt" to "\uD83D\uDE12",
-        "Disgust" to "\uD83D\uDE23",
-        "Fear" to "\uD83D\uDE28",
-        "Happiness" to "\uD83D\uDE42",
-        "Neutral" to "\uD83D\uDE10",
-        "Sadness" to "\uD83D\uDE1E",
-        "Surprise" to "\uD83D\uDE2E",
+        "Anger" to 0,
+        "Disgust" to 6,
+        "Fear" to 37,
+        "Happiness" to 45,
+        "Neutral" to 58,
+        "Sadness" to 9,
+        "Surprise" to 3,
+        "Noface" to -1
     )
 
     private val emotions = arrayOf(
@@ -78,7 +78,7 @@ class WeightSetCamera(
     )
 
     /* UI */
-    private lateinit var circularButton: PieMenu
+    private lateinit var pieMenu: PieMenu
     private lateinit var disabledIndicator: View
 
     private var scaledEmojiIndex: Int? = null
@@ -101,7 +101,7 @@ class WeightSetCamera(
     @SuppressLint("ClickableViewAccessibility")
     fun initCamera() {
         cameraLayout = layoutInflater.inflate(R.layout.weight_camera, null)
-        circularButton = cameraLayout.findViewById(R.id.circular_button)
+        pieMenu = cameraLayout.findViewById(R.id.circular_button)
         vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         val config = context.resources.configuration
@@ -110,7 +110,7 @@ class WeightSetCamera(
         vibrate = sharedPreferences.getInt("keyboardVibrate", -1)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
-        circularButton.mPlatform = EmojiPlatform.from(sharedPreferences.getString("emojiPlatform", "google")!!)
+        pieMenu.mPlatform = EmojiPlatform.from(sharedPreferences.getString("emojiPlatform", "google")!!)
 
         if (allPermissionsGranted()) {
             startCamera(config)
@@ -232,7 +232,8 @@ class WeightSetCamera(
 
             override fun onEmotionDetected(emotion: String) {
                 Handler(Looper.getMainLooper()).post {
-                    //mainEmojiText.text = labelEmojis[emotion]
+                    Log.d("asdf", "emotion detected")
+                    pieMenu.updateCircle(labelEmojis[emotion]!!, faceAnalyzer)
                 }
             }
 
