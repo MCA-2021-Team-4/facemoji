@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.view.Window
 import android.widget.Button
@@ -60,7 +61,7 @@ class EmojiWeightSetActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.weight_option)
-        sharedPreferences = this.baseContext.getSharedPreferences("setting", Context.MODE_PRIVATE)
+        sharedPreferences = baseContext.getSharedPreferences("setting", Context.MODE_PRIVATE)
         val sharedPreferencesEditor = sharedPreferences.edit()
 
         seekBarConfig()
