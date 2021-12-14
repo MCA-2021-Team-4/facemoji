@@ -20,6 +20,10 @@ import java.util.Collections.max
 import kotlin.math.max
 import android.graphics.YuvImage
 import android.media.Image
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
 import java.util.Collections.min
 import kotlin.math.min
@@ -49,6 +53,7 @@ internal class FaceAnalyzer(
     }
 
     override fun analyze(imageProxy: ImageProxy) {
+        val currentTimestamp = System.currentTimeMillis()
         val bitmapImage = imageProxy.toBitmap()!!
 
         val rotateMatrix = Matrix()
@@ -61,8 +66,11 @@ internal class FaceAnalyzer(
 //            val bitmapImage = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
 //            yuvToRgbConverter.yuvToRgb(image, bitmapImage)
 //        }
-        imageProxy.image?.close()
-        imageProxy.close()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(1000 - (System.currentTimeMillis() - currentTimestamp))
+            imageProxy.close()
+        }
     }
 
     fun Image.toBitmap(): Bitmap {
@@ -106,10 +114,10 @@ internal class FaceAnalyzer(
             )
             val faceBitmap = Bitmap.createBitmap(
                 bmp,
-                0,
-                0,
-                bboxOrig.width(),
-                bboxOrig.height()
+                max(bboxOrig.left, 0),
+                max(bboxOrig.top, 0),
+                min(bboxOrig.width(), bmp.width - max(bboxOrig.left, 0)),
+                min(bboxOrig.height(), bmp.height - max(bboxOrig.top, 0))
             )
             val resultBitmap = Bitmap.createScaledBitmap(
                 faceBitmap,
@@ -117,8 +125,9 @@ internal class FaceAnalyzer(
                 classifier.imageSizeY,
                 false
             )
-            val res = classifier.classifyFrame(resultBitmap)
+            val res = classifier.classifyFrame(resultBitmap) as EmotionData
             listener?.onEmotionDetected(res.toString())
+            listener?.onEmotionScoreDetected(res.emotionScores)
         }
     }
 
@@ -127,8 +136,11 @@ internal class FaceAnalyzer(
         /** Callback that receives face bounds that can be drawn on top of the viewfinder.  */
         fun onFacesDetected(proxyWidth: Int, proxyHeight: Int, face: Face)
 
-        /** Callback that receives face bounds that can be drawn on top of the viewfinder.  */
+        /** Callback that receives emotion string can be mapped to emojis.  */
         fun onEmotionDetected(emotion: String)
+
+        /** Callback that receives emotion scores that can be drawn on top of the viewfinder.  */
+        fun onEmotionScoreDetected(scores: FloatArray)
 
         /** Invoked when an error is encounter during face detection.  */
         fun onError(exception: Exception)

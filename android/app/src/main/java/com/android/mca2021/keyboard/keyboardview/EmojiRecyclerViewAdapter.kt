@@ -19,7 +19,6 @@ class EmojiRecyclerViewAdapter constructor(
 
     inner class Holder(itemView: View?) : RecyclerView.ViewHolder(itemView!!) {
         val textView = itemView?.findViewById<TextView>(R.id.emoji_text)
-
         fun bind(emoji: String, context: Context) {
             textView?.setText(emoji)
             val onClickListener = View.OnClickListener {
