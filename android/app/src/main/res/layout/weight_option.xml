@@ -179,20 +179,18 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/confirm_button"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:text="CONFIRM"
-        android:textSize="12dp" />
-
-    <FrameLayout
-        android:id="@+id/camera_frame"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="295dp"
+        android:layout_marginTop="50dp">
 
-    </FrameLayout>
+        <FrameLayout
+            android:id="@+id/camera_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </FrameLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

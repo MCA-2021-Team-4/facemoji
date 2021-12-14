@@ -30,6 +30,7 @@ class EmojiWeightSetActivity: AppCompatActivity() {
     private lateinit var seekBarSadness: SeekBar
     private lateinit var seekBarSurprise: SeekBar
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var sharedPreferencesEditor: SharedPreferences.Editor
     lateinit var weightSetCamera: WeightSetCamera
     private var mEmojiPlatform : EmojiPlatform = EmojiPlatform.GOOGLE
 
@@ -79,7 +80,7 @@ class EmojiWeightSetActivity: AppCompatActivity() {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.weight_option)
         sharedPreferences = baseContext.getSharedPreferences("setting", Context.MODE_PRIVATE)
-        val sharedPreferencesEditor = sharedPreferences.edit()
+        sharedPreferencesEditor = sharedPreferences.edit()
 
         setEmojiLayout()
         /*
@@ -94,14 +95,14 @@ class EmojiWeightSetActivity: AppCompatActivity() {
         seekBarConfig()
 
 
-        btnConfirm = findViewById(R.id.confirm_button)
-        btnConfirm.setOnClickListener {
-            emojiNames.forEachIndexed { idx, emoji ->
-                sharedPreferencesEditor.putInt(emoji, weightArray[idx])
-            }
-            sharedPreferencesEditor.apply()
-            finish()
-        }
+//        btnConfirm = findViewById(R.id.confirm_button)
+//        btnConfirm.setOnClickListener {
+//            emojiNames.forEachIndexed { idx, emoji ->
+//                sharedPreferencesEditor.putInt(emoji, weightArray[idx])
+//            }
+//            sharedPreferencesEditor.apply()
+//            finish()
+//        }
 
 
     }
@@ -169,6 +170,11 @@ class EmojiWeightSetActivity: AppCompatActivity() {
                     seekBarSadness -> weightArray[5] = p0.progress
                     seekBarSurprise -> weightArray[6] = p0.progress
                 }
+
+                emojiNames.forEachIndexed { idx, emoji ->
+                    sharedPreferencesEditor.putInt(emoji, weightArray[idx])
+                }
+                sharedPreferencesEditor.apply()
             }
         }
         seekBarAnger.setOnSeekBarChangeListener(listener)
