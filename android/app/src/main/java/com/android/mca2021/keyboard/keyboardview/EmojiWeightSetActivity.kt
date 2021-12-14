@@ -3,6 +3,7 @@ package com.android.mca2021.keyboard.keyboardview
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,6 +14,7 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.SeekBar
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.android.mca2021.keyboard.R
 
@@ -60,6 +62,7 @@ class EmojiWeightSetActivity: AppCompatActivity() {
         "surprise"
     )
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -107,6 +110,7 @@ class EmojiWeightSetActivity: AppCompatActivity() {
             }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun seekBarConfig() {
         seekBarAnger = findViewById(R.id.seekBar_anger)
         seekBarDisgust = findViewById(R.id.seekBar_disgust)

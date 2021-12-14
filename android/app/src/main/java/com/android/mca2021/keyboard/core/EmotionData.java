@@ -10,11 +10,9 @@ import java.io.Serializable;
  * Created by avsavchenko.
  */
 public class EmotionData implements ClassifierResult,Serializable {
-    public float[] emotionScores=null;
+    public float[] emotionScores;
     private static float[] weightArray = {1f, 1f, 1f, 1f, 1f, 1f, 1f};
-    public EmotionData(){
 
-    }
     public EmotionData(float[] emotionScores){
         this.emotionScores = new float[emotionScores.length];
         System.arraycopy(emotionScores, 0, this.emotionScores, 0, emotionScores.length);
