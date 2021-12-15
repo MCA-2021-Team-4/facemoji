@@ -184,6 +184,8 @@ class KeyboardCamera(
                 Log.e("facemoji", "Use case binding failed", exc)
             }
         }, ContextCompat.getMainExecutor(service))
+
+        faceAnalyzer.resumeAnalysis()
     }
 
     override fun getLayout(): View {

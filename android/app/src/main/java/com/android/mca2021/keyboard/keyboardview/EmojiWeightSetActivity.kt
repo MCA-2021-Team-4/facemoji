@@ -55,6 +55,7 @@ class EmojiWeightSetActivity: AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.weight_option)
         sharedPreferences = baseContext.getSharedPreferences("setting", Context.MODE_PRIVATE)

@@ -144,7 +144,6 @@
                 android:layout_height="60dp"
                 android:background="@drawable/preference_list_item"
                 android:gravity="start|center_vertical"
-                android:onClick="openKeyboardSetting"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/btn_emoji_platform">
