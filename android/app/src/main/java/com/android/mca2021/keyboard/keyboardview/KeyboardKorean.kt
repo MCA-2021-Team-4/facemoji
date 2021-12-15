@@ -12,6 +12,7 @@ import android.view.inputmethod.InputConnection
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import com.android.mca2021.keyboard.*
 import java.lang.NumberFormatException
 
@@ -128,27 +129,28 @@ class KeyboardKorean constructor(
             isCaps = false
             capsView?.setImageResource(R.drawable.ic_caps_unlock)
             for (button in buttons) {
-                when (button.text.toString()) {
+                val textView = button.findViewById<TextView>(R.id.key_text)
+                when (textView.text.toString()) {
                     "ㅃ" -> {
-                        button.text = "ㅂ"
+                        textView.text = "ㅂ"
                     }
                     "ㅉ" -> {
-                        button.text = "ㅈ"
+                        textView.text = "ㅈ"
                     }
                     "ㄸ" -> {
-                        button.text = "ㄷ"
+                        textView.text = "ㄷ"
                     }
                     "ㄲ" -> {
-                        button.text = "ㄱ"
+                        textView.text = "ㄱ"
                     }
                     "ㅆ" -> {
-                        button.text = "ㅅ"
+                        textView.text = "ㅅ"
                     }
                     "ㅒ" -> {
-                        button.text = "ㅐ"
+                        textView.text = "ㅐ"
                     }
                     "ㅖ" -> {
-                        button.text = "ㅔ"
+                        textView.text = "ㅔ"
                     }
                 }
             }
@@ -156,41 +158,43 @@ class KeyboardKorean constructor(
             isCaps = true
             capsView?.setImageResource(R.drawable.ic_caps_lock)
             for (button in buttons) {
-                when (button.text.toString()) {
+                val textView = button.findViewById<TextView>(R.id.key_text)
+                when (textView.text.toString()) {
                     "ㅂ" -> {
-                        button.text = "ㅃ"
+                        textView.text = "ㅃ"
                     }
                     "ㅈ" -> {
-                        button.text = "ㅉ"
+                        textView.text = "ㅉ"
                     }
                     "ㄷ" -> {
-                        button.text = "ㄸ"
+                        textView.text = "ㄸ"
                     }
                     "ㄱ" -> {
-                        button.text = "ㄲ"
+                        textView.text = "ㄲ"
                     }
                     "ㅅ" -> {
-                        button.text = "ㅆ"
+                        textView.text = "ㅆ"
                     }
                     "ㅐ" -> {
-                        button.text = "ㅒ"
+                        textView.text = "ㅒ"
                     }
                     "ㅔ" -> {
-                        button.text = "ㅖ"
+                        textView.text = "ㅖ"
                     }
                 }
             }
         }
     }
 
-    override fun handleTextButton(actionButton: Button) {
-        playClick(actionButton.text.toString().toCharArray().get(0).toInt())
+    override fun handleTextButton(actionButton: View) {
+        val textView = actionButton.findViewById<TextView>(R.id.key_text)
+        playClick(textView.text.toString().toCharArray().get(0).toInt())
         try {
-            Integer.parseInt(actionButton.text.toString())
+            Integer.parseInt(textView.text.toString())
             hangulMaker.directlyCommit()
-            inputConnection?.commitText(actionButton.text.toString(), 1)
+            inputConnection?.commitText(textView.text.toString(), 1)
         } catch (e: NumberFormatException) {
-            hangulMaker.commit(actionButton.text.toString().toCharArray().get(0))
+            hangulMaker.commit(textView.text.toString().toCharArray().get(0))
         }
         if (isCaps) {
             changeCaps()

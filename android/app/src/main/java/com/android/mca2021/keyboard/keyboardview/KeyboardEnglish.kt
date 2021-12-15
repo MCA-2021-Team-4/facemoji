@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.InputConnection
 import android.widget.LinearLayout
+import android.widget.TextView
 import com.android.mca2021.keyboard.*
 import java.util.*
 
@@ -106,10 +107,11 @@ class KeyboardEnglish constructor(
 
     override fun changeCaps() {
         isCaps = !isCaps
-        buttons.filter{ it.text != "CAM" }.forEach {
-            it.text =
-                if (isCaps) it.text.toString().lowercase(Locale.US)
-                else it.text.toString().uppercase(Locale.US)
+        buttons.filter{ it.findViewById<TextView>(R.id.key_text).text != "CAM" }.forEach {
+            val textView = it.findViewById<TextView>(R.id.key_text)
+            textView.text =
+                if (isCaps) textView.text.toString().lowercase(Locale.US)
+                else textView.text.toString().uppercase(Locale.US)
         }
     }
 }

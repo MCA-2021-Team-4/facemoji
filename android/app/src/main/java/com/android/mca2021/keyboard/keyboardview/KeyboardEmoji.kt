@@ -8,6 +8,7 @@ import android.view.inputmethod.InputConnection
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.view.forEachIndexed
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -55,7 +56,8 @@ class KeyboardEmoji constructor(
 
         val fourthLine: LinearLayout = emojiLayout.findViewById(R.id.fourth_line)
         fourthLine.forEachIndexed { item, child ->
-            val actionButton = child.findViewById<Button>(R.id.key_button)
+            val actionButton = child.findViewById<View>(R.id.key_button)
+            val textView = actionButton.findViewById<TextView>(R.id.key_text)
             val specialKey = child.findViewById<ImageView>(R.id.special_key)
             if (fourthLineText[item].equals("DEL")) {
                 val myOnClickListener = getDeleteAction()
@@ -67,9 +69,9 @@ class KeyboardEmoji constructor(
                 specialKey.setOnTouchListener(myOnTouchListener)
                 specialKey.setBackgroundResource(R.drawable.key_background)
             } else {
-                actionButton.text = fourthLineText[item]
+                textView.text = fourthLineText[item]
                 actionButton.setOnClickListener(View.OnClickListener {
-                    when ((it as Button).text) {
+                    when (it.findViewById<TextView>(R.id.key_text).text) {
                         "한/영" -> {
                             keyboardInteractionListener.changeMode(KeyboardInteractionManager.KeyboardType.ENGLISH)
                         }
