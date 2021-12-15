@@ -36,7 +36,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private lateinit var faceAnalyzer: FaceAnalyzer
 
     /* scales */
-    var mTotalScale = 1f
+    var mTotalScale = 0.8f
     var mCircleEmojiScale = 1f
     var mCircleRadiusScale = 1f
     var mSliceEmojiScale = 1f
@@ -60,6 +60,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private var mCenterX = 0F
     private var mCenterY = 0F
     private var mPressed = false
+    private var mIsTraversing = false
     private var mPressedButton = -1
     private var mPrevPressedButton = -1
     private val animDuration : Long= 200
@@ -195,7 +196,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
 
         /* center */
         mCenterX = w / 2f
-        mCenterY = (h * 0.8f)
+        mCenterY = (h * 0.85f)
 
         /* select shorter one from width & height as diameter */
         mOuterRadius = if (w>h) (h/2).toFloat() else (w/2).toFloat()
@@ -318,13 +319,18 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             MotionEvent.ACTION_DOWN -> {
                 if(!mPressed){
                     if(mPressedButton == 0){
+                        /* center circle */
                         mPressed = true
+                        mIsTraversing = true
                         if(this::faceAnalyzer.isInitialized)
                             faceAnalyzer.pauseAnalysis()
                         if(mCurrentEmojiId != -1)
                             updateSlices(mCurrentEmojiId)
                         spinAnim.start()
                         expandAnim_circle.start()
+                    }else if(mPressedButton == -1){
+                        /* background */
+                        mIsTraversing = false
                     }
                     invalidate()
                 }
@@ -384,11 +390,12 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                                 faceAnalyzer.resumeAnalysis()
                             if(mCurrentEmojiId != -1)
                                 inputConnection?.commitText(emojiIdtoString(mCurrentEmojiId), 1)
+                            mIsTraversing = false
                             circleSelectedAnim.start()
                             mPrevEmojiId = -1
                         }
                         expandAnim_reverseOthersTo0.start()
-                    } else{
+                    } else if(mPressedButton > 0){
                         /* box */
                         if(mPressedButton == 7 && mPrevEmojiId != -1){
                             mCurrentEmojiId = mPrevEmojiId
@@ -406,6 +413,12 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                     mPressedButton = -1
                     mPrevPressedButton = -1
                     mPressed = false
+                } else{
+                    if(!mPressed){
+                        mIsTraversing = false
+                    }
+                    if(this::faceAnalyzer.isInitialized)
+                        faceAnalyzer.resumeAnalysis()
                 }
                 circleRadius = mInnerRadius
                 invalidate()
@@ -456,6 +469,14 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     }
 
     override fun onDraw(canvas: Canvas) {
+        val mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        if(mIsTraversing){
+            mPaint.style = Paint.Style.FILL
+            mPaint.color = Color.BLACK
+            mPaint.alpha = 200
+            canvas.drawRect(0F, 0F, mWidth.toFloat(), mCenterY, mPaint)
+        }
+
         if(mPressed || !isAnimFinished()){
             for (i in 0 until mSliceNum)
                 if(!(mSlices[i].isPressed)){
@@ -467,18 +488,19 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                 }
         }
 
-        val mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        /* draw box */
         mPaint.style = Paint.Style.FILL
         mPaint.color = Color.BLACK
         canvas.drawRect(0F, mCenterY, mWidth.toFloat(), mHeight.toFloat(), mPaint)
 
         drawCircle(canvas)
 
-        /* new */
-        val prevEmojiSize = mInnerRadius/2.5f
-        val marginleft = mInnerRadius * 0.2f
-        if(mPrevEmojiId >= 0)
-            drawEmoji(canvas, mPrevEmojiId, prevEmojiSize + marginleft, mHeight - (mHeight - mCenterY)/2, prevEmojiSize, 100)
+        if(mPressed){
+            val prevEmojiSize = mInnerRadius/2.5f
+            val marginleft = mInnerRadius * 0.2f
+            if(mPrevEmojiId >= 0)
+                drawEmoji(canvas, mPrevEmojiId, prevEmojiSize + marginleft, mHeight - (mHeight - mCenterY)/2, prevEmojiSize, 100)
+        }
     }
 
     private fun resetSlices(){
@@ -546,6 +568,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
 
     private fun updateSlices(emojiId: Int){
         if(emojiId== -1){
+            mPrevEmojiId = -1
             initSlices()
         }
         else{
