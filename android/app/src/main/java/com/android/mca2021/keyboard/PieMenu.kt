@@ -334,20 +334,14 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                 if(mPressed){
                     if(mPrevPressedButton != mPressedButton){
                         resetSlices()
-                        if(sliceIndex >= 0 && mSlices[sliceIndex].mEmojiId != -1){
+                        if(sliceIndex in 0 until mSliceNum && mSlices[sliceIndex].mEmojiId != -1){
                             spreadAnim.start()
                             expandAnim.start()
                         }
                         mPrevPressedButton = mPressedButton
                     }
-                    if(sliceIndex >= 0 && mSlices[sliceIndex].mEmojiId != -1) {
+                    if( sliceIndex in 0 until mSliceNum && mSlices[sliceIndex].mEmojiId != -1) {
                         mSlices[sliceIndex].isPressed = true
-                    }else{
-                        /*
-
-                        if(this::faceAnalyzer.isInitialized)
-                            faceAnalyzer.resumeAnalysis()
-                         */
                     }
                 }
                 invalidate()
@@ -372,8 +366,8 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                         }
                     }
 
-                    if(mPressedButton >= 0){
-                        if(sliceIndex >= 0) {
+                    if(mPressedButton in 0..mSliceNum){
+                        if(sliceIndex in 0 until mSliceNum) {
                             /* selected slice */
                             if(mSlices[sliceIndex].mEmojiId != -1){
                                 mSlices[sliceIndex].isSelected = true
@@ -391,12 +385,23 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                             if(mCurrentEmojiId != -1)
                                 inputConnection?.commitText(emojiIdtoString(mCurrentEmojiId), 1)
                             circleSelectedAnim.start()
+                            mPrevEmojiId = -1
                         }
                         expandAnim_reverseOthersTo0.start()
                     } else{
-                        /* canceled */
-                        spinAnim_reverse.start()
-                        expandAnim_circleReverse.start()
+                        /* box */
+                        if(mPressedButton == 7){
+                            mCurrentEmojiId = mPrevEmojiId
+                            mPrevEmojiId = -1
+                            mEmojiUpdated = true
+                            expandAnim_emoji.start()
+                            expandAnim_reverseTo0.start()
+                            expandAnim_circleReverse.start()
+                            expandAnim_reverseOthersTo0.start()
+                        }else{
+                            spinAnim_reverse.start()
+                            expandAnim_circleReverse.start()
+                        }
                     }
                     mPressedButton = -1
                     mPrevPressedButton = -1
@@ -422,25 +427,30 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         if(distanceSquare < mInnerRadius * mInnerRadius){
             return 0
         }
+
+        //get the angle to detect which slice is currently being click
+        /* -PI ~ PI, starting from 3 o'clock */
+        var angle = atan2(dy.toDouble(), dx.toDouble())
+
+        /* shift to 0 ~ 2PI, starting from 9 o'clock */
+        angle = (angle + Math.PI)%(2 * Math.PI)
+
         /* slice buttons, index starting from 1 */
-        else if(distanceSquare < mOuterRadius * mOuterRadius){
-            //get the angle to detect which slice is currently being click
-            /* -PI ~ PI, starting from 3 o'clock */
-            var angle = atan2(dy.toDouble(), dx.toDouble())
-
-            /* shift to 0 ~ 2PI, starting from 9 o'clock */
-            angle = (angle + Math.PI)%(2 * Math.PI)
-
-            if(angle < Math.PI) {
+        if(angle < Math.PI ) {
+            if (distanceSquare < mOuterRadius * mOuterRadius) {
                 angle = Math.toDegrees(angle) + 180
-                for(i in 0 until mSliceNum){
+                for (i in 0 until mSliceNum) {
                     val mSlice = mSlices[i]
-                    val start = mSlice.centerDegree - (mSlice.degreeStep/2)
-                    val end = mSlice.centerDegree + (mSlice.degreeStep/2)
-                    if(angle in start..end)
-                        return i+1
+                    val start = mSlice.centerDegree - (mSlice.degreeStep / 2)
+                    val end = mSlice.centerDegree + (mSlice.degreeStep / 2)
+                    if (angle in start..end)
+                        return i + 1
                 }
             }
+        } else if(angle < Math.PI * 1.5f){
+            return 6
+        } else {
+            return 7
         }
         return -1
     }
@@ -463,6 +473,12 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         canvas.drawRect(0F, mCenterY, mWidth.toFloat(), mHeight.toFloat(), mPaint)
 
         drawCircle(canvas)
+
+        /* new */
+        val prevEmojiSize = mInnerRadius/2.5f
+        val marginleft = mInnerRadius * 0.2f
+        if(mPrevEmojiId >= 0)
+            drawEmoji(canvas, mPrevEmojiId, prevEmojiSize + marginleft, mHeight - (mHeight - mCenterY)/2, prevEmojiSize, 100)
     }
 
     private fun resetSlices(){
@@ -559,21 +575,26 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         mPaint.color = Color.WHITE
         canvas.drawCircle(mCenterX, mCenterY, mCircleRadiusScale * circleRadius, mPaint)
 
-        val id: Int = if(mCurrentEmojiId != -1)
-            context.resources.getIdentifier("zzz_${mPlatform.name.lowercase()}_${mCurrentEmojiId}", "drawable", context.packageName)
+        /* draw emoji */
+        val emojiSize = if(!mEmojiUpdated) mCircleEmojiScale * 1.2f * (mCircleRadiusScale * mCircleRadiusScale * circleRadius * circleRadius)/(mInnerRadius*2)
+        else circleEmojiSize
+        drawEmoji(canvas, mCurrentEmojiId, mCenterX, mCenterY, emojiSize)
+    }
+
+    private fun drawEmoji(canvas: Canvas, emojiId: Int, centerX: Float, centerY: Float, emojiSize: Float, alpha: Int = 255){
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        paint.alpha = alpha
+        val id: Int = if(emojiId != -1)
+            context.resources.getIdentifier("zzz_${mPlatform.name.lowercase()}_${emojiId}", "drawable", context.packageName)
         else
             context.resources.getIdentifier("zzz_${mPlatform.name.lowercase()}_no", "drawable", context.packageName)
         val bmp = BitmapFactory.decodeResource(context.resources, id)
         var mRectF =RectF()
-        if(!mEmojiUpdated){
-            circleEmojiSize = mCircleEmojiScale * 1.2f * (mCircleRadiusScale * mCircleRadiusScale * circleRadius * circleRadius)/(mInnerRadius*2)
-        }
-        mRectF.left = mCenterX - circleEmojiSize
-        mRectF.right = mCenterX + circleEmojiSize
-        mRectF.top = mCenterY - circleEmojiSize
-        mRectF.bottom = mCenterY + circleEmojiSize
-        canvas.drawBitmap(bmp, null, mRectF, null)
-
+        mRectF.left = centerX - emojiSize
+        mRectF.right = centerX + emojiSize
+        mRectF.top = centerY - emojiSize
+        mRectF.bottom = centerY + emojiSize
+        canvas.drawBitmap(bmp, null, mRectF, paint)
     }
 
 }
