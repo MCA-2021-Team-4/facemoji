@@ -93,7 +93,7 @@ def main():
                                 result_flat.append(top)
                                 emojis_list_empty[emotion_idx][level].remove(top)
                             else: continue
-                        elif sibling != 0 and top in stage:
+                        elif sibling != 0 and top in stage and top not in result[0]:
                             num -= 1
                             sibling -= 1
                             result[0].append(top)
@@ -105,7 +105,7 @@ def main():
                                 result[2].append(top)
                                 result_flat.append(top)
                             else: continue
-                        elif child != 0 and top in emotion[level + 1]:
+                        elif child != 0 and top in emotion[level + 1] and top not in result[2]:
                             num -= 1
                             child -= 1
                             result[2].append(top)
@@ -117,7 +117,7 @@ def main():
                                 result[1].append(top)
                                 result_flat.append(top)
                             else: continue
-                        elif parent != 0 and top in emotion[level - 1]:
+                        elif parent != 0 and top in emotion[level - 1] and top not in result[1]:
                             num -= 1
                             parent -= 1
                             result[1].append(top)
@@ -129,17 +129,17 @@ def main():
                             break
                     else:
                         for top_idx, top in enumerate(top_list):
-                            if sibling != 0 and top in stage:
+                            if sibling != 0 and top in stage and top not in result[0]:
                                 num -= 1
                                 sibling -= 1
                                 result[0].append(top)
                                 result_flat.append(top)
-                            elif child != 0 and top in emotion[level + 1]:
+                            elif child != 0 and top in emotion[level + 1] and top not in result[2]:
                                 num -= 1
                                 child -= 1
                                 result[2].append(top)
                                 result_flat.append(top)
-                            elif parent != 0 and top in emotion[level - 1]:
+                            elif parent != 0 and top in emotion[level - 1] and top not in result[1]:
                                 num -= 1
                                 parent -= 1
                                 result[1].append(top)
@@ -199,13 +199,14 @@ def main():
 
 is_connected = []
 connected_statistics = []
+longest_paths = []
 
 def check_connected():
     for emotion in emojis_list:
         num_true = 0
         num_false = 0
         emojis_flat = []
-        paths = set([])
+        longest = -1
         for emojis in emotion:
             for i in emojis:
                 emojis_flat.append(i)
@@ -214,19 +215,20 @@ def check_connected():
         for s, e in perms:
             visited = [False for i in range(95)]
             q = deque([])
-            q.append(s)
+            q.append((s, 1))
             visited[s] = True
             found = False
             while q:
-                node = q.popleft()
+                node, d = q.popleft()
                 for adj in result_graph_flat[node]:
                     if adj == e:
                         found = True
                         num_true += 1
+                        longest = max(longest, d)
                         break
                     if not visited[adj]:
                         visited[adj] = True
-                        q.append(adj)
+                        q.append((adj, d+1))
                 else: continue
                 break
             if not found:
@@ -234,8 +236,10 @@ def check_connected():
                 num_false += 1
         is_connected.append(connected)
         connected_statistics.append((num_true, num_false))
+        longest_paths.append(longest)
     print(is_connected)
     print(connected_statistics)
+    print(longest_paths)
 
 if __name__ == "__main__":
     main()
