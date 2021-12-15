@@ -17,6 +17,7 @@ import android.animation.Animator
 
 import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
+import android.graphics.drawable.Drawable
 import android.os.SystemClock
 import android.util.Log
 import android.view.KeyEvent
@@ -57,6 +58,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private val innerRadiusRatio = 0.3f
     private var circleRadius = 0f
     private var circleEmojiSize = 0f
+    private var barSymbolSize = 0f
     private val degreeStep :Float = 180f/mSliceNum
     private var currentStartingDegree = 0f
 
@@ -143,6 +145,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private lateinit var expandAnim_circleBig: ValueAnimator
     private lateinit var expandAnim_circleBigReverse: ValueAnimator
     private lateinit var expandAnim_emoji: ValueAnimator
+    private lateinit var expandAnim_barSymbol: ValueAnimator
     private lateinit var circleSelectedAnim : AnimatorSet
 
     private var spreadAnim = ValueAnimator.ofFloat(degreeStep, degreeStep * 1.2f).apply{
@@ -197,9 +200,8 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             expandAnim_circleReverse,
             expandAnim_circleBig,
             expandAnim_circleBigReverse,
-            expandAnim_emoji,
+            //expandAnim_emoji,
             spreadAnim,
-            alphaAnim_toLower
         )
         var finished = true
         for(anim in anims){
@@ -224,6 +226,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         mOuterRadius = if (w>h) (h/2).toFloat() else (w/2).toFloat()
         mOuterRadius = mOuterRadius * mTotalScale
         mInnerRadius = mOuterRadius * innerRadiusRatio
+        barSymbolSize = mInnerRadius * 0.3f
         circleRadius = mInnerRadius
         circleEmojiSize = circleRadius * 1.2f
 
@@ -329,6 +332,22 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             })
         }
 
+        /*
+        expandAnim_barSymbol = ValueAnimator.ofFloat(mInnerRadius * 0.3f, mInnerRadius * 0.5f).apply {
+            duration = (animDuration*1.5).toLong();
+            interpolator = OvershootInterpolator()
+            addUpdateListener { updatedAnim ->
+                circleEmojiSize = updatedAnim.animatedValue as Float
+                invalidate()
+            }
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    mEmojiUpdated = false
+                }
+            })
+        }
+         */
+
         initSlices()
     }
 
@@ -359,6 +378,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                     }else if (mPressedButton < 6){
                         /* background */
                         if(mIsTraversing){
+                            resetSlices()
                             alphaAnim_toLower.start()
                             mIsTraversing = false
                             mCurrentEmojiId = -1
@@ -510,6 +530,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
 
     @SuppressLint("DrawAllocation", "UseCompatLoadingForDrawables")
     override fun onDraw(canvas: Canvas) {
+        /* bg */
         val mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         if(mIsTraversing || alphaAnim_toLower.isStarted){
             mPaint.style = Paint.Style.FILL
@@ -518,6 +539,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             canvas.drawRect(0F, 0F, mWidth.toFloat(), mHeight.toFloat(), mPaint)
         }
 
+        /* slices */
         if(mPressed || !isAnimFinished()){
             for (i in 0 until mSliceNum)
                 if(!(mSlices[i].isPressed)){
@@ -529,43 +551,54 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                 }
         }
 
-        /* draw box */
+        /* box */
         mPaint.style = Paint.Style.FILL
         mPaint.color = Color.BLACK
         mPaint.alpha = 100
         canvas.drawRect(0F, mCenterY, mWidth.toFloat(), mHeight.toFloat(), mPaint)
 
+        /* circle */
         drawCircle(canvas)
 
         /* previous emoji */
         if(mPressed){
             val prevEmojiSize = mInnerRadius/2.5f
-            val marginleft = mInnerRadius * 0.2f
+            val margin = mInnerRadius * 0.4f
             if(mPrevEmojiId >= 0)
-                drawEmoji(canvas, mPrevEmojiId, prevEmojiSize + marginleft, mHeight - (mHeight - mCenterY)/2, prevEmojiSize, 100)
+                drawEmoji(canvas, mPrevEmojiId, mCenterX - mInnerRadius - prevEmojiSize - margin, mHeight - (mHeight - mCenterY)/2, prevEmojiSize, 100)
         }
 
+        /* cancel */
+        if(mPressed){
+            val cancelmargin: Float = mInnerRadius/2.5f + mInnerRadius*0.5f
+            drawDrawable(canvas,
+                context.getDrawable(R.drawable.cancel)!!, mCenterX + mInnerRadius + cancelmargin, mHeight - (mHeight - mCenterY)/2, mInnerRadius * 0.3f, 100)
+        }
+
+
         /* backspace */
-        val drawable = context.getDrawable(R.drawable.backspace)
+        val bsmargin: Float = mInnerRadius * 0.2f
+        drawDrawable(canvas,
+            context.getDrawable(R.drawable.backspace)!!, mWidth - mInnerRadius/2.5f - bsmargin, mHeight - (mHeight - mCenterY)/2, mInnerRadius * 0.3f)
+
+    }
+
+    private fun drawDrawable(canvas: Canvas, drawable: Drawable, centerX: Float, centerY: Float, size: Float, alpha: Int = 255){
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        paint.alpha = alpha
         val cv = Canvas()
         val bmp =
-            drawable?.let { Bitmap.createBitmap(it.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888) }
+            drawable.let { Bitmap.createBitmap(it.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888) }
         cv.setBitmap(bmp)
-        if (drawable != null) {
-            drawable.setBounds(0,0,drawable.intrinsicWidth,drawable.intrinsicHeight)
-            drawable.draw(cv)
-        }
-        val marginRight = mInnerRadius * 0.2f
-        val bsX = mWidth - mInnerRadius/2.5f - marginRight
-        val bsY = mHeight - (mHeight - mCenterY)/2
-        val bsSize = mInnerRadius * 0.3f
+        drawable.setBounds(0,0,drawable.intrinsicWidth,drawable.intrinsicHeight)
+        drawable.draw(cv)
         var mRectF = RectF()
-        mRectF.left = bsX - bsSize
-        mRectF.right = bsX + bsSize
-        mRectF.top = bsY - bsSize
-        mRectF.bottom = bsY + bsSize
+        mRectF.left = centerX - size
+        mRectF.right = centerX + size
+        mRectF.top = centerY - size
+        mRectF.bottom = centerY + size
         if (bmp != null) {
-            canvas.drawBitmap(bmp, null, mRectF, null)
+            canvas.drawBitmap(bmp, null, mRectF, paint)
         }
 
     }

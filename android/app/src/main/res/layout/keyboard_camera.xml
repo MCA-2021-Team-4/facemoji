@@ -25,14 +25,15 @@
 
     <Button
         android:id="@+id/change_camera_input_mode"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_marginStart="10dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/key_background"
         android:text="A"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginLeft="10dp"
+        app:layout_goneMarginBottom="8dp"
         app:layout_constraintStart_toStartOf="@+id/view_finder" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
