@@ -390,7 +390,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                         expandAnim_reverseOthersTo0.start()
                     } else{
                         /* box */
-                        if(mPressedButton == 7){
+                        if(mPressedButton == 7 && mPrevEmojiId != -1){
                             mCurrentEmojiId = mPrevEmojiId
                             mPrevEmojiId = -1
                             mEmojiUpdated = true
