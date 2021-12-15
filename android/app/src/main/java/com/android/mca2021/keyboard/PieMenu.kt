@@ -68,8 +68,8 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private var mPrevPressedButton = -1
     private val animDuration : Long= 200
 
-    private var bgAlpha = 200
-    private var bgAlphaDefault = 200
+    private var bgAlphaDefault = 150
+    private var bgAlpha = bgAlphaDefault
 
 
     class mSlice(val context: Context, var degreeStep: Float, var centerDegree: Float, var radius: Float, var emojiScale: Float, private val centerX: Float, private val centerY: Float, val platform: String){
@@ -96,8 +96,8 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
 
                 /* draw slice body */
                 mPaint.style = Paint.Style.FILL
-                mPaint.color = if(isPressed || isSelected) Color.WHITE else Color.DKGRAY
-                mPaint.alpha = 100
+                mPaint.color = if(isPressed || isSelected) Color.WHITE else Color.GRAY
+                mPaint.alpha = 150
                 canvas.drawArc(mRectF, centerDegree - degreeStep/2, degreeStep, true, mPaint)
 
 
@@ -443,17 +443,15 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                             mPrevEmojiId = -1
                         }
                         expandAnim_reverseOthersTo0.start()
-                    } else if(mPressedButton > 0){
-                        /* box */
-                        if(mPressedButton == 7 && mPrevEmojiId != -1){
-                            mCurrentEmojiId = mPrevEmojiId
-                            mPrevEmojiId = -1
-                            mEmojiUpdated = true
-                            expandAnim_emoji.start()
-                            expandAnim_reverseTo0.start()
-                            expandAnim_circleReverse.start()
-                            expandAnim_reverseOthersTo0.start()
-                        }
+                    } else if(mPressedButton ==7 && mPrevEmojiId != -1){
+                        /* left box */
+                        mCurrentEmojiId = mPrevEmojiId
+                        mPrevEmojiId = -1
+                        mEmojiUpdated = true
+                        expandAnim_emoji.start()
+                        expandAnim_reverseTo0.start()
+                        expandAnim_circleReverse.start()
+                        expandAnim_reverseOthersTo0.start()
                     } else{
                         spinAnim_reverse.start()
                         expandAnim_circleReverse.start()
@@ -517,7 +515,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             mPaint.style = Paint.Style.FILL
             mPaint.color = Color.BLACK
             mPaint.alpha = bgAlpha
-            canvas.drawRect(0F, 0F, mWidth.toFloat(), mCenterY, mPaint)
+            canvas.drawRect(0F, 0F, mWidth.toFloat(), mHeight.toFloat(), mPaint)
         }
 
         if(mPressed || !isAnimFinished()){
@@ -534,6 +532,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         /* draw box */
         mPaint.style = Paint.Style.FILL
         mPaint.color = Color.BLACK
+        mPaint.alpha = 100
         canvas.drawRect(0F, mCenterY, mWidth.toFloat(), mHeight.toFloat(), mPaint)
 
         drawCircle(canvas)
@@ -556,7 +555,6 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             drawable.setBounds(0,0,drawable.intrinsicWidth,drawable.intrinsicHeight)
             drawable.draw(cv)
         }
-
         val marginRight = mInnerRadius * 0.2f
         val bsX = mWidth - mInnerRadius/2.5f - marginRight
         val bsY = mHeight - (mHeight - mCenterY)/2
