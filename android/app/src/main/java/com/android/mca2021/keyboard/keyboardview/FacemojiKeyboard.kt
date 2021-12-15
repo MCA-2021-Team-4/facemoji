@@ -221,7 +221,7 @@ abstract class FacemojiKeyboard {
         val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
         when (i) {
             32 -> am!!.playSoundEffect(AudioManager.FX_KEYPRESS_SPACEBAR)
-            else -> am!!.playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD, -1.toFloat())
+            else -> am!!.playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD)
         }
     }
 
