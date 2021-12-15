@@ -16,7 +16,10 @@ import kotlin.math.sin
 import android.animation.Animator
 
 import android.animation.AnimatorListenerAdapter
+import android.annotation.SuppressLint
+import android.os.SystemClock
 import android.util.Log
+import android.view.KeyEvent
 import android.view.inputmethod.InputConnection
 import android.widget.Toast
 import com.android.mca2021.keyboard.core.FaceAnalyzer
@@ -329,6 +332,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         initSlices()
     }
 
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val currX = event.x
         val currY = event.y
@@ -336,6 +340,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         val sliceIndex = mPressedButton -1
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
+                Log.d("asdf", "mpressed : ${mPressedButton}")
                 if(!mPressed){
                     if(mPressedButton == 0){
                         /* center circle */
@@ -351,7 +356,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                         } else{
                             Toast.makeText(context, R.string.no_face, Toast.LENGTH_SHORT).show()
                         }
-                    }else{
+                    }else if (mPressedButton < 6){
                         /* background */
                         if(mIsTraversing){
                             alphaAnim_toLower.start()
@@ -361,6 +366,18 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                             if(this::faceAnalyzer.isInitialized)
                                 faceAnalyzer.resumeAnalysis()
                         }
+                    }else if (mPressedButton == 6){
+                        Log.d("asdf", "right box")
+                        /* right box */
+                        val eventTime = SystemClock.uptimeMillis()
+                        inputConnection?.finishComposingText()
+                        inputConnection?.sendKeyEvent(
+                            KeyEvent(
+                                eventTime, eventTime,
+                                KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
+                                KeyEvent.FLAG_SOFT_KEYBOARD
+                            )
+                        )
                     }
                 }
                 invalidate()
@@ -493,6 +510,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         return -1
     }
 
+    @SuppressLint("DrawAllocation", "UseCompatLoadingForDrawables")
     override fun onDraw(canvas: Canvas) {
         val mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         if(mIsTraversing || alphaAnim_toLower.isStarted){
@@ -520,12 +538,38 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
 
         drawCircle(canvas)
 
+        /* previous emoji */
         if(mPressed){
             val prevEmojiSize = mInnerRadius/2.5f
             val marginleft = mInnerRadius * 0.2f
             if(mPrevEmojiId >= 0)
                 drawEmoji(canvas, mPrevEmojiId, prevEmojiSize + marginleft, mHeight - (mHeight - mCenterY)/2, prevEmojiSize, 100)
         }
+
+        /* backspace */
+        val drawable = context.getDrawable(R.drawable.backspace)
+        val cv = Canvas()
+        val bmp =
+            drawable?.let { Bitmap.createBitmap(it.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888) }
+        cv.setBitmap(bmp)
+        if (drawable != null) {
+            drawable.setBounds(0,0,drawable.intrinsicWidth,drawable.intrinsicHeight)
+            drawable.draw(cv)
+        }
+
+        val marginRight = mInnerRadius * 0.2f
+        val bsX = mWidth - mInnerRadius/2.5f - marginRight
+        val bsY = mHeight - (mHeight - mCenterY)/2
+        val bsSize = mInnerRadius * 0.3f
+        var mRectF = RectF()
+        mRectF.left = bsX - bsSize
+        mRectF.right = bsX + bsSize
+        mRectF.top = bsY - bsSize
+        mRectF.bottom = bsY + bsSize
+        if (bmp != null) {
+            canvas.drawBitmap(bmp, null, mRectF, null)
+        }
+
     }
 
     private fun resetSlices(){
@@ -609,7 +653,6 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     }
 
     internal fun updateCircle(emojiId: Int, faceAnalyzer: FaceAnalyzer){
-        Log.d("asdf", "updateCircle, ${emojiId}")
         this.faceAnalyzer = faceAnalyzer
         mCurrentEmojiId = emojiId
         updateSlices(mCurrentEmojiId)
