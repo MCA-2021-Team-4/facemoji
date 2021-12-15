@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:gravity="center"
     android:layout_gravity="center"
@@ -15,9 +15,7 @@
             android:textColor="@color/black"
             android:layout_marginBottom="10dp"
             android:text="@string/reset"
-            android:textSize="10sp"/>
-
-
+            android:textSize="12sp"/>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -33,6 +31,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            tools:ignore="ContentDescription"
             />
 
         <SeekBar
@@ -60,6 +59,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            tools:ignore="ContentDescription"
             />
 
         <SeekBar
@@ -87,6 +87,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            tools:ignore="ContentDescription"
             />
 
         <SeekBar
@@ -114,6 +115,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            tools:ignore="ContentDescription"
             />
 
         <SeekBar
@@ -141,6 +143,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            tools:ignore="ContentDescription"
             />
 
         <SeekBar
@@ -168,6 +171,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            tools:ignore="ContentDescription"
             />
 
         <SeekBar
@@ -195,6 +199,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            tools:ignore="ContentDescription"
             />
 
         <SeekBar
