@@ -20,7 +20,7 @@ class KeyboardKorean constructor(
     override val context: Context,
     private val layoutInflater: LayoutInflater,
     override val keyboardInteractionListener: KeyboardInteractionManager
-): FacemojiKeyboard() {
+) : FacemojiKeyboard() {
     private lateinit var koreanLayout: LinearLayout
 
     override var inputConnection: InputConnection? = null
@@ -81,27 +81,16 @@ class KeyboardKorean constructor(
             R.id.fourth_line
         )
 
-        if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            firstLine.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                (height * 0.7).toInt()
-            )
-            secondLine.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                (height * 0.7).toInt()
-            )
-            thirdLine.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                (height * 0.7).toInt()
-            )
-        } else {
-            firstLine.layoutParams =
-                LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
-            secondLine.layoutParams =
-                LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
-            thirdLine.layoutParams =
-                LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
-        }
+        numPadLine.layoutParams =
+            LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
+        firstLine.layoutParams =
+            LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
+        secondLine.layoutParams =
+            LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
+        thirdLine.layoutParams =
+            LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
+        fourthLine.layoutParams =
+            LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
 
         layoutLines = listOf(
             numPadLine,
@@ -200,7 +189,6 @@ class KeyboardKorean constructor(
             changeCaps()
         }
     }
-
 
 
     override fun getSpaceAction(): View.OnClickListener {

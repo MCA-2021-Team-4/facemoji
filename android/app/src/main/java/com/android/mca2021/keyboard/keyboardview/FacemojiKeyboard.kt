@@ -180,7 +180,7 @@ abstract class FacemojiKeyboard {
                 val specialKey = children[item].findViewById<ImageView>(R.id.special_key)
                 val resourceId = when (myText[item]) {
                     "SPACE" -> R.drawable.ic_space_bar
-                    "DEL" -> R.drawable.del
+                    "DEL" -> R.drawable.backspace_dark
                     "CAPS" -> R.drawable.ic_caps_unlock
                     "ENTER" -> R.drawable.ic_enter
                     "CAM" -> R.drawable.cam
