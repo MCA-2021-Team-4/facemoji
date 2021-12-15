@@ -18,6 +18,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.util.Log
 import android.view.inputmethod.InputConnection
+import android.widget.Toast
 import com.android.mca2021.keyboard.core.FaceAnalyzer
 import com.seonjunkim.radialmenu.EmojiGraph
 
@@ -56,7 +57,6 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private val degreeStep :Float = 180f/mSliceNum
     private var currentStartingDegree = 0f
 
-
     private var mCenterX = 0F
     private var mCenterY = 0F
     private var mPressed = false
@@ -64,6 +64,9 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
     private var mPressedButton = -1
     private var mPrevPressedButton = -1
     private val animDuration : Long= 200
+
+    private var bgAlpha = 200
+    private var bgAlphaDefault = 200
 
 
     class mSlice(val context: Context, var degreeStep: Float, var centerDegree: Float, var radius: Float, var emojiScale: Float, private val centerX: Float, private val centerY: Float, val platform: String){
@@ -114,8 +117,6 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         }
     }
 
-    private lateinit var spinAnim_reverse: ValueAnimator
-
     private val spinAnim = ValueAnimator.ofFloat(30f, 180f).apply {
         duration = (animDuration * 2)
         interpolator = OvershootInterpolator(1.5f)
@@ -128,7 +129,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             invalidate()
         }
     }
-
+    private lateinit var spinAnim_reverse: ValueAnimator
 
     private lateinit var expandAnim: ValueAnimator
     private lateinit var expandAnim_reverse: ValueAnimator
@@ -164,12 +165,27 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
         }
     }
 
+    private val alphaAnim_toLower = ValueAnimator.ofInt(bgAlphaDefault, 0).apply {
+        duration = animDuration
+        addUpdateListener { updatedAnim ->
+            val value = updatedAnim.animatedValue
+            bgAlpha = value as Int
+            invalidate()
+        }
+        addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                mEmojiUpdated = false
+            }
+        })
+    }
+
     constructor(context: Context?) : this(context, null)
     constructor(context: Context?, attrs: AttributeSet?) : this(context, attrs, 0)
 
     private fun isAnimFinished(): Boolean{
         val anims = listOf<ValueAnimator>(
             spinAnim,
+            /* spinAnim_reverse -> below */
             expandAnim,
             expandAnim_reverse,
             expandAnim_reverseTo0,
@@ -177,7 +193,10 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
             expandAnim_circle,
             expandAnim_circleReverse,
             expandAnim_circleBig,
-            spreadAnim
+            expandAnim_circleBigReverse,
+            expandAnim_emoji,
+            spreadAnim,
+            alphaAnim_toLower
         )
         var finished = true
         for(anim in anims){
@@ -320,20 +339,31 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                 if(!mPressed){
                     if(mPressedButton == 0){
                         /* center circle */
-                        mPressed = true
-                        mIsTraversing = true
-                        if(this::faceAnalyzer.isInitialized)
-                            faceAnalyzer.pauseAnalysis()
-                        if(mCurrentEmojiId != -1)
+                        if(mCurrentEmojiId != -1){
+                            mPressed = true
+                            mIsTraversing = true
+                            bgAlpha = bgAlphaDefault
+                            if(this::faceAnalyzer.isInitialized)
+                                faceAnalyzer.pauseAnalysis()
                             updateSlices(mCurrentEmojiId)
-                        spinAnim.start()
-                        expandAnim_circle.start()
-                    }else if(mPressedButton == -1){
+                            spinAnim.start()
+                            expandAnim_circle.start()
+                        } else{
+                            Toast.makeText(context, R.string.no_face, Toast.LENGTH_SHORT).show()
+                        }
+                    }else{
                         /* background */
-                        mIsTraversing = false
+                        if(mIsTraversing){
+                            alphaAnim_toLower.start()
+                            mIsTraversing = false
+                            mCurrentEmojiId = -1
+                            mPrevEmojiId = -1
+                            if(this::faceAnalyzer.isInitialized)
+                                faceAnalyzer.resumeAnalysis()
+                        }
                     }
-                    invalidate()
                 }
+                invalidate()
             }
 
             MotionEvent.ACTION_MOVE -> {
@@ -390,6 +420,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                                 faceAnalyzer.resumeAnalysis()
                             if(mCurrentEmojiId != -1)
                                 inputConnection?.commitText(emojiIdtoString(mCurrentEmojiId), 1)
+                            alphaAnim_toLower.start()
                             mIsTraversing = false
                             circleSelectedAnim.start()
                             mPrevEmojiId = -1
@@ -405,20 +436,14 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                             expandAnim_reverseTo0.start()
                             expandAnim_circleReverse.start()
                             expandAnim_reverseOthersTo0.start()
-                        }else{
-                            spinAnim_reverse.start()
-                            expandAnim_circleReverse.start()
                         }
+                    } else{
+                        spinAnim_reverse.start()
+                        expandAnim_circleReverse.start()
                     }
                     mPressedButton = -1
                     mPrevPressedButton = -1
                     mPressed = false
-                } else{
-                    if(!mPressed){
-                        mIsTraversing = false
-                    }
-                    if(this::faceAnalyzer.isInitialized)
-                        faceAnalyzer.resumeAnalysis()
                 }
                 circleRadius = mInnerRadius
                 invalidate()
@@ -470,10 +495,10 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
 
     override fun onDraw(canvas: Canvas) {
         val mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        if(mIsTraversing){
+        if(mIsTraversing || alphaAnim_toLower.isStarted){
             mPaint.style = Paint.Style.FILL
             mPaint.color = Color.BLACK
-            mPaint.alpha = 200
+            mPaint.alpha = bgAlpha
             canvas.drawRect(0F, 0F, mWidth.toFloat(), mCenterY, mPaint)
         }
 
