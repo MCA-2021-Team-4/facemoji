@@ -13,7 +13,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"
         android:backgroundTint="@color/teal_200"
         android:text="@string/reset"
         android:textColor="@color/black"
@@ -25,9 +24,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/section_anger"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginHorizontal="20dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/button_reset">
@@ -59,8 +58,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/section_disgust"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="20dp"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/section_anger">
@@ -92,8 +91,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/section_fear"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="20dp"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/section_disgust">
@@ -125,8 +124,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/section_happiness"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="20dp"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/section_fear">
@@ -158,8 +157,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/section_neutral"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="20dp"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/section_happiness">
@@ -191,8 +190,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/section_sadness"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="20dp"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/section_neutral">
@@ -224,8 +223,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/section_surprise"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="20dp"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/section_sadness">
@@ -258,7 +257,8 @@
         android:id="@+id/camera_frame"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginVertical="20dp"
+        android:layout_marginHorizontal="50dp"
         app:layout_constraintTop_toBottomOf="@id/section_surprise"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
