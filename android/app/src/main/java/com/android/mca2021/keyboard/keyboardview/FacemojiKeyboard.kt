@@ -28,7 +28,7 @@ abstract class FacemojiKeyboard {
     open val myLongClickKeysText: List<List<String>> = listOf()
     open var layoutLines: List<LinearLayout> = listOf()
 
-    var buttons: MutableList<Button> = mutableListOf()
+    var buttons: MutableList<View> = mutableListOf()
     var isCaps: Boolean = false
     var sound = 0
     var vibrate = 0
@@ -99,11 +99,12 @@ abstract class FacemojiKeyboard {
         }
     }
 
-    fun getMyClickListener(actionButton: Button): View.OnClickListener {
+    fun getMyClickListener(actionButton: View): View.OnClickListener {
         val clickListener = (View.OnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 inputConnection?.requestCursorUpdates(InputConnection.CURSOR_UPDATE_IMMEDIATE)
             }
+            val textView = actionButton.findViewById<TextView>(R.id.key_text)
             playVibrate()
             val cursorcs: CharSequence? =
                 inputConnection?.getSelectedText(InputConnection.GET_TEXT_WITH_STYLES)
@@ -126,13 +127,13 @@ abstract class FacemojiKeyboard {
                     )
                 )
                 playClick(
-                    actionButton.text.toString().toCharArray().get(
+                    textView.text.toString().toCharArray().get(
                         0
                     ).toInt()
                 )
-                inputConnection?.commitText(actionButton.text, 1)
+                inputConnection?.commitText(textView.text, 1)
             } else {
-                when (actionButton.text.toString()) {
+                when (textView.text.toString()) {
                     "\uD83D\uDE00" -> {
                         keyboardInteractionListener.changeMode(KeyboardInteractionManager.KeyboardType.EMOJI)
                     }
@@ -159,13 +160,14 @@ abstract class FacemojiKeyboard {
         keyboardInteractionListener.changeMode(KeyboardInteractionManager.KeyboardType.KOREAN)
     }
 
-    open fun handleTextButton(actionButton: Button) {
+    open fun handleTextButton(actionButton: View) {
+        val textView = actionButton.findViewById<TextView>(R.id.key_text)
         playClick(
-            actionButton.text.toString().toCharArray().get(
+            textView.text.toString().toCharArray().get(
                 0
             ).code
         )
-        inputConnection?.commitText(actionButton.text, 1)
+        inputConnection?.commitText(textView.text, 1)
     }
 
     open fun setLayoutComponents() {
@@ -173,7 +175,8 @@ abstract class FacemojiKeyboard {
             val children = layoutLines[line].children.toList()
             val myText = myKeysText[line]
             for (item in children.indices) {
-                val actionButton = children[item].findViewById<Button>(R.id.key_button)
+                val actionButton = children[item].findViewById<View>(R.id.key_button)
+                val textView = actionButton.findViewById<TextView>(R.id.key_text)
                 val specialKey = children[item].findViewById<ImageView>(R.id.special_key)
                 val resourceId = when (myText[item]) {
                     "SPACE" -> R.drawable.ic_space_bar
@@ -190,7 +193,7 @@ abstract class FacemojiKeyboard {
                     "ENTER" -> getEnterAction()
                     "CAM" -> getCamAction()
                     else -> {
-                        actionButton.text = myText[item]
+                        textView.text = myText[item]
                         buttons.add(actionButton)
                         getMyClickListener(actionButton)
                     }
