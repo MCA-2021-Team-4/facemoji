@@ -15,4 +15,5 @@
     <string name="test_here">Test Here!</string>
     <string name="reset">Reset</string>
     <string name="no_face">Show me your face!</string>
+    <string name="settings">Settings</string>
 </resources>

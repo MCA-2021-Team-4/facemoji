@@ -32,7 +32,6 @@
                 android:id="@+id/btn_enable_keyboard"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
-                android:layout_marginTop="20dp"
                 android:background="@drawable/preference_list_item"
                 android:gravity="start|center_vertical"
                 android:onClick="enableKeyboard"
@@ -61,7 +60,8 @@
                 android:onClick="openKeyboardSetting"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btn_enable_keyboard">
+                app:layout_constraintTop_toBottomOf="@id/btn_enable_keyboard"
+                >
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -81,11 +81,24 @@
                 android:background="@color/itemPressed"
                 app:layout_constraintTop_toBottomOf="@id/btn_select_keyboard" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_marginStart="4dp"
+                android:text="@string/settings"
+                android:textSize="22sp"
+                app:layout_constraintBottom_toBottomOf="@+id/btn_vibration"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/btn_select_keyboard"
+                app:layout_constraintVertical_bias="0.6"
+                />
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/btn_vibration"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="60dp"
                 android:background="@drawable/preference_list_item"
                 android:gravity="start|center_vertical"
                 android:onClick="openKeyboardSetting"
@@ -174,7 +187,7 @@
     <View
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/white"
+        android:background="@color/gray"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -185,7 +198,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="8dp"
         android:autofillHints="hi"
         android:ems="10"
         android:hint="@string/test_here"
