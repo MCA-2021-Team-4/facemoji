@@ -408,7 +408,7 @@ class PieMenu(context: Context?, attrs: AttributeSet?, defStyle: Int) :
                     if(mPrevPressedButton != mPressedButton){
                         resetSlices()
                         if(sliceIndex in 0 until mSliceNum && mSlices[sliceIndex].mEmojiId != -1){
-                            spreadAnim.start()
+                            //spreadAnim.start()
                             expandAnim.start()
                         }
                         mPrevPressedButton = mPressedButton
